@@ -1,0 +1,59 @@
+package com.app.dixon.facorites.core.ex
+
+import java.net.URL
+
+/**
+ * 全路径：com.app.dixon.facorites.core.ex
+ * 类描述：通用扩展方法
+ * 创建人：xuzheng
+ * 创建时间：3/29/22 5:30 PM
+ */
+// String -> String_Url
+fun String?.try2URL(): String = if (!isNullOrEmpty()) {
+    when {
+        startsWith("http") -> this
+        // 尝试拼接成一个URL
+        else -> "https://$this" // 尝试拼接成一个URL
+    }
+} else ""
+
+// String -> String_Host
+// Host正常不带Http，这里返回的带
+fun String?.try2Host(): String = if (!isNullOrEmpty()) {
+    when {
+        startsWith("http") -> {
+            try {
+                val host = URL(this).host
+                var res = ""
+                if (host.isNotEmpty()) {
+                    res = this.substring(0, this.indexOf(host) + host.length)
+                }
+                res
+            } catch (e: Exception) {
+                ""
+            }
+        }
+        // 尝试拼接成一个URL
+        else -> {
+            try {
+                val host = URL("https://$this").host
+                var res = ""
+                if (host.isNotEmpty()) {
+                    res = this.substring(0, this.indexOf(host) + host.length)
+                }
+                res
+            } catch (e: Exception) {
+                ""
+            }
+        }
+    }
+} else ""
+
+// 尝试转为图标链接
+fun String?.try2IconLink(): String {
+    val host = this.try2Host()
+    if (host.isNotEmpty()) {
+        return "$host/favicon.ico"
+    }
+    return ""
+}

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_shape_round_rect_white"
+    android:orientation="vertical">
+
+    <com.app.dixon.facorites.core.view.ExpendEditText
+        android:id="@+id/etEntryInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="@drawable/app_shape_create_entry_input"
+        android:hint="链接"
+        android:paddingStart="12dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="10dp"
+        android:singleLine="true"
+        android:textColor="#404040"
+        android:textColorHint="#909090"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/etEntryTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/app_shape_create_entry_input"
+        android:hint="添加"
+        android:paddingStart="12dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="10dp"
+        android:singleLine="true"
+        android:textColor="#404040"
+        android:textColorHint="#909090"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/etEntryRemark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="@drawable/app_shape_create_entry_input"
+        android:hint="备注"
+        android:paddingStart="12dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="10dp"
+        android:singleLine="true"
+        android:textColor="#404040"
+        android:textColorHint="#909090"
+        android:textSize="14sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/app_shape_create_entry_default"
+        android:paddingStart="12dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="10dp"
+        android:text="默认收藏夹"
+        android:textColor="#909090"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tvCreate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/app_shape_create_entry_add"
+        android:paddingStart="22dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="22dp"
+        android:paddingBottom="8dp"
+        android:text="添加"
+        android:textColor="#FFF"
+        android:textSize="14sp" />
+
+</LinearLayout>
