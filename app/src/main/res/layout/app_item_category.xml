@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardContent"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:layout_marginBottom="10dp"
+    app:cardBackgroundColor="#F0F0F0"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="0dp">
+
+    <ImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="12dp"
+        android:src="@drawable/app_mine_normal" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginStart="54dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="默认收藏夹"
+            android:textColor="#606060"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="2022.04.07 · 0条收藏 · 最近更新0条"
+            android:textColor="#D9D9D9"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

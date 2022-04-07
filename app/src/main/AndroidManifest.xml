@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity android:name=".page.entry.EntryActivity"></activity>
         <activity android:name=".page.home.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,19 +22,25 @@
             <!-- 图片 -->
             <intent-filter android:label="收藏">
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="image/*" />
             </intent-filter>
             <!-- 文字 -->
             <intent-filter android:label="收藏">
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
             <!-- 多图 -->
             <intent-filter android:label="收藏">
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="image/*" />
             </intent-filter>
         </activity>

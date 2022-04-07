@@ -1,5 +1,6 @@
 package com.app.dixon.facorites.core.data.service
 
+import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.bean.io.toEntry
@@ -140,17 +141,76 @@ object DataService : IService {
 
     /**
      * 创建新条目
+     *
+     * @param id 分类id
      */
-    fun createEntry(id: Long, bean: BaseEntryBean, callback: ((Boolean) -> Unit)? = null) {
+    fun createEntry(id: Long, bean: BaseEntryBean, callback: Callback<BaseEntryBean>? = null) {
         ioService.postEvent {
             doCreateEntry(id, bean, callback)
         }
     }
 
+    /**
+     * 删除条目
+     */
+    fun deleteEntry(id: Long, bean: BaseEntryBean, callback: Callback<BaseEntryBean>? = null) {
+        ioService.postEvent {
+            doDeleteEntry(id, bean, callback)
+        }
+    }
+
+    private fun doDeleteEntry(id: Long, bean: BaseEntryBean, callback: Callback<BaseEntryBean>?) {
+        val filter = categoryList.filter { it.id == id }
+        if (filter.isNotEmpty()) {
+            // 移除本地数据
+            val jsonList = FileUtils.readStringByLine("$ROOT_PATH/$id").toMutableList()
+            val iterator = jsonList.iterator()
+            var exit = false
+            while (iterator.hasNext() && !exit) {
+                val next = iterator.next()
+                next.toEntry()?.let { entry ->
+                    if (bean == entry) {
+                        iterator.remove()
+                        exit = true
+                    }
+                }
+            }
+            var jsonString = ""
+            jsonList.forEach { jsonString += "$it\n" }
+            val success = FileUtils.saveString("$ROOT_PATH/$id", jsonString)
+            if (success) {
+                // 移除内存数据
+                entryMap[id]?.remove(bean)
+                // 回调注册
+                backUi {
+                    callback?.onSuccess(bean)
+                    callbackRegister(entryCallbacks) {
+                        it.onDataDeleted(bean)
+                    }
+                    callbackRegister(globalEntryCallbacks) {
+                        it.onDataDeleted(bean)
+                    }
+                }
+            } else {
+                callback?.backUi { onFail("文件写入失败") }
+            }
+        } else {
+            callback?.backUi { onFail("查找分类失败") }
+        }
+    }
+
+
+    /**
+     * 更新条目
+     */
+    fun updateEntry() {
+
+    }
+
     private fun doCreateEntry(
         id: Long,
         bean: BaseEntryBean,
-        callback: ((Boolean) -> Unit)? = null
+        callback: Callback<BaseEntryBean>? = null
     ) {
         val list = entryMap[id]
         // 存在指定ID的分类才能添加条目
@@ -161,7 +221,7 @@ object DataService : IService {
             if (isSuccess) {
                 // 文件写入成功后，才能更新内存数据
                 it.add(bean)
-                callback?.backUi { invoke(true) }
+                callback?.backUi { onSuccess(bean) }
                 backUi {
                     // 回调对应ID的EntryCreate事件
                     callbackRegister(entryCallbacks) { register ->
@@ -175,9 +235,10 @@ object DataService : IService {
                     }
                 }
             } else {
-                callback?.backUi { invoke(false) }
+                callback?.backUi { onFail("写入条目失败") }
             }
-        }
+        } ?: callback?.backUi { onFail("查找分类失败") }
+
         Ln.i("DataService") { "创建条目后的条目数据：${FileUtils.readString("$ROOT_PATH/$id")}" }
     }
 

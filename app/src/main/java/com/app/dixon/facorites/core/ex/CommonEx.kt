@@ -1,5 +1,7 @@
 package com.app.dixon.facorites.core.ex
 
+import android.util.Patterns
+import android.webkit.URLUtil
 import java.net.URL
 
 /**
@@ -56,4 +58,13 @@ fun String?.try2IconLink(): String {
         return "$host/favicon.ico"
     }
     return ""
+}
+
+// 判断是否是URL
+fun String?.isValidUrl(): Boolean {
+    if (this == null) return false
+    if (Patterns.WEB_URL.matcher(this).matches() || URLUtil.isValidUrl(this)) {
+        return true
+    }
+    return false
 }

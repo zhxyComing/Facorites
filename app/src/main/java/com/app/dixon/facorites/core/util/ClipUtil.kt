@@ -1,7 +1,9 @@
 package com.app.dixon.facorites.core.util
 
+import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+
 
 /**
  * 全路径：com.app.dixon.facorites.core.util
@@ -15,5 +17,11 @@ object ClipUtil {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val item = clipboard.primaryClip?.getItemAt(0)
         return item?.text?.toString() ?: ""
+    }
+
+    fun copyToClip(context: Context, str: String) {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val mClipData = ClipData.newPlainText("Facorites", str)
+        clipboard.setPrimaryClip(mClipData)
     }
 }

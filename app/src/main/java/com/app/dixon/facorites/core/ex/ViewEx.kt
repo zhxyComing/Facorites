@@ -2,7 +2,12 @@ package com.app.dixon.facorites.core.ex
 
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.view.animation.CycleInterpolator
+import android.view.animation.TranslateAnimation
 import android.widget.TextView
+import com.app.dixon.facorites.R
 
 /**
  * 全路径：com.app.dixon.facorites.core.ex
@@ -106,4 +111,23 @@ fun View?.setPaddingRight(right: Int) {
  */
 fun View?.setPaddingBottom(bottom: Int) {
     this?.setPadding(this.paddingLeft, this.paddingTop, this.paddingRight, bottom)
+}
+
+/**
+ * view 抖动动画 表示数据错误
+ */
+fun View.shakeTip() {
+    val translateAnimation = TranslateAnimation(0f, 10f, 0f, 0f)
+    translateAnimation.interpolator = CycleInterpolator(6f)
+    translateAnimation.duration = 500
+    startAnimation(translateAnimation)
+}
+
+/**
+ * TextView 空数据提示
+ */
+fun TextView.shakeTipIfEmpty() {
+    if (text.toString().isEmpty()) {
+        shakeTip()
+    }
 }

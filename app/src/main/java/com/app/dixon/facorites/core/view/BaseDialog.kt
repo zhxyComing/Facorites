@@ -23,7 +23,7 @@ abstract class BaseDialog(context: Context, themeResId: Int = R.style.Dialog) : 
         val window: Window? = window
         if (window != null) {
             val lp: WindowManager.LayoutParams = window.attributes
-            lp.gravity = Gravity.CENTER
+            lp.gravity = Gravity.BOTTOM
             if (widthPx() != PX_AUTO) {
                 lp.width = widthPx()
             }

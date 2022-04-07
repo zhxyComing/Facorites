@@ -4,6 +4,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
 import com.app.dixon.facorites.base.BaseApplication
+import com.app.dixon.facorites.core.common.Callback
+import com.app.dixon.facorites.core.common.CommonCallback
+import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.dixon.dlibrary.util.ToastUtil
@@ -40,11 +43,7 @@ class FromShareHelper {
             Ln.i("FromShare", it)
             // 获取到链接 走创建流程
             BaseApplication.currentActivity.get()?.let { context ->
-                CreateEntryDialog(context, it) { success ->
-                    if (success) {
-                        ToastUtil.toast("创建成功！")
-                    }
-                }.show()
+                CreateEntryDialog(context, it).show()
             }
         }
     }

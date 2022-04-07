@@ -11,4 +11,16 @@ open class BaseEntryBean(val date: Long) {
     override fun toString(): String {
         return "BaseEntryBean(date=$date)"
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other?.javaClass != javaClass) return false
+        other as BaseEntryBean
+        if (date != other.date) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return date.hashCode()
+    }
 }

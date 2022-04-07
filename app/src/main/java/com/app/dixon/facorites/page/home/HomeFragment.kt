@@ -10,6 +10,7 @@ import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.util.CollectionUtil
+import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.view.LinkCardView
 import kotlinx.android.synthetic.main.app_fragment_home_content.*
 
@@ -42,6 +43,14 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         cards.add(findViewById(R.id.cardFourth))
         cards.add(findViewById(R.id.cardFifth))
         this@HomeFragment.cards = cards
+
+        // TODO 测试删除
+        cards.forEachIndexed { index, linkCardView ->
+//            linkCardView.setOnLongClickListener {
+//                DataService.deleteEntry(DataService.getCategoryList()[0].id, entries[index])
+//                true
+//            }
+        }
     }
 
     override fun onVisibleFirst() {
@@ -57,16 +66,17 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
 
     private fun initView() {
         val size = minOf(entries.size, MAX_ENTRY_NUM)
-        for (index in 0 until size) {
+        for (index in 0 until MAX_ENTRY_NUM) {
             // TODO 根据类型判断
-            (entries[index] as? LinkEntryBean)?.let {
+            (entries.getOrNull(index) as? LinkEntryBean)?.let {
                 cards[index].setLinkEntry(it)
-            }
+            } ?: cards[index].clear()
         }
     }
 
     // 获取最近的前三个Entry
     private fun obtainLastEntry() {
+        entries.clear()
         val allEntry = mutableListOf<BaseEntryBean>()
         DataService.getCategoryList().forEach { category ->
             DataService.getEntryList(category.id)?.let { entryList ->
@@ -87,7 +97,10 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
     }
 
     override fun onDataDeleted(t: BaseEntryBean) {
-
+        if (entries.contains(t)) {
+            obtainLastEntry()
+            initView()
+        }
     }
 
     override fun onDataUpdated(t: BaseEntryBean) {

@@ -80,7 +80,7 @@
     <com.app.dixon.facorites.core.view.LinkCardView
         android:id="@+id/cardFirst"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
@@ -89,7 +89,7 @@
     <com.app.dixon.facorites.core.view.LinkCardView
         android:id="@+id/cardSecond"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
@@ -98,7 +98,7 @@
     <com.app.dixon.facorites.core.view.LinkCardView
         android:id="@+id/cardThird"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
@@ -107,7 +107,7 @@
     <com.app.dixon.facorites.core.view.LinkCardView
         android:id="@+id/cardFourth"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
@@ -116,7 +116,7 @@
     <com.app.dixon.facorites.core.view.LinkCardView
         android:id="@+id/cardFifth"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
