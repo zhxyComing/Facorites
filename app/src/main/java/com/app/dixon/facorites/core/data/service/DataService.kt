@@ -110,7 +110,7 @@ object DataService : IService {
     private fun doCreateCategory(name: String, callback: ((Long) -> Unit)? = null) {
         // 创建文件夹
         val dirId = Date().time
-        if (!FileUtils.createDir("$ROOT_PATH/$dirId}")) {
+        if (!FileUtils.createNewFile("$ROOT_PATH/$dirId")) {
             callback?.backUi { invoke(-1L) }
             return
         }
@@ -153,17 +153,17 @@ object DataService : IService {
     /**
      * 删除条目
      */
-    fun deleteEntry(id: Long, bean: BaseEntryBean, callback: Callback<BaseEntryBean>? = null) {
+    fun deleteEntry(categoryId: Long, bean: BaseEntryBean, callback: Callback<BaseEntryBean>? = null) {
         ioService.postEvent {
-            doDeleteEntry(id, bean, callback)
+            doDeleteEntry(categoryId, bean, callback)
         }
     }
 
-    private fun doDeleteEntry(id: Long, bean: BaseEntryBean, callback: Callback<BaseEntryBean>?) {
-        val filter = categoryList.filter { it.id == id }
+    private fun doDeleteEntry(categoryId: Long, bean: BaseEntryBean, callback: Callback<BaseEntryBean>?) {
+        val filter = categoryList.filter { it.id == categoryId }
         if (filter.isNotEmpty()) {
             // 移除本地数据
-            val jsonList = FileUtils.readStringByLine("$ROOT_PATH/$id").toMutableList()
+            val jsonList = FileUtils.readStringByLine("$ROOT_PATH/$categoryId").toMutableList()
             val iterator = jsonList.iterator()
             var exit = false
             while (iterator.hasNext() && !exit) {
@@ -175,12 +175,16 @@ object DataService : IService {
                     }
                 }
             }
+            if (!exit) {
+                callback?.backUi { onFail("查找条目失败") }
+                return
+            }
             var jsonString = ""
             jsonList.forEach { jsonString += "$it\n" }
-            val success = FileUtils.saveString("$ROOT_PATH/$id", jsonString)
+            val success = FileUtils.saveString("$ROOT_PATH/$categoryId", jsonString)
             if (success) {
                 // 移除内存数据
-                entryMap[id]?.remove(bean)
+                entryMap[categoryId]?.remove(bean)
                 // 回调注册
                 backUi {
                     callback?.onSuccess(bean)
@@ -303,11 +307,11 @@ object DataService : IService {
 
     interface IDataChanged<T> {
 
-        fun onDataCreated(t: T)
+        fun onDataCreated(bean: T)
 
-        fun onDataDeleted(t: T)
+        fun onDataDeleted(bean: T)
 
-        fun onDataUpdated(t: T)
+        fun onDataUpdated(bean: T)
     }
 
     // 分类变化时的回调

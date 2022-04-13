@@ -9,7 +9,8 @@ package com.app.dixon.facorites.core.util
 
 const val SWITCH_STATUS_OPEN = 1
 const val SWITCH_STATUS_CLOSE = 0
-const val SWITCH_STATUS_CHANGING = -1
+const val SWITCH_STATUS_HIDING = 2
+const val SWITCH_STATUS_OPENING = 3
 
 class SwitchAnimStatusMonitor(var status: Int) {
 
@@ -21,11 +22,21 @@ class SwitchAnimStatusMonitor(var status: Int) {
         status = SWITCH_STATUS_CLOSE
     }
 
-    fun setChanging() {
-        status = SWITCH_STATUS_CHANGING
+    fun setClosing() {
+        status = SWITCH_STATUS_HIDING
+    }
+
+    fun setOpening() {
+        status = SWITCH_STATUS_OPENING
     }
 
     fun canOpen() = status == SWITCH_STATUS_CLOSE
 
     fun canClose() = status == SWITCH_STATUS_OPEN
+
+    fun isChanging() = status == SWITCH_STATUS_HIDING || status == SWITCH_STATUS_OPENING
+
+    fun isClosing() = status == SWITCH_STATUS_HIDING
+
+    fun isOpening() = status == SWITCH_STATUS_OPENING
 }

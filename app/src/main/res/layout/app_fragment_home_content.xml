@@ -33,17 +33,17 @@
         android:textColor="#404040"
         android:textSize="32sp" />
 
-    <androidx.cardview.widget.CardView
+    <com.app.dixon.facorites.core.util.NestedScrollableHost
         android:layout_width="match_parent"
-        android:layout_height="160dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="13dp"
-        android:layout_marginEnd="20dp"
-        app:cardBackgroundColor="#26969A"
-        app:cardCornerRadius="6dp"
-        app:cardElevation="0dp">
+        android:layout_height="wrap_content">
 
-    </androidx.cardview.widget.CardView>
+        <com.app.dixon.facorites.core.view.InfiniteBanner
+            android:id="@+id/banner"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_marginTop="13dp" />
+
+    </com.app.dixon.facorites.core.util.NestedScrollableHost>
 
     <LinearLayout
         android:layout_width="match_parent"

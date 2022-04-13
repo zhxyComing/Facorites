@@ -1,6 +1,7 @@
 package com.app.dixon.facorites.page.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,9 +10,11 @@ import com.app.dixon.facorites.base.VisibleExtensionFragment
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.ex.hide
+import com.app.dixon.facorites.core.ex.show
 import com.app.dixon.facorites.core.util.CollectionUtil
-import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.view.LinkCardView
+import com.facebook.drawee.view.SimpleDraweeView
 import kotlinx.android.synthetic.main.app_fragment_home_content.*
 
 /**
@@ -46,10 +49,18 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
 
         // TODO 测试删除
         cards.forEachIndexed { index, linkCardView ->
-//            linkCardView.setOnLongClickListener {
-//                DataService.deleteEntry(DataService.getCategoryList()[0].id, entries[index])
-//                true
-//            }
+            linkCardView.setOnClickListener {
+                Log.i("testkkk","$index")
+                hideSubCard(index)
+            }
+        }
+    }
+
+    private fun hideSubCard(target: Int) {
+        cards.forEachIndexed { index, linkCardView ->
+            if (target != index) {
+                linkCardView.hideSubCard()
+            }
         }
     }
 
@@ -57,20 +68,34 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         super.onVisibleFirst()
         DataService.register(this)
         initData()
-        initView()
+        initBanner()
+        initEntries()
+    }
+
+    private fun initBanner() {
+        val images = listOf("https://imgs.699pic.com/01/500/340/209/500340209.jpg!list2x.v1", "https://pic.5tu.cn/uploads/allimg/1605/251507157490.jpg")
+        banner.setParams(images, { inflate, container, bean ->
+            val item = inflate.inflate(R.layout.app_item_banner_home, container, false)
+            val imageView = item.findViewById<SimpleDraweeView>(R.id.ivImage)
+            imageView.setImageURI(bean)
+            item
+        })
     }
 
     private fun initData() {
         obtainLastEntry()
     }
 
-    private fun initView() {
-        val size = minOf(entries.size, MAX_ENTRY_NUM)
+    private fun initEntries() {
         for (index in 0 until MAX_ENTRY_NUM) {
             // TODO 根据类型判断
             (entries.getOrNull(index) as? LinkEntryBean)?.let {
+                cards[index].show()
                 cards[index].setLinkEntry(it)
-            } ?: cards[index].clear()
+            } ?: let {
+                cards[index].hide()
+                cards[index].clear()
+            }
         }
     }
 
@@ -90,20 +115,20 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         }
     }
 
-    override fun onDataCreated(data: BaseEntryBean) {
+    override fun onDataCreated(bean: BaseEntryBean) {
         // 更新数据
-        CollectionUtil.insertDataToHead(entries, data, MAX_ENTRY_NUM)
-        initView()
+        CollectionUtil.insertDataToHead(entries, bean, MAX_ENTRY_NUM)
+        initEntries()
     }
 
-    override fun onDataDeleted(t: BaseEntryBean) {
-        if (entries.contains(t)) {
+    override fun onDataDeleted(bean: BaseEntryBean) {
+        if (entries.contains(bean)) {
             obtainLastEntry()
-            initView()
+            initEntries()
         }
     }
 
-    override fun onDataUpdated(t: BaseEntryBean) {
+    override fun onDataUpdated(bean: BaseEntryBean) {
 
     }
 }

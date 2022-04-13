@@ -8,13 +8,10 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.BaseActivity
-import com.app.dixon.facorites.core.common.Callback
-import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.function.fromshare.FromShareHelper
 import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.app.dixon.facorites.page.category.CategoryFragment
 import com.dixon.dlibrary.util.FontUtil
-import com.dixon.dlibrary.util.ToastUtil
 
 
 class HomeActivity : BaseActivity() {

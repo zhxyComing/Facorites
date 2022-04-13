@@ -43,15 +43,15 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
         }
     }
 
-    override fun onDataCreated(t: CategoryInfoBean) {
+    override fun onDataCreated(bean: CategoryInfoBean) {
         rvCategory.adapter?.notifyDataSetChanged()
     }
 
-    override fun onDataDeleted(t: CategoryInfoBean) {
+    override fun onDataDeleted(bean: CategoryInfoBean) {
         rvCategory.adapter?.notifyDataSetChanged()
     }
 
-    override fun onDataUpdated(t: CategoryInfoBean) {
+    override fun onDataUpdated(bean: CategoryInfoBean) {
         rvCategory.adapter?.notifyDataSetChanged()
     }
 }

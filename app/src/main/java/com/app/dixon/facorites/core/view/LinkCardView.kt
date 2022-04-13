@@ -5,19 +5,14 @@ import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
-import android.widget.FrameLayout
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.SuccessCallback
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.*
-import com.app.dixon.facorites.core.util.ClipUtil
-import com.app.dixon.facorites.core.util.Ln
-import com.app.dixon.facorites.core.util.SWITCH_STATUS_CLOSE
-import com.app.dixon.facorites.core.util.SwitchAnimStatusMonitor
+import com.app.dixon.facorites.core.util.*
 import com.dixon.dlibrary.util.AnimationUtil
 import com.dixon.dlibrary.util.FontUtil
 import com.dixon.dlibrary.util.ToastUtil
@@ -27,18 +22,21 @@ import com.facebook.drawee.interfaces.DraweeController
 import com.facebook.imagepipeline.image.ImageInfo
 import kotlinx.android.synthetic.main.app_view_link_card.view.*
 
-
 /**
  * 全路径：com.app.dixon.facorites.core.view
  * 类描述：链接类型的卡片
  * 创建人：xuzheng
  * 创建时间：3/31/22 10:21 AM
  */
-class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
-    FrameLayout(context, attrs, defStyle) {
+
+private const val CLICK_DELAY_TIME = 300L
+
+class LinkCardView(context: Context) : BaseEntryView(context) {
 
     private val animMonitor = SwitchAnimStatusMonitor(SWITCH_STATUS_CLOSE)
     private var bean: LinkEntryBean? = null
+
+    private var animChain: AnimChain? = null
 
     init {
         LayoutInflater.from(context).inflate(R.layout.app_view_link_card, this, true)
@@ -66,13 +64,14 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
         tvDelete.setOnClickListener {
             // 删除
-            bean?.let { linkBean ->
-                DataService.deleteEntry(DataService.getCategoryList()[0].id, linkBean, SuccessCallback {
-                    ToastUtil.toast("删除成功！")
-                    // 收起面板
-                    subCardLogic()
-                    bean = null
-                })
+            // 收起面板
+            hideSubCard {
+                bean?.let { linkBean ->
+                    DataService.deleteEntry(linkBean.belongTo, linkBean, SuccessCallback {
+                        ToastUtil.toast("删除成功！")
+                        bean = null
+                    })
+                }
             }
         }
 
@@ -105,19 +104,18 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
         override fun onFailure(id: String?, throwable: Throwable?) {
             super.onFailure(id, throwable)
+            // 图标加载失败
             Ln.i("icon_link", "$link ${throwable?.message.toString()}")
-            // 图标加载失败 隐藏图标View
-            icon.hide()
         }
     }
 
-    private fun subCardLogic() {
+    private fun subCardLogic(runOnUiComplete: (() -> Unit)? = null) {
         if (bean == null) {
             // 空的 没有展开效果
             return
         }
         if (animMonitor.canOpen()) {
-            animMonitor.setChanging()
+            animMonitor.setOpening()
             subCard.show()
             subCard.alpha = 0f
             val heightAnim = AnimationUtil.height(subCard, 0f, 24.dpF, 300, DecelerateInterpolator(), null)
@@ -125,27 +123,57 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
                     animMonitor.setOpen()
+                    runOnUiComplete?.invoke()
                 }
             })
-            AnimationUtil.Chain().addAnimator(heightAnim).addAnimator(alphaAnim).start()
+            animChain = AnimChain().addAnimator(heightAnim).addAnimator(alphaAnim).apply { start() }
         } else if (animMonitor.canClose()) {
-            animMonitor.setChanging()
+            animMonitor.setClosing()
             val alphaAnim = AnimationUtil.alpha(subCard, 1f, 0f, 300, DecelerateInterpolator(), null)
             val heightAnim = AnimationUtil.height(subCard, 24.dpF, 0f, 300, DecelerateInterpolator(), object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
                     animMonitor.setClose()
                     subCard.hide()
+                    runOnUiComplete?.invoke()
                 }
             })
-            AnimationUtil.Chain().addAnimator(alphaAnim).addAnimator(heightAnim).start()
+            animChain = AnimChain().addAnimator(alphaAnim).addAnimator(heightAnim).apply { start() }
         }
     }
 
     override fun setOnClickListener(l: OnClickListener?) {
         super.setOnClickListener {
-            subCardLogic()
-            l?.onClick(it)
+            throttleClick {
+                subCardLogic()
+                l?.onClick(it)
+            }
+        }
+    }
+
+    fun hideSubCard(runOnUiComplete: (() -> Unit)? = null) {
+        if (animMonitor.canClose()) {
+            subCardLogic(runOnUiComplete)
+        } else if (animMonitor.isOpening()) {
+            // 直接取消动画 收起面板
+            animChain?.cancel()
+            val alphaAnim = AnimationUtil.alpha(subCard, subCard.alpha, 0f, 300, DecelerateInterpolator(), null)
+            val heightAnim = AnimationUtil.height(subCard, subCard.height.toFloat(), 0f, 300, DecelerateInterpolator(), object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    animMonitor.setClose()
+                    subCard.hide()
+                    runOnUiComplete?.invoke()
+                }
+            })
+            animChain = AnimChain().addAnimator(alphaAnim).addAnimator(heightAnim).apply { start() }
+        }
+    }
+
+    private fun throttleClick(action: () -> Unit) {
+        if (System.currentTimeMillis() - globalClickTime >= CLICK_DELAY_TIME) {
+            globalClickTime = System.currentTimeMillis()
+            action.invoke()
         }
     }
 }

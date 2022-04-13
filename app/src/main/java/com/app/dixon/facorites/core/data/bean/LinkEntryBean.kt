@@ -10,7 +10,7 @@ package com.app.dixon.facorites.core.data.bean
  * @param title 标题
  * @param remark 备注
  */
-class LinkEntryBean(val link: String, val title: String, val remark: String, date: Long) : BaseEntryBean(date) {
+class LinkEntryBean(val link: String, val title: String, val remark: String, date: Long, belongTo: Long) : BaseEntryBean(date, belongTo) {
 
     override fun toString(): String {
         return "LinkEntryBean(link='$link', title='$title', remark='$remark') ${super.toString()}"

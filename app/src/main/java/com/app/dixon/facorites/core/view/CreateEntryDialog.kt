@@ -50,7 +50,8 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
                         link = text,
                         title = title,
                         remark = remark,
-                        date = Date().time
+                        date = Date().time,
+                        belongTo = spinner.selectedItemId
                     ),
                     callback
                 )

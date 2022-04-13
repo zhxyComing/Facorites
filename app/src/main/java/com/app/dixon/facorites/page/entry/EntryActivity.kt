@@ -16,6 +16,8 @@ class EntryActivity : BaseActivity() {
 
     private var categoryInfo by Delegates.notNull<CategoryInfoBean>()
 
+    private val data = mutableListOf<BaseEntryBean>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
@@ -29,10 +31,8 @@ class EntryActivity : BaseActivity() {
     }
 
     private fun initView() {
-        val data = mutableListOf<BaseEntryBean>().apply {
-            DataService.getEntryList(categoryInfo.id)?.let {
-                addAll(it)
-            }
+        DataService.getEntryList(categoryInfo.id)?.let {
+            data.addAll(it)
         }
         // 最近时间排序
         data.sortByDescending { it.date }
@@ -45,14 +45,18 @@ class EntryActivity : BaseActivity() {
 
     private inner class DataChangedCallback(categoryId: Long) : DataService.IEntryChanged(categoryId) {
 
-        override fun onDataCreated(t: BaseEntryBean) {
-
+        override fun onDataCreated(bean: BaseEntryBean) {
+            data.add(0, bean)
+            rvCategory.adapter?.notifyDataSetChanged()
         }
 
-        override fun onDataDeleted(t: BaseEntryBean) {
+        override fun onDataDeleted(bean: BaseEntryBean) {
+            data.remove(bean)
+            rvCategory.adapter?.notifyDataSetChanged()
         }
 
-        override fun onDataUpdated(t: BaseEntryBean) {
+        override fun onDataUpdated(bean: BaseEntryBean) {
+            rvCategory.adapter?.notifyDataSetChanged()
         }
     }
 }
