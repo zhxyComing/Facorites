@@ -39,4 +39,8 @@ class SwitchAnimStatusMonitor(var status: Int) {
     fun isClosing() = status == SWITCH_STATUS_HIDING
 
     fun isOpening() = status == SWITCH_STATUS_OPENING
+
+    fun isClosed() = status == SWITCH_STATUS_CLOSE
+
+    fun isOpened() = status == SWITCH_STATUS_OPEN
 }

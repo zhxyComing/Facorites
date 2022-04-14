@@ -5,7 +5,9 @@ import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.SuccessCallback
@@ -29,9 +31,9 @@ import kotlinx.android.synthetic.main.app_view_link_card.view.*
  * 创建时间：3/31/22 10:21 AM
  */
 
-private const val CLICK_DELAY_TIME = 300L
+private const val CLICK_DELAY_TIME = 500L
 
-class LinkCardView(context: Context) : BaseEntryView(context) {
+class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) : BaseEntryView(context, attrs, defStyle) {
 
     private val animMonitor = SwitchAnimStatusMonitor(SWITCH_STATUS_CLOSE)
     private var bean: LinkEntryBean? = null
@@ -144,7 +146,7 @@ class LinkCardView(context: Context) : BaseEntryView(context) {
 
     override fun setOnClickListener(l: OnClickListener?) {
         super.setOnClickListener {
-            throttleClick {
+            globalThrottleClick {
                 subCardLogic()
                 l?.onClick(it)
             }
@@ -170,10 +172,36 @@ class LinkCardView(context: Context) : BaseEntryView(context) {
         }
     }
 
-    private fun throttleClick(action: () -> Unit) {
+    private fun globalThrottleClick(action: () -> Unit) {
         if (System.currentTimeMillis() - globalClickTime >= CLICK_DELAY_TIME) {
             globalClickTime = System.currentTimeMillis()
             action.invoke()
         }
+    }
+
+    fun openSubCardAtOnce() {
+        if (animMonitor.isOpened()) {
+            return
+        }
+        animChain?.cancel()
+        val layoutParams: ViewGroup.LayoutParams = subCard.layoutParams
+        layoutParams.height = 24.dp
+        subCard.layoutParams = layoutParams
+        subCard.alpha = 1f
+        subCard.show()
+        animMonitor.setOpen()
+    }
+
+    fun closeSubCardAtOnce() {
+        if (animMonitor.isClosed()) {
+            return
+        }
+        animChain?.cancel()
+        val layoutParams: ViewGroup.LayoutParams = subCard.layoutParams
+        layoutParams.height = 0.dp
+        subCard.layoutParams = layoutParams
+        subCard.alpha = 0f
+        subCard.hide()
+        animMonitor.setClose()
     }
 }

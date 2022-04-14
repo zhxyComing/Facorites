@@ -110,6 +110,8 @@
     <!-- TODO 临时使用 后边自定义View -->
     <Spinner
         android:id="@+id/spinner"
+        android:background="@drawable/app_shape_rect_grey"
+        android:scrollbars="none"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"

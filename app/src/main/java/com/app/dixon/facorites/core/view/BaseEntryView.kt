@@ -10,7 +10,7 @@ import android.widget.FrameLayout
  * 创建人：xuzheng
  * 创建时间：4/13/22 4:58 PM
  */
-open class BaseEntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) : FrameLayout(context, attrs, defStyle) {
+open class BaseEntryView(context: Context, attrs: AttributeSet?, defStyle: Int) : FrameLayout(context, attrs, defStyle) {
 
     companion object {
 
