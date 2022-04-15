@@ -10,6 +10,7 @@ import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.BaseActivity
 import com.app.dixon.facorites.core.function.fromshare.FromShareHelper
 import com.app.dixon.facorites.core.view.CreateEntryDialog
+import com.app.dixon.facorites.page.browse.BrowseFragment
 import com.app.dixon.facorites.page.category.CategoryFragment
 import com.dixon.dlibrary.util.FontUtil
 
@@ -22,7 +23,7 @@ class HomeActivity : BaseActivity() {
     private val pages = listOf<Fragment>(
         HomeFragment(),
         CategoryFragment(),
-        HomeFragment(),
+        BrowseFragment(),
         HomeFragment()
     )
 

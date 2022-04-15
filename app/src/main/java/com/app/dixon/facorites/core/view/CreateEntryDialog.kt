@@ -25,8 +25,29 @@ import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import kotlinx.android.synthetic.main.app_item_category_spinner.view.*
 import java.util.*
 
-class CreateEntryDialog(context: Context, val link: String? = null, private val callback: Callback<BaseEntryBean> = CommonCallback("创建成功！")) :
+// TODO 优化代码
+class CreateEntryDialog(context: Context, val link: String? = null, private val callback: Callback<BaseEntryBean> = CommonCallback("创建成功！"), val editType: Int = EDIT_TYPE_CREATE) :
     BaseDialog(context) {
+
+    companion object {
+        const val EDIT_TYPE_CREATE = 0
+        const val EDIT_TYPE_UPDATE = 1
+    }
+
+    // 带入的Entry
+    private var tapeEntry: LinkEntryBean? = null
+
+    constructor(
+        context: Context, entry: LinkEntryBean,
+        callback: Callback<BaseEntryBean> = CommonCallback("更新成功！"),
+        editType: Int = EDIT_TYPE_UPDATE
+    ) : this(
+        context,
+        callback = callback,
+        editType = editType
+    ) {
+        this.tapeEntry = entry
+    }
 
     override fun heightPx(): Int = PX_AUTO
 
@@ -44,17 +65,32 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
             val title = etEntryTitle.text.toString()
             val remark = etEntryRemark.text.toString()
             if (text.isNotEmpty() && title.isNotEmpty()) {
-                DataService.createEntry(
-                    spinner.selectedItemId,
-                    LinkEntryBean(
-                        link = text,
-                        title = title,
-                        remark = remark,
-                        date = Date().time,
-                        belongTo = spinner.selectedItemId
-                    ),
-                    callback
-                )
+                if (editType == EDIT_TYPE_CREATE) {
+                    DataService.createEntry(
+                        LinkEntryBean(
+                            link = text,
+                            title = title,
+                            remark = remark,
+                            date = Date().time,
+                            belongTo = spinner.selectedItemId
+                        ),
+                        callback
+                    )
+                } else if (editType == EDIT_TYPE_UPDATE) {
+                    tapeEntry?.let {
+                        DataService.updateEntry(
+                            it,
+                            LinkEntryBean(
+                                link = text,
+                                title = title,
+                                remark = remark,
+                                date = it.date,
+                                belongTo = spinner.selectedItemId
+                            ),
+                            callback
+                        )
+                    }
+                }
                 dismiss()
             } else {
                 // 未填数据提示
@@ -73,6 +109,19 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
             parseTitle(it)
         }
         initSpinner()
+        // 带入完整数据 比如更新
+        tapeEntry?.let {
+            etEntryInput.setText(it.link)
+            etEntryTitle.setText(it.title)
+            etEntryRemark.setText(it.remark)
+            var spinnerIndex: Int? = null
+            DataService.getCategoryList().forEachIndexed { index, categoryInfoBean ->
+                if (categoryInfoBean.id == it.belongTo) {
+                    spinnerIndex = index
+                }
+            }
+            spinnerIndex?.let { index -> spinner.setSelection(index) }
+        }
     }
 
     private fun parseTitle(link: String) {

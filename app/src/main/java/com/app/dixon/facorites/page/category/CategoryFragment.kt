@@ -15,7 +15,15 @@ import kotlinx.android.synthetic.main.app_fragment_category_content.*
 /**
  * 分类 Fragment
  */
+
+private const val SORT_TYPE_TIME = "sort_time"
+private const val SORT_TYPE_NAME = "sort_name"
+
 class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChanged {
+
+    private val dataList: MutableList<CategoryInfoBean> = mutableListOf()
+
+    private var sortType: String = SORT_TYPE_TIME
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,8 +39,9 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
 
     private fun initView() {
         context?.let {
-            val list = DataService.getCategoryList()
-            val adapter = CategoryAdapter(it, list)
+            dataList.addAll(DataService.getCategoryList())
+            dataList.sortByDescending { data -> data.id } // 新创建的收藏夹排前边
+            val adapter = CategoryAdapter(it, dataList)
             rvCategory.layoutManager = LinearLayoutManager(it)
             rvCategory.adapter = adapter
         }
@@ -41,17 +50,49 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
                 CreateCategoryDialog(it).show()
             }
         }
+        sort.setOnClickListener {
+            changeSort()
+        }
+    }
+
+    private fun changeSort() {
+        when (sortType) {
+            SORT_TYPE_TIME -> {
+                dataList.sortBy { data -> data.name }
+                rvCategory.adapter?.notifyDataSetChanged()
+                sortType = SORT_TYPE_NAME
+                sort.text = "名称排序"
+            }
+            SORT_TYPE_NAME -> {
+                dataList.sortByDescending { data -> data.id }
+                rvCategory.adapter?.notifyDataSetChanged()
+                sortType = SORT_TYPE_TIME
+                sort.text = "最近创建排序"
+            }
+        }
     }
 
     override fun onDataCreated(bean: CategoryInfoBean) {
+        dataList.add(0, bean)
+        if (sortType == SORT_TYPE_NAME) {
+            dataList.sortBy { data -> data.name }
+        }
         rvCategory.adapter?.notifyDataSetChanged()
     }
 
     override fun onDataDeleted(bean: CategoryInfoBean) {
-        rvCategory.adapter?.notifyDataSetChanged()
+        val index = dataList.indexOf(bean)
+        if (index != -1) {
+            dataList.removeAt(index)
+            rvCategory.adapter?.notifyItemRemoved(index)
+        }
     }
 
     override fun onDataUpdated(bean: CategoryInfoBean) {
-        rvCategory.adapter?.notifyDataSetChanged()
+        val index = dataList.indexOf(bean)
+        if (index != -1) {
+            dataList[index] = bean
+            rvCategory.adapter?.notifyItemChanged(index)
+        }
     }
 }

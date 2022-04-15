@@ -62,6 +62,9 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
         tvUpdate.setOnClickListener {
             // 修改
+            bean?.let {
+                CreateEntryDialog(context, it).show()
+            }
         }
 
         tvDelete.setOnClickListener {
@@ -69,7 +72,7 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
             // 收起面板
             hideSubCard {
                 bean?.let { linkBean ->
-                    DataService.deleteEntry(linkBean.belongTo, linkBean, SuccessCallback {
+                    DataService.deleteEntry(linkBean, SuccessCallback {
                         ToastUtil.toast("删除成功！")
                         bean = null
                     })
@@ -95,6 +98,7 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
             .setUri(iconLink) // other setters
             .build()
         icon.controller = controller
+        tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
     }
 
     fun clear() {

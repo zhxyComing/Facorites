@@ -50,7 +50,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         // TODO 测试删除
         cards.forEachIndexed { index, linkCardView ->
             linkCardView.setOnClickListener {
-                Log.i("testkkk","$index")
+                Log.i("testkkk", "$index")
                 hideSubCard(index)
             }
         }
@@ -129,6 +129,11 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
     }
 
     override fun onDataUpdated(bean: BaseEntryBean) {
-
+        val index = entries.indexOf(bean)
+        if (index != -1) {
+            (bean as? LinkEntryBean)?.let {
+                cards[index].setLinkEntry(it)
+            }
+        }
     }
 }

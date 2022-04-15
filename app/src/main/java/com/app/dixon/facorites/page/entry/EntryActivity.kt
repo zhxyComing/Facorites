@@ -57,19 +57,46 @@ class EntryActivity : BaseActivity() {
         override fun onDataDeleted(bean: BaseEntryBean) {
             // 移除数据
             Ln.i("EntryActivity", "onDataDeleted $bean")
-            val iterator = data.iterator()
-            while (iterator.hasNext()) {
-                val next = iterator.next()
-                if (next.data == bean) {
-                    Ln.i("EntryActivity", "remove success")
-                    iterator.remove()
-                }
+            find(bean)?.let { index ->
+                data.removeAt(index)
+                rvCategory.adapter?.notifyItemRemoved(index)
             }
-            rvCategory.adapter?.notifyDataSetChanged()
         }
 
         override fun onDataUpdated(bean: BaseEntryBean) {
-            rvCategory.adapter?.notifyDataSetChanged()
+            // 找到ID一样的数据 然后替换
+            find(bean)?.let { index ->
+                val originOpenStatus = data[index].isOpen
+                val originCategory = data[index].data.belongTo
+                // 同一文件夹 更新
+                if (originCategory == bean.belongTo) {
+                    data[index] = Openable(originOpenStatus, bean)
+                    rvCategory.adapter?.notifyItemChanged(index)
+                } else {
+                    // 不同文件夹 移除
+                    data.removeAt(index)
+                    rvCategory.adapter?.notifyItemRemoved(index)
+                }
+            } ?: let {
+                // 说明是更新过来的数据
+                // 重新请求数据 排序
+                data.clear()
+                DataService.getEntryList(categoryInfo.id)?.forEach {
+                    data.add(Openable(data = it))
+                }
+                // 最近时间排序
+                data.sortByDescending { it.data.date }
+                rvCategory.adapter?.notifyDataSetChanged()
+            }
+        }
+
+        private fun find(bean: BaseEntryBean): Int? {
+            data.forEachIndexed { index, openable ->
+                if (openable.data == bean) {
+                    return index
+                }
+            }
+            return null
         }
     }
 }
