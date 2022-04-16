@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import com.app.dixon.facorites.R
+import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.common.SuccessCallback
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
@@ -86,6 +87,17 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
                 ToastUtil.toast("已复制到剪贴板")
             }
         }
+
+        ivBrowse.setOnClickListener {
+            bean?.let { linkBean ->
+                if (linkBean.link.isValidUrl()) {
+                    PageJumper.openBrowsePage(context, linkBean.link)
+                } else {
+                    ClipUtil.copyToClip(context, linkBean.link)
+                    ToastUtil.toast("非网页链接，已复制到剪贴板，请自行选择合适程序")
+                }
+            }
+        }
     }
 
     fun setLinkEntry(bean: LinkEntryBean) {
@@ -122,6 +134,7 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
         }
         if (animMonitor.canOpen()) {
             animMonitor.setOpening()
+            ivBrowse.invisible()
             subCard.show()
             subCard.alpha = 0f
             val heightAnim = AnimationUtil.height(subCard, 0f, 24.dpF, 300, DecelerateInterpolator(), null)
@@ -141,6 +154,7 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
                     super.onAnimationEnd(animation)
                     animMonitor.setClose()
                     subCard.hide()
+                    ivBrowse.show()
                     runOnUiComplete?.invoke()
                 }
             })
@@ -169,6 +183,7 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
                     super.onAnimationEnd(animation)
                     animMonitor.setClose()
                     subCard.hide()
+                    ivBrowse.show()
                     runOnUiComplete?.invoke()
                 }
             })
@@ -193,6 +208,7 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
         subCard.layoutParams = layoutParams
         subCard.alpha = 1f
         subCard.show()
+        ivBrowse.invisible()
         animMonitor.setOpen()
     }
 
@@ -206,6 +222,7 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
         subCard.layoutParams = layoutParams
         subCard.alpha = 0f
         subCard.hide()
+        ivBrowse.show()
         animMonitor.setClose()
     }
 }

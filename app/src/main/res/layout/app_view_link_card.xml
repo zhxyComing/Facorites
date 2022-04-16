@@ -21,15 +21,26 @@
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="7dp"
+            android:layout_weight="1"
             android:ellipsize="end"
             android:singleLine="true"
             android:textColor="#605040"
             android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/ivBrowse"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="7dp"
+            android:contentDescription="@string/app_browse_tip"
+            android:padding="5dp"
+            android:src="@drawable/app_arrow_right" />
     </LinearLayout>
 
     <LinearLayout

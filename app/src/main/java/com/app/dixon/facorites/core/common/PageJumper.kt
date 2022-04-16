@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.fragment.app.Fragment
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.ex.backUi
+import com.app.dixon.facorites.page.browse.BrowseActivity
 import com.app.dixon.facorites.page.entry.EntryActivity
 
 /**
@@ -23,6 +24,18 @@ object PageJumper {
         resultJump(asContext) {
             val intent = Intent(it, EntryActivity::class.java).apply {
                 putExtra(CATEGORY_INFO, categoryInfo)
+            }
+            startActivity(it, intent, requestCode)
+        }
+    }
+
+    /**
+     * 打开浏览页
+     */
+    fun openBrowsePage(asContext: Any, link: String, requestCode: Int = -1) {
+        resultJump(asContext) {
+            val intent = Intent(it, BrowseActivity::class.java).apply {
+                putExtra(BROWSE_LINK, link)
             }
             startActivity(it, intent, requestCode)
         }

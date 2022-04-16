@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Facorites</string>
+    <string name="app_jump_tip">跳转</string>
+    <string name="app_browse_tip">预览</string>
 </resources>
