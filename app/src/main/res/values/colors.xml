@@ -11,6 +11,7 @@
     <color name="app_theme_green">#26969A</color>
     <color name="app_theme_red">#FF2442</color>
     <color name="app_theme_grey">#A0A0A0</color>
+    <color name="app_theme_transparent">#00000000</color>
 
     <!--MD配色-->
 

@@ -10,24 +10,39 @@
         android:layout_width="match_parent"
         android:layout_height="80dp">
 
+        <ImageView
+            android:id="@+id/ivClose"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="bottom"
+            android:paddingStart="12dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="14dp"
+            android:src="@drawable/app_close" />
+
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginStart="60dp"
+            android:layout_marginEnd="60dp"
             android:layout_marginBottom="12dp"
             android:singleLine="true"
-            android:textColor="@color/app_theme_green_dark"
-            android:textSize="18sp"
+            android:textColor="#404040"
+            android:textSize="16sp"
             android:textStyle="bold" />
     </FrameLayout>
 
-    <View
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/md_red_100" />
+        android:max="100"
+        android:progress="0"
+        android:progressDrawable="@drawable/app_shape_progress_bg_normal" />
 
     <com.app.dixon.facorites.page.browse.BrowseWebView
         android:id="@+id/webView"

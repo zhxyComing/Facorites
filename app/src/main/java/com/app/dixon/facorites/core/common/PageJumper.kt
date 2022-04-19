@@ -8,6 +8,7 @@ import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.page.browse.BrowseActivity
 import com.app.dixon.facorites.page.entry.EntryActivity
+import com.app.dixon.facorites.page.home.HomeActivity
 
 /**
  * 全路径：com.app.dixon.facorites.core.common
@@ -16,6 +17,28 @@ import com.app.dixon.facorites.page.entry.EntryActivity
  * 创建时间：4/7/22 5:20 PM
  */
 object PageJumper {
+
+    /**
+     * 打开首页
+     */
+    fun openHomePage(asContext: Any, requestCode: Int = -1) {
+        resultJump(asContext) {
+            val intent = Intent(it, HomeActivity::class.java)
+            startActivity(it, intent, requestCode)
+        }
+    }
+
+    /**
+     * 打开首页
+     */
+    fun openHomePage(asContext: Any, link: String, requestCode: Int = -1) {
+        resultJump(asContext) {
+            val intent = Intent(it, HomeActivity::class.java).apply {
+                putExtra(TRANSIT_LINK, link)
+            }
+            startActivity(it, intent, requestCode)
+        }
+    }
 
     /**
      * 打开收藏列表页
@@ -35,7 +58,7 @@ object PageJumper {
     fun openBrowsePage(asContext: Any, link: String, requestCode: Int = -1) {
         resultJump(asContext) {
             val intent = Intent(it, BrowseActivity::class.java).apply {
-                putExtra(BROWSE_LINK, link)
+                putExtra(TRANSIT_LINK, link)
             }
             startActivity(it, intent, requestCode)
         }

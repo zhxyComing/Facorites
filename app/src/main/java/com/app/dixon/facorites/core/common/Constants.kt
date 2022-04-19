@@ -12,3 +12,11 @@ const val CATEGORY_ID = "category_id"
 const val CATEGORY_INFO = "category_info"
 
 const val BROWSE_LINK = "browse_link"
+
+const val TRANSIT_LINK = "transit_link"
+
+const val SORT_TYPE_TIME = "sort_time"
+
+const val SORT_TYPE_NAME = "sort_name"
+
+const val SORT_TYPE_TIME_ORDER = "sort_time_order"

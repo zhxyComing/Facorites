@@ -14,18 +14,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <ImageView
-        android:id="@+id/ivIcon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="12dp"
-        android:src="@drawable/app_dir" />
+    <!--    <ImageView-->
+    <!--        android:id="@+id/ivIcon"-->
+    <!--        android:layout_width="24dp"-->
+    <!--        android:layout_height="24dp"-->
+    <!--        android:layout_gravity="center_vertical"-->
+    <!--        android:layout_marginStart="12dp"-->
+    <!--        android:src="@drawable/app_dir" />-->
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginStart="48dp"
+        android:layout_marginStart="20dp"
         android:gravity="center_vertical"
         android:orientation="vertical">
 
@@ -33,17 +33,16 @@
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:text="默认收藏夹"
             android:textColor="@color/white"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvDesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="10dp"
             android:text="2022.04.07 · 0条收藏 · 最近更新0条"
             android:textColor="#D9D9D9"
             android:textSize="10sp" />

@@ -115,4 +115,12 @@ object FileUtils {
         val file = File(BaseApplication.application.filesDir, path)
         return file.createNewFile()
     }
+
+    /**
+     * 删除文件
+     */
+    fun deleteFile(path: String): Boolean {
+        val file = File(BaseApplication.application.filesDir, path)
+        return file.delete()
+    }
 }

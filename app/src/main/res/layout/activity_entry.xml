@@ -33,6 +33,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvEntryNum"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -52,9 +53,10 @@
         android:paddingEnd="20dp">
 
         <TextView
+            android:id="@+id/sort"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="最近时间排序"
+            android:text="最近创建排序"
             android:textColor="#606060"
             android:textSize="14sp"
             android:textStyle="bold" />

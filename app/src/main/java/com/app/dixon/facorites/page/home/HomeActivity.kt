@@ -1,6 +1,8 @@
 package com.app.dixon.facorites.page.home
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -34,10 +36,6 @@ class HomeActivity : BaseActivity() {
         FontUtil.font(window.decorView)
 
         initLogic()
-    }
-
-    override fun onResume() {
-        super.onResume()
         autoParse()
     }
 
@@ -114,5 +112,12 @@ class HomeActivity : BaseActivity() {
         override fun getItemCount(): Int = pages.size
 
         override fun createFragment(position: Int): Fragment = pages[position]
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        // 这句必须调
+        setIntent(intent)
+        super.onNewIntent(intent)
+        autoParse()
     }
 }

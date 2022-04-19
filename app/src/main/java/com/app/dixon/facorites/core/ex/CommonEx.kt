@@ -68,3 +68,24 @@ fun String?.isValidUrl(): Boolean {
     }
     return false
 }
+
+fun <T> MutableList<T>.removeByCondition(condition: (T) -> Boolean): Boolean {
+    val iterator = iterator()
+    var hasRemove = false
+    while (iterator.hasNext()) {
+        if (condition.invoke(iterator.next())) {
+            hasRemove = true
+            iterator.remove()
+        }
+    }
+    return hasRemove
+}
+
+fun <T> MutableList<T>.findByCondition(condition: (T) -> Boolean): T? {
+    forEach {
+        if (condition.invoke(it)) {
+            return it
+        }
+    }
+    return null
+}

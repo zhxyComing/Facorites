@@ -8,6 +8,7 @@ import android.view.MotionEvent
 import android.webkit.*
 import com.dixon.dlibrary.util.Ln
 import com.dixon.dlibrary.util.ToastUtil
+import kotlinx.android.synthetic.main.activity_browse.*
 import kotlinx.android.synthetic.main.activity_browse.view.*
 
 /**

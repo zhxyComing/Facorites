@@ -8,6 +8,8 @@ import com.app.dixon.facorites.core.data.bean.io.toJson
 import com.app.dixon.facorites.core.data.service.base.IService
 import com.app.dixon.facorites.core.data.service.base.WorkService
 import com.app.dixon.facorites.core.ex.backUi
+import com.app.dixon.facorites.core.ex.findByCondition
+import com.app.dixon.facorites.core.ex.removeByCondition
 import com.app.dixon.facorites.core.util.Ln
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -62,6 +64,7 @@ object DataService : IService {
                 }
                 // 初次初始化，创建默认收藏夹
                 doCreateCategory("默认收藏夹")
+                return@postEvent
             }
             // 1.获取所有分类 并添加到内存
             val categoryInfoJson = FileUtils.readString("$ROOT_PATH/$CATEGORY_INFO_PATH")
@@ -149,9 +152,47 @@ object DataService : IService {
     }
 
     private fun doDeleteCategory(categoryId: Long, callback: ((Long) -> Unit)?) {
-        // 删除本地的分类信息、分类文件
-        // 删除内存的分类信息、分类文件
-        
+        // 1.删除本地的分类信息、分类文件
+        val deleteCategoryInfo = categoryList.findByCondition { it.id == categoryId } ?: let {
+            Ln.e("DeleteCategory", "未找到分类")
+            callback?.backUi { invoke(-1L) }
+            return
+        }
+        val saveList = categoryList.toMutableList() // 创建副本
+        val hasRemove = saveList.removeByCondition {
+            it.id == categoryId
+        }
+        if (hasRemove) {
+            if (FileUtils.saveString("$ROOT_PATH/$CATEGORY_INFO_PATH", Gson().toJson(saveList))
+                && FileUtils.deleteFile("$ROOT_PATH/$categoryId")
+            ) {
+                // 文件删除成功
+                // 2.删除内存的分类信息、分类文件
+                categoryList.removeByCondition { it.id == categoryId }
+                val deleteEntries = entryMap.remove(categoryId)
+                // 3.回调
+                backUi {
+                    callback?.invoke(categoryId)
+                    callbackRegister(categoryCallbacks) {
+                        it.onDataDeleted(deleteCategoryInfo)
+                    }
+                    deleteEntries?.forEach { bean ->
+                        callbackRegister(globalEntryCallbacks) {
+                            it.onDataDeleted(bean)
+                        }
+                    }
+                }
+            } else {
+                Ln.e("DeleteCategory", "分类文件删除失败")
+                // 未找到该分类
+                callback?.backUi { invoke(-1L) }
+            }
+        } else {
+            Ln.e("DeleteCategory", "未找到分类")
+            // 未找到该分类
+            callback?.backUi { invoke(-1L) }
+        }
+
     }
 
     /**

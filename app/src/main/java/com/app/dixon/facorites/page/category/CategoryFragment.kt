@@ -7,17 +7,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.VisibleExtensionFragment
+import com.app.dixon.facorites.core.common.SORT_TYPE_NAME
+import com.app.dixon.facorites.core.common.SORT_TYPE_TIME
+import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.view.CreateCategoryDialog
+import com.dixon.dlibrary.util.FontUtil
 import kotlinx.android.synthetic.main.app_fragment_category_content.*
 
 /**
  * 分类 Fragment
  */
-
-private const val SORT_TYPE_TIME = "sort_time"
-private const val SORT_TYPE_NAME = "sort_name"
 
 class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChanged {
 
@@ -25,15 +26,33 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
 
     private var sortType: String = SORT_TYPE_TIME
 
+    // 有条目变化时 刷新列表的内容 比如收藏数等等
+    private val itemContentUpdateListener = object : DataService.IGlobalEntryChanged {
+        override fun onDataCreated(bean: BaseEntryBean) {
+            rvCategory.adapter?.notifyDataSetChanged()
+        }
+
+        override fun onDataDeleted(bean: BaseEntryBean) {
+            rvCategory.adapter?.notifyDataSetChanged()
+        }
+
+        override fun onDataUpdated(bean: BaseEntryBean) {
+            rvCategory.adapter?.notifyDataSetChanged()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.app_fragment_category_content, container, false)
+    ): View = inflater.inflate(R.layout.app_fragment_category_content, container, false).apply {
+        FontUtil.font(this)
+    }
 
     override fun onVisibleFirst() {
         super.onVisibleFirst()
         DataService.register(this)
+        DataService.register(itemContentUpdateListener)
         initView()
     }
 

@@ -45,6 +45,8 @@ class FromShareHelper {
             BaseApplication.currentActivity.get()?.let { context ->
                 CreateEntryDialog(context, it).show()
             }
+            // 记得清数据 以防跳转到其它页面退回后再次触发
+            intent.removeExtra(Intent.EXTRA_TEXT)
         }
     }
 
