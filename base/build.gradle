@@ -1,0 +1,33 @@
+apply from: "${rootProject.rootDir}/config.gradle"
+project.ext.setLibDefaultConfig project
+
+android {
+
+    defaultConfig {
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    // 基础库 所有Module都需要的那种
+    // Gson converter
+    api 'com.squareup.retrofit2:converter-gson:2.9.0'
+    // 爬虫
+    api 'org.jsoup:jsoup:1.12.1'
+    // fresco 如要支持动态图、WebP需要另外添加依赖
+    api 'com.facebook.fresco:fresco:2.1.0'
+    // Gson
+    api 'com.google.code.gson:gson:2.8.6'
+    // 还没适配、用到网络库..
+    // Retrofit
+    api 'com.squareup.retrofit2:retrofit:2.9.0'
+    // ktx
+    api 'androidx.palette:palette-ktx:1.0.0'
+}

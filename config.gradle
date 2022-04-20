@@ -1,0 +1,58 @@
+apply from: "${rootProject.rootDir}/version.gradle"
+
+project.ext {
+
+    //主module（app）配置
+    setAppDefaultConfig = {
+        extension -> //extension后续会传入project替代
+            extension.apply plugin: 'com.android.application'
+            extension.apply plugin: 'kotlin-android'
+            extension.apply plugin: 'kotlin-android-extensions'
+            extension.description "app"
+            //设置通用Android配置
+            setAndroidConfig extension.android
+            //设置通用依赖配置
+            setDependencies extension.dependencies
+    }
+
+    //设置lib配置
+    setLibDefaultConfig = {
+        extension ->
+            extension.apply plugin: 'com.android.library'
+            extension.apply plugin: 'kotlin-android'
+            extension.apply plugin: 'kotlin-android-extensions'
+            extension.description "lib"
+            //设置通用Android配置
+            setAndroidConfig extension.android
+            //设置通用依赖配置
+            setDependencies extension.dependencies
+    }
+
+    //设置android配置
+    setAndroidConfig = {
+        extension -> //extension 即 android 对象
+            extension.compileSdkVersion 31
+            extension.buildToolsVersion "30.0.3"
+            extension.defaultConfig {
+                minSdkVersion 21
+                targetSdkVersion 31
+                versionCode project.ext.versionCode
+                versionName project.ext.versionName
+
+                testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+            }
+            extension.compileOptions {
+                sourceCompatibility JavaVersion.VERSION_1_8
+                targetCompatibility JavaVersion.VERSION_1_8
+            }
+            extension.kotlinOptions {
+                jvmTarget = '1.8'
+            }
+    }
+
+    //设置通用依赖
+    setDependencies = {
+        extension ->
+//            extension.implementation xxx
+    }
+}

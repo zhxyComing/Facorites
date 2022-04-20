@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.app.dixon.facorites" >
+    package="com.app.dixon.facorites">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- 小米手机装不上，不是开发者模式的问题，是启动Activity没有设置exported=true(所以在关闭MIUI优化后会提示AndroidManifest合并错误)，草 -->
     <application
         android:name=".base.BaseApplication"
         android:allowBackup="true"
@@ -14,19 +15,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:usesCleartextTraffic="true"
-        tools:targetApi="m" >
+        tools:targetApi="m">
         <activity android:name=".page.browse.BrowseActivity" />
         <activity android:name=".page.entry.EntryActivity" />
         <activity
             android:name=".page.home.HomeActivity"
-            android:launchMode="singleTask" >
+            android:exported="true"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <!-- 图片 -->
-            <intent-filter android:label="收藏" >
+            <intent-filter android:label="收藏">
                 <action android:name="android.intent.action.SEND" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -34,7 +36,7 @@
                 <data android:mimeType="image/*" />
             </intent-filter>
             <!-- 文字 -->
-            <intent-filter android:label="收藏" >
+            <intent-filter android:label="收藏">
                 <action android:name="android.intent.action.SEND" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -42,7 +44,7 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
             <!-- 多图 -->
-            <intent-filter android:label="收藏" >
+            <intent-filter android:label="收藏">
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
 
                 <category android:name="android.intent.category.DEFAULT" />

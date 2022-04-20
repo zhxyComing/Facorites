@@ -8,9 +8,10 @@ import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.BaseActivity
 import com.app.dixon.facorites.core.common.BROWSE_LINK
 import com.app.dixon.facorites.core.data.service.JSoupService
-import com.app.dixon.facorites.core.ex.*
+import com.app.dixon.facorites.core.ex.invisible
+import com.app.dixon.facorites.core.ex.show
+import com.app.dixon.facorites.core.ex.try2URL
 import com.dixon.dlibrary.util.FontUtil
-import com.dixon.dlibrary.util.Ln
 import kotlinx.android.synthetic.main.activity_browse.*
 
 

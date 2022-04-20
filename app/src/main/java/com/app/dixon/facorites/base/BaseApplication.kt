@@ -3,10 +3,10 @@ package com.app.dixon.facorites.base
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import com.dixon.dlibrary.util.DUtil
 import com.app.dixon.facorites.BuildConfig
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.data.service.JSoupService
-import com.dixon.dlibrary.util.DUtil
 import com.facebook.drawee.backends.pipeline.Fresco
 import java.lang.ref.WeakReference
 

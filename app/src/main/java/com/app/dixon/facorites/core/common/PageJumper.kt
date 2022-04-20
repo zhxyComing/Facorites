@@ -58,7 +58,7 @@ object PageJumper {
     fun openBrowsePage(asContext: Any, link: String, requestCode: Int = -1) {
         resultJump(asContext) {
             val intent = Intent(it, BrowseActivity::class.java).apply {
-                putExtra(TRANSIT_LINK, link)
+                putExtra(BROWSE_LINK, link)
             }
             startActivity(it, intent, requestCode)
         }

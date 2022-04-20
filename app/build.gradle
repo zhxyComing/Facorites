@@ -1,27 +1,25 @@
-plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-android-extensions'
-}
+apply from: "${rootProject.rootDir}/config.gradle"
+project.ext.setAppDefaultConfig project
+
+// 读取本地数据 如密钥、签名
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def localStoreFile = properties.getProperty('storeFile')
+def localStorePassword = properties.getProperty('storePassword')
+def localKeyAlias = properties.getProperty('keyAlias')
+def localKeyPassword = properties.getProperty('keyPassword')
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.3"
-
     defaultConfig {
         applicationId "com.app.dixon.facorites"
-        minSdkVersion 21
-        targetSdkVersion 31
-        versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         release {
-//            v2SigningEnabled false
-//            v1SigningEnabled true
+            storeFile file(localStoreFile)
+            storePassword localStorePassword
+            keyAlias localKeyAlias
+            keyPassword localKeyPassword
         }
     }
 
@@ -31,13 +29,6 @@ android {
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
     }
 }
 
@@ -51,20 +42,7 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    implementation 'com.google.code.gson:gson:2.8.6'
-    // 在小米手机上运行失败 貌似是AndroidManifest的合成上有问题
+
+    implementation project(':base')
     implementation 'com.dixon.library:dlibrary:1.0.1'
-    implementation 'org.jsoup:jsoup:1.12.1'
-
-    // fresco 如要支持动态图、WebP需要另外添加依赖
-    implementation 'com.facebook.fresco:fresco:2.1.0'
-
-    // 还没适配、用到网络库..
-    // Retrofit
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    // Gson converter
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-
-    implementation 'androidx.palette:palette-ktx:1.0.0'
-
 }

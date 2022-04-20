@@ -8,3 +8,5 @@ TODO 排序功能 ✅
 TODO 分类的删改
 TODO 下载器
 TODO 星标（星标排序）隐私
+TODO 组件化处理 ✅
+TODO 浏览器打开

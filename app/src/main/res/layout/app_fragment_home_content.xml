@@ -15,7 +15,7 @@
         android:background="@drawable/app_shape_search"
         android:drawableStart="@drawable/app_search_icon"
         android:drawablePadding="6dp"
-        android:hint="Search"
+        android:hint="搜索"
         android:paddingStart="12dp"
         android:paddingTop="8dp"
         android:paddingEnd="12dp"
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:text="Collection"
+        android:text="收藏"
         android:textColor="#404040"
         android:textSize="32sp" />
 
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
-            android:text="Last Collection"
+            android:text="最近收藏"
             android:textColor="#404040"
             android:textSize="18sp" />
 
@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            android:text="View All"
+            android:text="浏览所有"
             android:textColor="#26969A"
             android:textSize="14sp" />
 
