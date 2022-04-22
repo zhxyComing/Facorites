@@ -8,16 +8,7 @@ import android.view.MotionEvent
 import android.webkit.*
 import com.dixon.dlibrary.util.Ln
 import com.dixon.dlibrary.util.ToastUtil
-import kotlinx.android.synthetic.main.activity_browse.*
 import kotlinx.android.synthetic.main.activity_browse.view.*
-import androidx.core.content.ContextCompat.startActivity
-
-import android.content.Intent
-
-import android.content.pm.ResolveInfo
-import android.net.Uri
-import java.lang.Exception
-import java.net.URISyntaxException
 
 
 /**
@@ -32,6 +23,8 @@ import java.net.URISyntaxException
  */
 @SuppressLint("SetJavaScriptEnabled")
 class BrowseWebView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : WebView(context, attrs) {
+
+    private var onSchemeJumpListener: ((String) -> Unit)? = null
 
     init {
         // 注意：Android 9.0 开始，应用包括WebView只能请求https数据，除非Application添加android:usesCleartextTraffic="true"
@@ -76,8 +69,9 @@ class BrowseWebView @JvmOverloads constructor(context: Context, attrs: Attribute
 
         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
             Ln.i("WebViewRequest", "start ${request?.url.toString()}")
-            request?.url?.toString()?.let {
-                if (parseScheme(it)) {
+            request?.url?.toString()?.let { link ->
+                if (SchemeJumper.isSchemeJumpLink(link)) {
+                    onSchemeJumpListener?.invoke(link)
                     return true
                 }
             }
@@ -87,47 +81,6 @@ class BrowseWebView @JvmOverloads constructor(context: Context, attrs: Attribute
         override fun onReceivedHttpError(view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?) {
             Ln.i("WebViewRequest", "error ${request?.url.toString()}")
             super.onReceivedHttpError(view, request, errorResponse)
-        }
-
-        // 支持打开第三方APP
-        @SuppressLint("QueryPermissionsNeeded")
-        private fun parseScheme(link: String): Boolean {
-            try {
-                // intent协议
-                if (link.startsWith("intent://")) {
-                    val intent: Intent
-                    try {
-                        intent = Intent.parseUri(link, Intent.URI_INTENT_SCHEME)
-                        intent.addCategory("android.intent.category.BROWSABLE")
-                        intent.component = null
-                        intent.selector = null
-                        val resolves = context.packageManager.queryIntentActivities(intent, 0)
-                        if (resolves.size > 0) {
-                            context.startActivity(intent)
-                        }
-                        return true
-                    } catch (e: URISyntaxException) {
-                        e.printStackTrace()
-                    }
-                }
-                // 处理自定义scheme协议
-                if (!link.startsWith("http")) {
-                    try {
-                        // 以下固定写法
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
-                        intent.flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                        context.startActivity(intent)
-                    } catch (e: Exception) {
-                        // 防止没有安装的情况
-                        e.printStackTrace()
-                        ToastUtil.toast("您所打开的第三方App未安装！")
-                    }
-                    return true
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            return false
         }
     }
 
@@ -140,5 +93,9 @@ class BrowseWebView @JvmOverloads constructor(context: Context, attrs: Attribute
             }
         }
         return super.onTouchEvent(event)
+    }
+
+    fun setOnSchemeJumpListener(listener: (String) -> Unit) {
+        onSchemeJumpListener = listener
     }
 }

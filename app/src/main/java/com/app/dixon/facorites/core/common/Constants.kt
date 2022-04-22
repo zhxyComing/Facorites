@@ -9,6 +9,8 @@ package com.app.dixon.facorites.core.common
 
 const val CATEGORY_ID = "category_id"
 
+const val ENTRY_ID = "entry_id"
+
 const val CATEGORY_INFO = "category_info"
 
 const val BROWSE_LINK = "browse_link"

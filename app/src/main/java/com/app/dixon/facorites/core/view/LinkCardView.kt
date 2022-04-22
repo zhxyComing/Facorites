@@ -16,6 +16,7 @@ import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.*
 import com.app.dixon.facorites.core.util.*
+import com.app.dixon.facorites.page.browse.SchemeJumper
 import com.dixon.dlibrary.util.AnimationUtil
 import com.dixon.dlibrary.util.FontUtil
 import com.dixon.dlibrary.util.ToastUtil
@@ -91,7 +92,7 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
         ivBrowse.setOnClickListener {
             bean?.let { linkBean ->
                 if (linkBean.link.isValidUrl()) {
-                    PageJumper.openBrowsePage(context, linkBean.link)
+                    PageJumper.openBrowsePage(context, linkBean.belongTo, linkBean.date, linkBean.link)
                 } else {
                     ClipUtil.copyToClip(context, linkBean.link)
                     ToastUtil.toast("非网页链接，已复制到剪贴板，请自行选择合适程序")
@@ -111,6 +112,12 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
             .build()
         icon.controller = controller
         tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
+        bean.schemeJump?.let { scheme ->
+            tvSchemeJump.show()
+            tvSchemeJump.setOnClickListener {
+                SchemeJumper.jumpByScheme(context, scheme)
+            }
+        } ?: tvSchemeJump.hide()
     }
 
     fun clear() {

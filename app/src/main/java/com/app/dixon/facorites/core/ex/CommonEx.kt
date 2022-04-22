@@ -81,11 +81,32 @@ fun <T> MutableList<T>.removeByCondition(condition: (T) -> Boolean): Boolean {
     return hasRemove
 }
 
-fun <T> MutableList<T>.findByCondition(condition: (T) -> Boolean): T? {
+fun <T> List<T>.findByCondition(condition: (T) -> Boolean): T? {
     forEach {
         if (condition.invoke(it)) {
             return it
         }
     }
     return null
+}
+
+fun <T> List<T>.findIndexByCondition(condition: (T) -> Boolean): Int? {
+    forEachIndexed { index, t ->
+        if (condition.invoke(t)) {
+            return index
+        }
+    }
+    return null
+}
+
+
+/**
+ * 尝试提取Http链接
+ */
+fun String.tryExtractHttp() = indexOf("http").let {
+    if (it != -1) {
+        substring(it)
+    } else {
+        this
+    }
 }

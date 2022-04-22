@@ -196,6 +196,44 @@ object DataService : IService {
     }
 
     /**
+     * 修改分类
+     */
+    fun updateCategory(originBean: CategoryInfoBean, newBean: CategoryInfoBean, callback: ((Long) -> Unit)? = null) {
+        ioService.postEvent {
+            doUpdateCategory(originBean, newBean, callback)
+        }
+    }
+
+    private fun doUpdateCategory(originBean: CategoryInfoBean, newBean: CategoryInfoBean, callback: ((Long) -> Unit)?) {
+        // 更新category_info存储的数据即可
+        // 1.内存里找不到该分类，return
+        val deleteBean = categoryList.findByCondition { it.id == originBean.id } ?: let {
+            Ln.e("UpdateCategory", "未找到分类")
+            callback?.backUi { invoke(-1L) }
+            return
+        }
+        // 2.正确做法是先创建副本，修改值，保存到本地成功后，才能更新内存数据
+        // 这里取巧：先修改内存，再保存本地，如果本地保存失败了，再把内存数据改回去
+        val index = categoryList.indexOf(deleteBean)
+        if (index != -1) {
+            categoryList[index] = newBean
+        }
+        if (FileUtils.saveString("$ROOT_PATH/$CATEGORY_INFO_PATH", Gson().toJson(categoryList))) {
+            // 3.文件更新成功 回调
+            backUi {
+                callback?.invoke(originBean.id)
+                callbackRegister(categoryCallbacks) {
+                    it.onDataUpdated(newBean)
+                }
+            }
+        } else {
+            categoryList[index] = originBean
+            Ln.e("UpdateCategory", "分类文件更新失败")
+            callback?.backUi { invoke(-1L) }
+        }
+    }
+
+    /**
      * 创建新条目
      *
      * @param categoryId 分类id

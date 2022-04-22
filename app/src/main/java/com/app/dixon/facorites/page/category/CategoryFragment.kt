@@ -12,6 +12,8 @@ import com.app.dixon.facorites.core.common.SORT_TYPE_TIME
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.ex.findByCondition
+import com.app.dixon.facorites.core.ex.findIndexByCondition
 import com.app.dixon.facorites.core.view.CreateCategoryDialog
 import com.dixon.dlibrary.util.FontUtil
 import kotlinx.android.synthetic.main.app_fragment_category_content.*
@@ -108,10 +110,9 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
     }
 
     override fun onDataUpdated(bean: CategoryInfoBean) {
-        val index = dataList.indexOf(bean)
-        if (index != -1) {
-            dataList[index] = bean
-            rvCategory.adapter?.notifyItemChanged(index)
+        dataList.findIndexByCondition { it.id == bean.id }?.let {
+            dataList[it] = bean
+            rvCategory.adapter?.notifyItemChanged(it)
         }
     }
 }

@@ -7,6 +7,7 @@ import com.app.dixon.facorites.base.BaseApplication
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.CommonCallback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
+import com.app.dixon.facorites.core.ex.tryExtractHttp
 import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.dixon.dlibrary.util.ToastUtil
@@ -41,9 +42,10 @@ class FromShareHelper {
     private fun handleSendText(intent: Intent) {
         intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
             Ln.i("FromShare", it)
+            ToastUtil.toast(it)
             // 获取到链接 走创建流程
             BaseApplication.currentActivity.get()?.let { context ->
-                CreateEntryDialog(context, it).show()
+                CreateEntryDialog(context, it.tryExtractHttp()).show()
             }
             // 记得清数据 以防跳转到其它页面退回后再次触发
             intent.removeExtra(Intent.EXTRA_TEXT)

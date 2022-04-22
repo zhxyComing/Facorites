@@ -17,3 +17,12 @@ fun <T> T.backUi(block: T.() -> Unit) {
         block()
     }
 }
+
+/**
+ * 返回主线程执行
+ */
+fun <T> T.backUi(timeDelay: Long, block: T.() -> Unit) {
+    HandlerUtil.UIHandler.postDelayed({
+        block()
+    }, timeDelay)
+}

@@ -49,7 +49,7 @@ open class BaseApplication : Application() {
     private fun initLifecycle() {
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-
+                currentActivity = WeakReference(activity)
             }
 
             override fun onActivityStarted(activity: Activity) {
