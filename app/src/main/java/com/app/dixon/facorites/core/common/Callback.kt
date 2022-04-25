@@ -35,11 +35,11 @@ class CommonCallback<T>(private val success: String) : Callback<T> {
 /**
  * 通用回调
  */
-class SuccessCallback<T>(private val action: () -> Unit) : Callback<T> {
+open class SuccessCallback<T>(private val action: (T) -> Unit) : Callback<T> {
 
     override fun onSuccess(data: T) {
         Ln.i("CommonCallback", "success $data")
-        action.invoke()
+        action.invoke(data)
     }
 
     override fun onFail(msg: String) {

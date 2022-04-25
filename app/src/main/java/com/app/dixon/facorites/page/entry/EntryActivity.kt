@@ -11,6 +11,7 @@ import com.app.dixon.facorites.core.common.SORT_TYPE_TIME_ORDER
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.ex.setImageByPath
 import com.app.dixon.facorites.core.util.Ln
 import com.dixon.dlibrary.util.FontUtil
 import kotlinx.android.synthetic.main.activity_entry.*
@@ -58,6 +59,11 @@ class EntryActivity : BaseActivity() {
         // 排序方式
         sort.setOnClickListener {
             changeSort()
+        }
+
+        // 设置背景图
+        categoryInfo.bgPath?.let {
+            bgView.setImageByPath(it)
         }
     }
 

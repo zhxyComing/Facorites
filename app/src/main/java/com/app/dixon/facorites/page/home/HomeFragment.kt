@@ -97,6 +97,23 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
                 cards[index].clear()
             }
         }
+        updateEntryTip()
+    }
+
+    private fun updateEntryTip() {
+        when {
+            entries.size >= MAX_ENTRY_NUM -> {
+                entryTip.text = "-- 仅展示最近五条 --"
+                entryTip.show()
+            }
+            entries.isEmpty() -> {
+                entryTip.text = "-- 您的收藏空空如也～ --"
+                entryTip.show()
+            }
+            else -> {
+                entryTip.hide()
+            }
+        }
     }
 
     // 获取最近的前三个Entry

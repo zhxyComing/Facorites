@@ -12,7 +12,8 @@
     <com.app.dixon.facorites.core.view.GradientSimpleDraweeView
         android:id="@+id/bgView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
 
     <!--    <ImageView-->
     <!--        android:id="@+id/ivIcon"-->

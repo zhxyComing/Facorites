@@ -45,4 +45,6 @@ dependencies {
 
     implementation project(':base')
     implementation 'com.dixon.library:dlibrary:1.0.1'
+    // 图片裁剪
+    implementation 'com.github.yalantis:ucrop:2.2.6'
 }

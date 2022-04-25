@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.BaseAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.CommonCallback
@@ -16,11 +13,9 @@ import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.data.service.JSoupService
-import com.app.dixon.facorites.core.ex.shakeTip
 import com.app.dixon.facorites.core.ex.shakeTipIfEmpty
 import com.app.dixon.facorites.core.ex.try2URL
 import com.dixon.dlibrary.util.ScreenUtil
-import com.dixon.dlibrary.util.ToastUtil
 import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import kotlinx.android.synthetic.main.app_item_category_spinner.view.*
 import java.util.*

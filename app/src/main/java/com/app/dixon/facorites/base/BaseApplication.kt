@@ -5,6 +5,7 @@ import android.app.Application
 import android.os.Bundle
 import com.dixon.dlibrary.util.DUtil
 import com.app.dixon.facorites.BuildConfig
+import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.data.service.JSoupService
 import com.facebook.drawee.backends.pipeline.Fresco
@@ -41,6 +42,7 @@ open class BaseApplication : Application() {
 
         DataService.runService()
         JSoupService.runService()
+        BitmapIOService.runService()
 
         Fresco.initialize(this)
         initLifecycle()

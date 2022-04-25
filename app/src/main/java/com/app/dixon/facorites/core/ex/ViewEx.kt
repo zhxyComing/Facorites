@@ -1,13 +1,14 @@
 package com.app.dixon.facorites.core.ex
 
+import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.view.animation.CycleInterpolator
 import android.view.animation.TranslateAnimation
 import android.widget.TextView
-import com.app.dixon.facorites.R
+import com.app.dixon.facorites.base.BaseApplication
+import com.facebook.drawee.view.SimpleDraweeView
+import java.io.File
 
 /**
  * 全路径：com.app.dixon.facorites.core.ex
@@ -130,4 +131,30 @@ fun TextView.shakeTipIfEmpty() {
     if (text.toString().isEmpty()) {
         shakeTip()
     }
+}
+
+/**
+ * 安全的使用SimpleDraweeView，防止内存泄漏
+ * SimpleDraweeView.setImageURI(Uri uri, @Nullable Object callerContext) context如果是Activity，会导致内存泄漏...
+ */
+fun SimpleDraweeView.setImageByPath(path: String?) {
+    if (path.isNullOrEmpty()) return
+    if (path.startsWith("file://")) {
+        setImageURI(path)
+        return
+    }
+    if (path.startsWith("http")) {
+        setImageURI(Uri.parse(path), BaseApplication.application)
+        return
+    }
+    setImageURI(Uri.fromFile(File(path)), BaseApplication.application)
+}
+
+/**
+ * 安全的使用SimpleDraweeView，防止内存泄漏
+ * SimpleDraweeView.setImageURI(Uri uri, @Nullable Object callerContext) context如果是Activity，会导致内存泄漏...
+ */
+fun SimpleDraweeView.setImageByUri(uri: Uri?) {
+    if (uri == null) return
+    setImageURI(uri, BaseApplication.application)
 }

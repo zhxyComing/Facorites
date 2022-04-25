@@ -148,4 +148,9 @@ class InfiniteBanner @JvmOverloads constructor(context: Context, attrs: Attribut
             }
         })
     }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        stopLoop()
+    }
 }

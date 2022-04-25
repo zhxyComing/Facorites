@@ -10,4 +10,4 @@ import kotlinx.android.parcel.Parcelize
  * 创建时间：3/18/22 3:07 PM
  */
 @Parcelize
-data class CategoryInfoBean(val id: Long, val name: String) : Parcelable
+data class CategoryInfoBean(val id: Long, val name: String, val bgPath: String? = null) : Parcelable

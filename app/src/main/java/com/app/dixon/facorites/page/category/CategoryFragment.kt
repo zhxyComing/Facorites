@@ -12,7 +12,6 @@ import com.app.dixon.facorites.core.common.SORT_TYPE_TIME
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.DataService
-import com.app.dixon.facorites.core.ex.findByCondition
 import com.app.dixon.facorites.core.ex.findIndexByCondition
 import com.app.dixon.facorites.core.view.CreateCategoryDialog
 import com.dixon.dlibrary.util.FontUtil

@@ -1,10 +1,12 @@
 package com.app.dixon.facorites.core.data.service
 
+import android.net.Uri
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.bean.io.toEntry
 import com.app.dixon.facorites.core.data.bean.io.toJson
+import com.app.dixon.facorites.core.data.service.base.FileUtils
 import com.app.dixon.facorites.core.data.service.base.IService
 import com.app.dixon.facorites.core.data.service.base.WorkService
 import com.app.dixon.facorites.core.ex.backUi
@@ -24,6 +26,8 @@ import kotlin.collections.HashMap
  * 类描述：数据存取服务
  * 创建人：xuzheng
  * 创建时间：3/17/22 8:09 PM
+ *
+ * (data/data/xxx/file/mark)
  *
  * 目录 -> 分类 -> 条目
  *
@@ -52,7 +56,7 @@ object DataService : IService {
     private val ioService: WorkService = WorkService()
 
     /**
-     * 初始化ArrArrAsdsa
+     * 初始化
      */
     override fun runService() {
         ioService.runService()
@@ -104,13 +108,13 @@ object DataService : IService {
     /**
      * 创建新分类
      */
-    fun createCategory(name: String, callback: ((Long) -> Unit)? = null) {
+    fun createCategory(name: String, bgPath: String? = null, callback: ((Long) -> Unit)? = null) {
         ioService.postEvent {
-            doCreateCategory(name, callback)
+            doCreateCategory(name, bgPath, callback)
         }
     }
 
-    private fun doCreateCategory(name: String, callback: ((Long) -> Unit)? = null) {
+    private fun doCreateCategory(name: String, bgPath: String? = null, callback: ((Long) -> Unit)? = null) {
         // 创建文件夹
         val dirId = Date().time
         if (!FileUtils.createNewFile("$ROOT_PATH/$dirId")) {
@@ -119,7 +123,7 @@ object DataService : IService {
         }
         // 使用临时数据更新文件
         val saveList = categoryList.toMutableList() // 创建副本
-        val categoryBean = CategoryInfoBean(dirId, name)
+        val categoryBean = CategoryInfoBean(dirId, name, bgPath)
         saveList.add(categoryBean)
         val isSuccess =
             FileUtils.saveString(
@@ -514,4 +518,11 @@ object DataService : IService {
 
     // 全局任一Entry变化时的回调
     interface IGlobalEntryChanged : IDataChanged<BaseEntryBean>
+
+    override fun toString(): String {
+        callbackRegister(globalEntryCallbacks){
+
+        }
+        return "$globalEntryCallbacks "
+    }
 }

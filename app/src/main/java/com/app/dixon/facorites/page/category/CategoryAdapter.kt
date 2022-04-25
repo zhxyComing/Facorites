@@ -2,7 +2,6 @@ package com.app.dixon.facorites.page.category
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +10,8 @@ import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.ex.setImageByPath
+import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.util.TimeUtils
 import com.app.dixon.facorites.core.view.EditCategoryDialog
 import com.dixon.dlibrary.util.FontUtil
@@ -40,11 +41,14 @@ class CategoryAdapter(val context: Context, val data: List<CategoryInfoBean>) : 
         holder.itemView.cardContent.setOnClickListener {
             PageJumper.openEntryPage(context, data[position])
         }
-        holder.itemView.bgView.setImageURI(Uri.parse("https://pic.5tu.cn/uploads/allimg/1605/251507157490.jpg"), context)
         holder.itemView.setOnLongClickListener {
             EditCategoryDialog(context, info).show()
             true
         }
+        info.bgPath?.let {
+            Ln.i("CategoryAdapter", it)
+            holder.itemView.bgView.setImageByPath(it)
+        } ?: holder.itemView.bgView.setImageByPath("https://pic.5tu.cn/uploads/allimg/1605/251507157490.jpg")
     }
 
     override fun getItemCount(): Int = data.size

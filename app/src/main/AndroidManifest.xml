@@ -5,7 +5,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- 小米手机装不上，不是开发者模式的问题，是启动Activity没有设置exported=true(所以在关闭MIUI优化后会提示AndroidManifest合并错误)，草 -->
     <application
         android:name=".base.BaseApplication"
         android:allowBackup="true"
@@ -13,9 +12,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:theme="@style/Theme.Facorites.AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
+        <activity
+            android:name=".page.crop.CropActivity"
+            android:exported="false" />
         <activity android:name=".page.browse.BrowseActivity" />
         <activity android:name=".page.entry.EntryActivity" />
         <activity
