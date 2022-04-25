@@ -79,6 +79,7 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
                                 link = text,
                                 title = title,
                                 remark = remark,
+                                schemeJump = it.schemeJump,
                                 date = it.date,
                                 belongTo = spinner.selectedItemId
                             ),
