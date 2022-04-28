@@ -11,9 +11,10 @@ import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.hide
+import com.app.dixon.facorites.core.ex.process
 import com.app.dixon.facorites.core.ex.show
 import com.app.dixon.facorites.core.util.CollectionUtil
-import com.app.dixon.facorites.core.view.LinkCardView
+import com.app.dixon.facorites.core.view.EntryView
 import com.facebook.drawee.view.SimpleDraweeView
 import kotlinx.android.synthetic.main.app_fragment_home_content.*
 
@@ -32,14 +33,14 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
 
     // 仅包含最近的前N个元素
     private val entries = mutableListOf<BaseEntryBean>()
-    private lateinit var cards: List<LinkCardView>
+    private lateinit var cards: List<EntryView>
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View = inflater.inflate(R.layout.app_fragment_home_content, container, false).apply {
-        val cards = mutableListOf<LinkCardView>()
+        val cards = mutableListOf<EntryView>()
         cards.add(findViewById(R.id.cardFirst))
         cards.add(findViewById(R.id.cardSecond))
         cards.add(findViewById(R.id.cardThird))
@@ -88,10 +89,15 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
 
     private fun initEntries() {
         for (index in 0 until MAX_ENTRY_NUM) {
-            // TODO 根据类型判断
-            (entries.getOrNull(index) as? LinkEntryBean)?.let {
+            (entries.getOrNull(index))?.let {
+                it.process({ linkEntry ->
+                    // link 类型
+                    cards[index].setLinkEntry(linkEntry)
+                }, { imageEntry ->
+                    // image 类型
+                    cards[index].setImageEntry(imageEntry)
+                })
                 cards[index].show()
-                cards[index].setLinkEntry(it)
             } ?: let {
                 cards[index].hide()
                 cards[index].clear()

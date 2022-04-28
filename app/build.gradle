@@ -47,4 +47,6 @@ dependencies {
     implementation 'com.dixon.library:dlibrary:1.0.1'
     // 图片裁剪
     implementation 'com.github.yalantis:ucrop:2.2.6'
+    // 图片查看器
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 }

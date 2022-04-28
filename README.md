@@ -13,6 +13,14 @@ TODO 组件化处理 ✅
 TODO 浏览器打开 ✅
 TODO 提取颜色 自动适配网页Topbar ⬇️
 TODO 记录浏览器打开链接 ✅
+TODO 空页面
+TODO 分类页支持更换背景图
+TODO 将图片转存到本地 ✅
+TODO 图片压缩
+TODO 图片条目删除时图片也一并删除
+TODO 图片预览 ✅
+TODO 自动解析链接里的Http链接 ✅ 并支持设置开关
+TODO 获取缩略图
 
 
 已知问题

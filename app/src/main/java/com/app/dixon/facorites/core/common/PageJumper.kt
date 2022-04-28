@@ -9,6 +9,7 @@ import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.page.browse.BrowseActivity
 import com.app.dixon.facorites.page.entry.EntryActivity
 import com.app.dixon.facorites.page.home.HomeActivity
+import com.app.dixon.facorites.page.image.ImageActivity
 
 /**
  * 全路径：com.app.dixon.facorites.core.common
@@ -61,6 +62,18 @@ object PageJumper {
                 putExtra(ENTRY_ID, entryId)
                 putExtra(CATEGORY_ID, categoryId)
                 putExtra(BROWSE_LINK, link)
+            }
+            startActivity(it, intent, requestCode)
+        }
+    }
+
+    /**
+     * 打开图片浏览页
+     */
+    fun openImagePage(asContext: Any, path: String, requestCode: Int = -1) {
+        resultJump(asContext) {
+            val intent = Intent(it, ImageActivity::class.java).apply {
+                putExtra(IMAGE_PATH, path)
             }
             startActivity(it, intent, requestCode)
         }

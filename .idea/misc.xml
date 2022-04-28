@@ -21,16 +21,18 @@
         <entry key="app/src/main/res/layout/activity_browse.xml" value="0.165" />
         <entry key="app/src/main/res/layout/activity_crop.xml" value="0.17604166666666668" />
         <entry key="app/src/main/res/layout/activity_entry.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_image.xml" value="0.171875" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.3170289855072464" />
         <entry key="app/src/main/res/layout/app_dialog_category_delete_content.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_dialog_category_edit_content.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/app_dialog_create_category_content.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/app_dialog_create_entry_content.xml" value="0.17447916666666666" />
+        <entry key="app/src/main/res/layout/app_dialog_create_category_content.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/app_dialog_create_entry_content.xml" value="0.25" />
         <entry key="app/src/main/res/layout/app_dialog_scheme_jump_content.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_dialog_update_category_content.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/app_fragment_category_content.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/app_fragment_category_content.xml" value="0.25" />
         <entry key="app/src/main/res/layout/app_fragment_home_content.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_item_category.xml" value="0.19166666666666668" />
+        <entry key="app/src/main/res/layout/app_item_entry.xml" value="0.246875" />
         <entry key="app/src/main/res/layout/app_view_link_card.xml" value="0.134375" />
       </map>
     </option>

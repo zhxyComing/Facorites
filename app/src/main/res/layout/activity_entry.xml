@@ -16,7 +16,7 @@
             android:layout_height="match_parent"
             android:background="@drawable/app_shape_fragment_category_top_bar" />
 
-        <com.facebook.drawee.view.SimpleDraweeView
+        <com.app.dixon.facorites.core.view.GradientSimpleDraweeView
             android:id="@+id/bgView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

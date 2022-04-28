@@ -14,7 +14,6 @@ import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.findIndexByCondition
 import com.app.dixon.facorites.core.view.CreateCategoryDialog
-import com.dixon.dlibrary.util.FontUtil
 import kotlinx.android.synthetic.main.app_fragment_category_content.*
 
 /**
@@ -46,9 +45,7 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.app_fragment_category_content, container, false).apply {
-        FontUtil.font(this)
-    }
+    ): View = inflater.inflate(R.layout.app_fragment_category_content, container, false)
 
     override fun onVisibleFirst() {
         super.onVisibleFirst()

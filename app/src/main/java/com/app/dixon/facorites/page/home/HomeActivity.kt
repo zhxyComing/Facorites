@@ -17,6 +17,7 @@ import com.app.dixon.facorites.core.function.fromshare.FromShareHelper
 import com.app.dixon.facorites.core.util.ImageSelectHelper
 import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.view.CreateEntryDialog
+import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
 import com.app.dixon.facorites.page.category.CategoryFragment
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.dixon.dlibrary.util.FontUtil
@@ -147,6 +148,12 @@ class HomeActivity : BaseActivity() {
                 // 2.2 裁剪失败
                 val cropError = UCrop.getError(it)
                 Ln.i("CropResult", "fail ${cropError.toString()}")
+            } else if (requestCode == ENTRY_IMAGE_REQUEST) {
+                // 图片收藏选图成功
+                it.data?.let { uri ->
+                    Ln.i("ImageResult", "$uri")
+                    EventBus.getDefault().post(CategoryImageCompleteEvent(uri))
+                }
             } else {
                 // do nothing
             }
@@ -156,7 +163,7 @@ class HomeActivity : BaseActivity() {
 
     // 跳转分类背景图裁剪
     private fun openCategoryBgCrop(uri: Uri) {
-        Ln.i("openCategoryBgCrop","${400.dp} ${100.dp}")
+        Ln.i("openCategoryBgCrop", "${400.dp} ${100.dp}")
         ImageSelectHelper.openImageCropPage(
             this, uri,
             BitmapIOService.createBitmapSavePath(),

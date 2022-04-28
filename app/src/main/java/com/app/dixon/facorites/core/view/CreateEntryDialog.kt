@@ -1,6 +1,8 @@
 package com.app.dixon.facorites.core.view
 
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,15 +12,25 @@ import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.CommonCallback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
+import com.app.dixon.facorites.core.data.bean.ImageEntryBean
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
+import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.data.service.JSoupService
-import com.app.dixon.facorites.core.ex.shakeTipIfEmpty
-import com.app.dixon.facorites.core.ex.try2URL
+import com.app.dixon.facorites.core.enum.EntryType
+import com.app.dixon.facorites.core.ex.*
+import com.app.dixon.facorites.core.util.ImageSelectHelper
+import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.dixon.dlibrary.util.ScreenUtil
+import com.dixon.dlibrary.util.ToastUtil
 import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import kotlinx.android.synthetic.main.app_item_category_spinner.view.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import java.util.*
+
+const val ENTRY_IMAGE_REQUEST = 101
 
 // TODO 优化代码
 class CreateEntryDialog(context: Context, val link: String? = null, private val callback: Callback<BaseEntryBean> = CommonCallback("创建成功！"), val editType: Int = EDIT_TYPE_CREATE) :
@@ -29,8 +41,16 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
         const val EDIT_TYPE_UPDATE = 1
     }
 
+    // 当前的编辑类型
+    private var type: Int = EntryType.LINK
+
+    // link类型参数
     // 带入的Entry
     private var tapeEntry: LinkEntryBean? = null
+
+    // 图片类型参数
+    // 选图
+    private var imagePath: String? = null
 
     constructor(
         context: Context, entry: LinkEntryBean,
@@ -55,48 +75,25 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
     override fun windowAnimStyle(): Int = R.style.DialogAnimStyle
 
     override fun initDialog() {
+        EventBus.getDefault().register(this)
         tvCreate.setOnClickListener {
-            val text = etEntryInput.text.toString()
-            val title = etEntryTitle.text.toString()
-            val remark = etEntryRemark.text.toString()
-            if (text.isNotEmpty() && title.isNotEmpty()) {
-                if (editType == EDIT_TYPE_CREATE) {
-                    DataService.createEntry(
-                        LinkEntryBean(
-                            link = text,
-                            title = title,
-                            remark = remark,
-                            date = Date().time,
-                            belongTo = spinner.selectedItemId
-                        ),
-                        callback
-                    )
-                } else if (editType == EDIT_TYPE_UPDATE) {
-                    tapeEntry?.let {
-                        DataService.updateEntry(
-                            it,
-                            LinkEntryBean(
-                                link = text,
-                                title = title,
-                                remark = remark,
-                                schemeJump = it.schemeJump,
-                                date = it.date,
-                                belongTo = spinner.selectedItemId
-                            ),
-                            callback
-                        )
-                    }
-                }
-                dismiss()
+            if (type == EntryType.LINK) {
+                saveLink()
             } else {
-                // 未填数据提示
-                etEntryInput.shakeTipIfEmpty()
-                etEntryTitle.shakeTipIfEmpty()
+                saveImage()
             }
         }
         // 粘贴时解析
         etEntryInput.setOnPasteListener {
-            parseTitle(it)
+            ToastUtil.toast(it)
+            val realUrl = it.tryExtractHttpByMatcher()
+            if (it != realUrl) {
+                // 原始字符串不是纯链接，且解析出了链接，重新设置Title为链接
+                etEntryInput.post {
+                    etEntryInput.setText(realUrl)
+                }
+            }
+            parseTitle(realUrl)
         }
         // 带入弹窗的链接进行解析
         // 比如外部跳转
@@ -117,6 +114,108 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
                 }
             }
             spinnerIndex?.let { index -> spinner.setSelection(index) }
+        }
+
+        initImageLayout()
+    }
+
+    // 保存链接
+    private fun saveLink() {
+        val text = etEntryInput.text.toString()
+        val title = etEntryTitle.text.toString()
+        val remark = etEntryRemark.text.toString()
+        if (text.isNotEmpty() && title.isNotEmpty()) {
+            if (editType == EDIT_TYPE_CREATE) {
+                DataService.createEntry(
+                    LinkEntryBean(
+                        link = text,
+                        title = title,
+                        remark = remark,
+                        date = Date().time,
+                        belongTo = spinner.selectedItemId
+                    ),
+                    callback
+                )
+            } else if (editType == EDIT_TYPE_UPDATE) {
+                tapeEntry?.let {
+                    DataService.updateEntry(
+                        it,
+                        LinkEntryBean(
+                            link = text,
+                            title = title,
+                            remark = remark,
+                            schemeJump = it.schemeJump,
+                            date = it.date,
+                            belongTo = spinner.selectedItemId
+                        ),
+                        callback
+                    )
+                }
+            }
+            dismiss()
+        } else {
+            // 未填数据提示
+            etEntryInput.shakeTipIfEmpty()
+            etEntryTitle.shakeTipIfEmpty()
+        }
+    }
+
+    // 保存图片
+    private fun saveImage() {
+        val title = etImageTitle.text.toString()
+        val path = imagePath
+        if (title.isNotEmpty() && !path.isNullOrEmpty()) {
+            DataService.createEntry(
+                ImageEntryBean(
+                    path = path,
+                    title = title,
+                    date = Date().time,
+                    belongTo = spinner.selectedItemId
+                ),
+                callback
+            )
+            dismiss()
+        } else {
+            etImageTitle.shakeTipIfEmpty()
+            if (path.isNullOrEmpty()) {
+                selectImage.shakeTip()
+            }
+        }
+    }
+
+    // 图片类型
+    private fun initImageLayout() {
+        if (tapeEntry != null) {
+            layoutChange.hide()
+            return
+        }
+        layoutChange.setOnClickListener {
+            changeType()
+            if (type == EntryType.LINK) {
+                linkLayout.show()
+                imageLayout.hide()
+                layoutChange.setImageResource(R.drawable.app_image_red)
+            } else {
+                linkLayout.hide()
+                imageLayout.show()
+                layoutChange.setImageResource(R.drawable.app_link_red)
+            }
+        }
+        initImageLayoutUi()
+    }
+
+    private fun initImageLayoutUi() {
+        selectImage.setOnClickListener {
+            // 打开图片选择
+            ImageSelectHelper.openImageSelectPage(ENTRY_IMAGE_REQUEST)
+        }
+    }
+
+    private fun changeType() {
+        type = if (type == EntryType.LINK) {
+            EntryType.IMAGE
+        } else {
+            EntryType.LINK
         }
     }
 
@@ -161,5 +260,34 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
         }
 
         class ViewHolder(val itemView: View)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        EventBus.getDefault().unregister(this)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onImageSelectComplete(event: CategoryImageCompleteEvent) {
+        // 转存图片到本地
+        val bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(event.uri))
+        val absolutePath = BitmapIOService.createBitmapSavePath()
+        tvTip.text = "导入中，请耐心等待"
+        selectImage.isEnabled = false
+        BitmapIOService.saveBitmap(absolutePath, bitmap, object : Callback<String> {
+            override fun onSuccess(data: String) {
+                ToastUtil.toast("图片转存成功")
+                imagePath = data
+                bgView.setImageByUri(event.uri)
+                tvTip.text = "从相册选取图片"
+                selectImage.isEnabled = true
+            }
+
+            override fun onFail(msg: String) {
+                ToastUtil.toast("图片转存失败，请更换图片后重新尝试")
+                tvTip.text = "从相册选取图片"
+                selectImage.isEnabled = true
+            }
+        })
     }
 }

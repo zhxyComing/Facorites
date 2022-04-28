@@ -32,10 +32,9 @@ object BitmapIOService : IService {
     /**
      * 保存图片 现在裁剪页自动保存图片，返回路径，不需要手动保存
      */
-    fun saveBitmap(bitmap: Bitmap, callback: Callback<String>) {
+    fun saveBitmap(absolutePath: String, bitmap: Bitmap, callback: Callback<String>) {
         ioService.postEvent {
-            val path = "$ROOT_PATH/${Date().time}.png"
-            FileUtils.saveBitmap(path, bitmap, object : Callback<String> {
+            FileUtils.saveBitmap(absolutePath, bitmap, object : Callback<String> {
                 override fun onSuccess(data: String) {
                     backUi { callback.onSuccess(data) }
                 }
@@ -50,20 +49,9 @@ object BitmapIOService : IService {
     /**
      * 从指定路径读取图片
      */
-    fun readBitmap(path: String, callback: Callback<Bitmap>) {
+    fun readBitmap(absolutePath: String, callback: Callback<Bitmap>) {
         ioService.postEvent {
-            FileUtils.readBitmapByPath(path)?.let {
-                backUi { callback.onSuccess(it) }
-            } ?: backUi { callback.onFail("获取图片失败") }
-        }
-    }
-
-    /**
-     * 从绝对值路径读取图片
-     */
-    fun readBitmapByAbsolutePath(absolutePath: String, callback: Callback<Bitmap>) {
-        ioService.postEvent {
-            FileUtils.readBitmapByAbsolutePath(absolutePath)?.let {
+            FileUtils.readBitmap(absolutePath)?.let {
                 backUi { callback.onSuccess(it) }
             } ?: backUi { callback.onFail("获取图片失败") }
         }

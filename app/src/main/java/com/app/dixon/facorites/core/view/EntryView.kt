@@ -12,6 +12,8 @@ import android.view.animation.DecelerateInterpolator
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.common.SuccessCallback
+import com.app.dixon.facorites.core.data.bean.BaseEntryBean
+import com.app.dixon.facorites.core.data.bean.ImageEntryBean
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.*
@@ -35,10 +37,10 @@ import kotlinx.android.synthetic.main.app_view_link_card.view.*
 
 private const val CLICK_DELAY_TIME = 500L
 
-class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) : BaseEntryView(context, attrs, defStyle) {
+class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) : BaseEntryView(context, attrs, defStyle) {
 
     private val animMonitor = SwitchAnimStatusMonitor(SWITCH_STATUS_CLOSE)
-    private var bean: LinkEntryBean? = null
+    private var bean: BaseEntryBean? = null
 
     private var animChain: AnimChain? = null
 
@@ -50,7 +52,7 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
         tvJump.setOnClickListener {
             // 跳转
             // TODO
-            bean?.let { linkBean ->
+            (bean as? LinkEntryBean)?.let { linkBean ->
                 if (linkBean.link.isValidUrl()) {
                     val uri: Uri = Uri.parse(linkBean.link)
                     val intent = Intent(Intent.ACTION_VIEW, uri)
@@ -64,7 +66,7 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
 
         tvUpdate.setOnClickListener {
             // 修改
-            bean?.let {
+            (bean as? LinkEntryBean)?.let {
                 CreateEntryDialog(context, it).show()
             }
         }
@@ -73,8 +75,8 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
             // 删除
             // 收起面板
             hideSubCard {
-                bean?.let { linkBean ->
-                    DataService.deleteEntry(linkBean, SuccessCallback {
+                bean?.let { entry ->
+                    DataService.deleteEntry(entry, SuccessCallback {
                         ToastUtil.toast("删除成功！")
                         bean = null
                     })
@@ -83,21 +85,23 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
         }
 
         tvCopy.setOnClickListener {
-            bean?.let { linkBean ->
+            (bean as? LinkEntryBean)?.let { linkBean ->
                 ClipUtil.copyToClip(context, linkBean.link)
                 ToastUtil.toast("已复制到剪贴板")
             }
         }
 
         ivBrowse.setOnClickListener {
-            bean?.let { linkBean ->
-                if (linkBean.link.isValidUrl()) {
-                    PageJumper.openBrowsePage(context, linkBean.belongTo, linkBean.date, linkBean.link)
+            bean?.process({ linkEntry ->
+                if (linkEntry.link.isValidUrl()) {
+                    PageJumper.openBrowsePage(context, linkEntry.belongTo, linkEntry.date, linkEntry.link)
                 } else {
-                    ClipUtil.copyToClip(context, linkBean.link)
+                    ClipUtil.copyToClip(context, linkEntry.link)
                     ToastUtil.toast("非网页链接，已复制到剪贴板，请自行选择合适程序")
                 }
-            }
+            }, { imageEntry ->
+                PageJumper.openImagePage(context, imageEntry.path)
+            })
         }
     }
 
@@ -118,9 +122,34 @@ class LinkCardView @JvmOverloads constructor(context: Context, attrs: AttributeS
                 SchemeJumper.jumpByScheme(context, scheme)
             }
         } ?: tvSchemeJump.hide()
+        initLinkUi()
+    }
+
+    private fun initLinkUi() {
+        tvJump.show()
+        tvUpdate.show()
+        tvCopy.show()
+        ivBrowse.show()
+        tvDelete.show()
+    }
+
+    fun setImageEntry(bean: ImageEntryBean) {
+        this.bean = bean
+        icon.setActualImageResource(R.drawable.app_image_for_entry)
+        title.text = bean.title
+        initImageUi()
+    }
+
+    private fun initImageUi() {
+        tvJump.hide()
+        tvUpdate.hide()
+        tvCopy.hide()
+        ivBrowse.show()
+        tvDelete.show()
     }
 
     fun clear() {
+        this.bean = null
         title.text = ""
         icon.setImageURI("")
     }

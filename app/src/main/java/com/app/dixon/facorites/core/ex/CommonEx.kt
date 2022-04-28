@@ -2,7 +2,11 @@ package com.app.dixon.facorites.core.ex
 
 import android.util.Patterns
 import android.webkit.URLUtil
+import com.app.dixon.facorites.core.data.bean.BaseEntryBean
+import com.app.dixon.facorites.core.data.bean.ImageEntryBean
+import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import java.net.URL
+import java.util.regex.Pattern
 
 /**
  * 全路径：com.app.dixon.facorites.core.ex
@@ -102,11 +106,43 @@ fun <T> List<T>.findIndexByCondition(condition: (T) -> Boolean): Int? {
 
 /**
  * 尝试提取Http链接
+ *
+ * 常见于从第三方APP直接分享到这里，通常链接为 xxx，http...
  */
 fun String.tryExtractHttp() = indexOf("http").let {
     if (it != -1) {
         substring(it)
     } else {
         this
+    }
+}
+
+/**
+ * 尝试提取Http链接
+ *
+ * 正则方式
+ */
+fun String.tryExtractHttpByMatcher(): String {
+    if (!startsWith("http")) {
+        val regex =
+            "((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#\$%^&*+?:_/=<>[\\u4e00-\\u9fa5]*]*)+)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#\$%^&*+?:_/=<>[\\u4e00-\\u9fa5]*]*)+)";
+        val matcher = Pattern.compile(regex).matcher(this)
+        if (matcher.find()) {
+            return matcher.group()
+        }
+        return this
+    }
+    return this
+}
+
+/**
+ * 根据BaseEntryBean的实际类型进行特殊处理
+ */
+fun BaseEntryBean.process(linkAction: (linkEntry: LinkEntryBean) -> Unit, imageAction: (imageEntry: ImageEntryBean) -> Unit) {
+    (this as? LinkEntryBean)?.let {
+        linkAction.invoke(it)
+    }
+    (this as? ImageEntryBean)?.let {
+        imageAction.invoke(it)
     }
 }

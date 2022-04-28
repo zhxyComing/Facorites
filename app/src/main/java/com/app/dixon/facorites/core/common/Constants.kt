@@ -15,6 +15,8 @@ const val CATEGORY_INFO = "category_info"
 
 const val BROWSE_LINK = "browse_link"
 
+const val IMAGE_PATH = "image_path"
+
 const val TRANSIT_LINK = "transit_link"
 
 const val SORT_TYPE_TIME = "sort_time"

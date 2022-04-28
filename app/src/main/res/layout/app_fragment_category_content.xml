@@ -22,21 +22,33 @@
             android:gravity="bottom"
             android:orientation="vertical">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="收藏集"
-                android:textColor="@color/white"
-                android:textSize="32sp"
-                android:textStyle="bold" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="收藏集"
+                    android:textColor="@color/white"
+                    android:textSize="32sp" />
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="5dp"
+                    android:src="@drawable/app_category_icon" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
                 android:layout_marginTop="10dp"
-                android:text="管理你的收藏集～"
-                android:textColor="#E0E0E0"
-                android:textSize="12sp" />
+                android:text="管理你的收藏集"
+                android:textColor="#F0F0F0"
+                android:textSize="10sp" />
         </LinearLayout>
 
 
@@ -45,6 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
+            android:alpha="0.8"
             android:background="@drawable/app_shape_round_white"
             android:paddingStart="10dp"
             android:paddingTop="6dp"

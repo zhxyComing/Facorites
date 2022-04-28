@@ -77,7 +77,7 @@
 
     <!-- 显示最近三个收藏 -->
 
-    <com.app.dixon.facorites.core.view.LinkCardView
+    <com.app.dixon.facorites.core.view.EntryView
         android:id="@+id/cardFirst"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -86,7 +86,7 @@
         android:layout_marginEnd="20dp"
         android:background="@drawable/app_shape_home_entry_card" />
 
-    <com.app.dixon.facorites.core.view.LinkCardView
+    <com.app.dixon.facorites.core.view.EntryView
         android:id="@+id/cardSecond"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -95,7 +95,7 @@
         android:layout_marginEnd="20dp"
         android:background="@drawable/app_shape_home_entry_card" />
 
-    <com.app.dixon.facorites.core.view.LinkCardView
+    <com.app.dixon.facorites.core.view.EntryView
         android:id="@+id/cardThird"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
         android:layout_marginEnd="20dp"
         android:background="@drawable/app_shape_home_entry_card" />
 
-    <com.app.dixon.facorites.core.view.LinkCardView
+    <com.app.dixon.facorites.core.view.EntryView
         android:id="@+id/cardFourth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -113,7 +113,7 @@
         android:layout_marginEnd="20dp"
         android:background="@drawable/app_shape_home_entry_card" />
 
-    <com.app.dixon.facorites.core.view.LinkCardView
+    <com.app.dixon.facorites.core.view.EntryView
         android:id="@+id/cardFifth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

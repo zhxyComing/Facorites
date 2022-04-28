@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
+import com.app.dixon.facorites.core.ex.process
 import kotlinx.android.synthetic.main.app_item_entry.view.*
 
 /**
@@ -28,27 +29,29 @@ class EntryAdapter(val context: Context, val data: List<Openable<BaseEntryBean>>
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
         val openable = data[position]
         val entry = openable.data
-        (entry as? LinkEntryBean)?.let {
-            holder.itemView.linkCard.apply {
-                setLinkEntry(entry)
-                setOnClickListener {
-                    // 0. 查找当前列表的打开状态
-                    val openIndex = findOpenIndex()
-                    // 1. 改变当前卡片的打开状态
-                    openable.isOpen = !openable.isOpen
-                    // 2. 如果是打开卡片，则把旧的已开卡片关闭，并记录新的
-                    if (openable.isOpen) {
-                        if (openIndex != -1) {
-                            data[openIndex].isOpen = false
-                            notifyItemChanged(openIndex)
-                        }
+        entry.process({ linkEntry ->
+            holder.itemView.linkCard.setLinkEntry(linkEntry)
+        }, { imageEntry ->
+            holder.itemView.linkCard.setImageEntry(imageEntry)
+        })
+        holder.itemView.linkCard.apply {
+            setOnClickListener {
+                // 0. 查找当前列表的打开状态
+                val openIndex = findOpenIndex()
+                // 1. 改变当前卡片的打开状态
+                openable.isOpen = !openable.isOpen
+                // 2. 如果是打开卡片，则把旧的已开卡片关闭，并记录新的
+                if (openable.isOpen) {
+                    if (openIndex != -1) {
+                        data[openIndex].isOpen = false
+                        notifyItemChanged(openIndex)
                     }
                 }
-                if (openable.isOpen) {
-                    openSubCardAtOnce()
-                } else {
-                    closeSubCardAtOnce()
-                }
+            }
+            if (openable.isOpen) {
+                openSubCardAtOnce()
+            } else {
+                closeSubCardAtOnce()
             }
         }
     }

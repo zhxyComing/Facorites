@@ -130,9 +130,11 @@ object FileUtils {
 
     /**
      * 保存图片
+     *
+     * 图片的路径一律使用绝对值 方便外部通过Uri去调用
      */
-    fun saveBitmap(path: String, bitmap: Bitmap, asyncCallback: Callback<String>) {
-        val file = File(ROOT_CATEGORY, path)
+    fun saveBitmap(absolutePath: String, bitmap: Bitmap, asyncCallback: Callback<String>) {
+        val file = File(absolutePath)
         if (!file.exists()) {
             val success = file.createNewFile()
             if (!success) {
@@ -145,7 +147,7 @@ object FileUtils {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
             fos.flush()
             fos.close()
-            asyncCallback.onSuccess(path)
+            asyncCallback.onSuccess(file.absolutePath)
         } catch (e: IOException) {
             Ln.e("BitmapUtils", e.toString())
             asyncCallback.onFail(e.toString())
@@ -155,8 +157,8 @@ object FileUtils {
     /**
      * 读取图片
      */
-    fun readBitmapByPath(path: String): Bitmap? {
-        val file = File(ROOT_CATEGORY, path)
+    fun readBitmap(absolutePath: String): Bitmap? {
+        val file = File(absolutePath)
         if (!file.exists()) {
             return null
         }
@@ -187,30 +189,4 @@ object FileUtils {
         }
         return file.absolutePath
     }
-
-    /**
-     * 读取图片
-     */
-    fun readBitmapByAbsolutePath(absolutePath: String): Bitmap? {
-        val file = File(absolutePath)
-        if (!file.exists()) {
-            return null
-        }
-        // 最大读取10M图片
-        val buf = ByteArray(1024 * 1024 * 10)
-        val bitmap: Bitmap?
-        try {
-            val fis = FileInputStream(file.absolutePath)
-            val len: Int = fis.read(buf, 0, buf.size)
-            bitmap = BitmapFactory.decodeByteArray(buf, 0, len)
-            if (bitmap == null) {
-                return null
-            }
-            fis.close()
-        } catch (e: Exception) {
-            return null
-        }
-        return bitmap
-    }
-
 }
