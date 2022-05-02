@@ -154,9 +154,11 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
     override fun onDataUpdated(bean: BaseEntryBean) {
         val index = entries.indexOf(bean)
         if (index != -1) {
-            (bean as? LinkEntryBean)?.let {
+            bean.process({
                 cards[index].setLinkEntry(it)
-            }
+            }, {
+                cards[index].setImageEntry(it)
+            })
         }
     }
 }

@@ -2,7 +2,6 @@ package com.app.dixon.facorites.core.view
 
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,8 +31,12 @@ import java.util.*
 
 const val ENTRY_IMAGE_REQUEST = 101
 
-// TODO 优化代码
-class CreateEntryDialog(context: Context, val link: String? = null, private val callback: Callback<BaseEntryBean> = CommonCallback("创建成功！"), val editType: Int = EDIT_TYPE_CREATE) :
+// 创建用构造函数
+class CreateEntryDialog(
+    context: Context,
+    private val linkFromShare: String? = null,
+    private val callback: Callback<BaseEntryBean> = CommonCallback("创建成功！")
+) :
     BaseDialog(context) {
 
     companion object {
@@ -41,26 +44,28 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
         const val EDIT_TYPE_UPDATE = 1
     }
 
-    // 当前的编辑类型
-    private var type: Int = EntryType.LINK
+    // 编辑类型 创建｜更新
+    private var editType = EDIT_TYPE_CREATE
 
-    // link类型参数
-    // 带入的Entry
-    private var tapeEntry: LinkEntryBean? = null
+    // 数据类型 链接｜图片
+    private var dataType: Int = EntryType.LINK
+
+    // 用于更新带入的Entry
+    private var tapeEntry: BaseEntryBean? = null
 
     // 图片类型参数
     // 选图
     private var imagePath: String? = null
 
+    // 更新用构造函数
     constructor(
-        context: Context, entry: LinkEntryBean,
-        callback: Callback<BaseEntryBean> = CommonCallback("更新成功！"),
-        editType: Int = EDIT_TYPE_UPDATE
+        context: Context, entry: BaseEntryBean,
+        callback: Callback<BaseEntryBean> = CommonCallback("更新成功！")
     ) : this(
         context,
         callback = callback,
-        editType = editType
     ) {
+        this.editType = EDIT_TYPE_UPDATE
         this.tapeEntry = entry
     }
 
@@ -75,15 +80,67 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
     override fun windowAnimStyle(): Int = R.style.DialogAnimStyle
 
     override fun initDialog() {
+        initCommonLogic()
+        initLinkLogic()
+        initImageLayout()
+    }
+
+    // 通用逻辑的初始化
+    // 1.EventBus注册；
+    // 2.点击保存或取消；
+    // 3.选择分类；
+    private fun initCommonLogic() {
         EventBus.getDefault().register(this)
         tvCreate.setOnClickListener {
-            if (type == EntryType.LINK) {
-                saveLink()
+            if (dataType == EntryType.LINK) {
+                saveOrUpdateLink()
             } else {
-                saveImage()
+                saveOrUpdateImage()
             }
         }
-        // 粘贴时解析
+        // 分类的下拉列表
+        initSpinner()
+        // 更新时默认选中已选的分类
+        tapeEntry?.let {
+            var spinnerIndex: Int? = null
+            DataService.getCategoryList().forEachIndexed { index, categoryInfoBean ->
+                if (categoryInfoBean.id == it.belongTo) {
+                    spinnerIndex = index
+                }
+            }
+            spinnerIndex?.let { index -> spinner.setSelection(index) }
+        }
+        // 切换数据类型
+        layoutChange.setOnClickListener {
+            changeType()
+            if (dataType == EntryType.LINK) {
+                showLinkUi()
+                layoutChange.setImageResource(R.drawable.app_image_red)
+            } else {
+                showImageUi()
+                layoutChange.setImageResource(R.drawable.app_link_red)
+            }
+        }
+        // 更新 其它类型不显示 并往UI填充已有数据
+        tapeEntry?.process({ linkEntry ->
+            dataType = EntryType.LINK
+            showLinkUi()
+            etEntryInput.setText(linkEntry.link)
+            etEntryTitle.setText(linkEntry.title)
+            etEntryRemark.setText(linkEntry.remark)
+        }, { imageEntry ->
+            dataType = EntryType.IMAGE
+            showImageUi()
+            etImageTitle.setText(imageEntry.title)
+            bgView.setImageByPath(imageEntry.path)
+            imagePath = imageEntry.path
+        })
+        tapeEntry?.let { layoutChange.hide() }
+    }
+
+    // 链接数据初始化逻辑
+    private fun initLinkLogic() {
+        // 粘贴时解析 抽取Http链接
         etEntryInput.setOnPasteListener {
             ToastUtil.toast(it)
             val realUrl = it.tryExtractHttpByMatcher()
@@ -95,32 +152,25 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
             }
             parseTitle(realUrl)
         }
-        // 带入弹窗的链接进行解析
-        // 比如外部跳转
-        link?.let {
+        // 带入弹窗的链接进行解析 比如外部分享跳转
+        linkFromShare?.let {
             etEntryInput.setText(it)
             parseTitle(it)
         }
-        initSpinner()
-        // 带入完整数据 比如更新
-        tapeEntry?.let {
-            etEntryInput.setText(it.link)
-            etEntryTitle.setText(it.title)
-            etEntryRemark.setText(it.remark)
-            var spinnerIndex: Int? = null
-            DataService.getCategoryList().forEachIndexed { index, categoryInfoBean ->
-                if (categoryInfoBean.id == it.belongTo) {
-                    spinnerIndex = index
-                }
-            }
-            spinnerIndex?.let { index -> spinner.setSelection(index) }
-        }
+    }
 
-        initImageLayout()
+    private fun showLinkUi() {
+        linkLayout.show()
+        imageLayout.hide()
+    }
+
+    private fun showImageUi() {
+        linkLayout.hide()
+        imageLayout.show()
     }
 
     // 保存链接
-    private fun saveLink() {
+    private fun saveOrUpdateLink() {
         val text = etEntryInput.text.toString()
         val title = etEntryTitle.text.toString()
         val remark = etEntryRemark.text.toString()
@@ -137,7 +187,7 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
                     callback
                 )
             } else if (editType == EDIT_TYPE_UPDATE) {
-                tapeEntry?.let {
+                (tapeEntry as? LinkEntryBean)?.let {
                     DataService.updateEntry(
                         it,
                         LinkEntryBean(
@@ -161,19 +211,34 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
     }
 
     // 保存图片
-    private fun saveImage() {
+    private fun saveOrUpdateImage() {
         val title = etImageTitle.text.toString()
         val path = imagePath
         if (title.isNotEmpty() && !path.isNullOrEmpty()) {
-            DataService.createEntry(
-                ImageEntryBean(
-                    path = path,
-                    title = title,
-                    date = Date().time,
-                    belongTo = spinner.selectedItemId
-                ),
-                callback
-            )
+            if (editType == EDIT_TYPE_CREATE) {
+                DataService.createEntry(
+                    ImageEntryBean(
+                        path = path,
+                        title = title,
+                        date = Date().time,
+                        belongTo = spinner.selectedItemId
+                    ),
+                    callback
+                )
+            } else if (editType == EDIT_TYPE_UPDATE) {
+                (tapeEntry as? ImageEntryBean)?.let {
+                    DataService.updateEntry(
+                        it,
+                        ImageEntryBean(
+                            path = path,
+                            title = title,
+                            date = it.date,
+                            belongTo = spinner.selectedItemId
+                        ),
+                        callback
+                    )
+                }
+            }
             dismiss()
         } else {
             etImageTitle.shakeTipIfEmpty()
@@ -185,26 +250,6 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
 
     // 图片类型
     private fun initImageLayout() {
-        if (tapeEntry != null) {
-            layoutChange.hide()
-            return
-        }
-        layoutChange.setOnClickListener {
-            changeType()
-            if (type == EntryType.LINK) {
-                linkLayout.show()
-                imageLayout.hide()
-                layoutChange.setImageResource(R.drawable.app_image_red)
-            } else {
-                linkLayout.hide()
-                imageLayout.show()
-                layoutChange.setImageResource(R.drawable.app_link_red)
-            }
-        }
-        initImageLayoutUi()
-    }
-
-    private fun initImageLayoutUi() {
         selectImage.setOnClickListener {
             // 打开图片选择
             ImageSelectHelper.openImageSelectPage(ENTRY_IMAGE_REQUEST)
@@ -212,7 +257,7 @@ class CreateEntryDialog(context: Context, val link: String? = null, private val 
     }
 
     private fun changeType() {
-        type = if (type == EntryType.LINK) {
+        dataType = if (dataType == EntryType.LINK) {
             EntryType.IMAGE
         } else {
             EntryType.LINK

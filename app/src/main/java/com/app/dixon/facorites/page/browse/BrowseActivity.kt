@@ -107,6 +107,7 @@ class BrowseActivity : BaseActivity() {
             ToastUtil.toast("已保存跳转外链，下次可在收藏卡片直接跳转")
             val entryBean = DataService.getEntryList(categoryId)?.findByCondition { it.date == entryId }
             entryBean?.let {
+                // 只有链接才能更新scheme
                 (entryBean as? LinkEntryBean)?.let {
                     it.schemeJump = scheme
                     DataService.updateEntry(entryBean, entryBean)

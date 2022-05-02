@@ -1,6 +1,7 @@
 package com.app.dixon.facorites.page.entry
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.dixon.facorites.R
@@ -13,8 +14,11 @@ import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.setImageByPath
 import com.app.dixon.facorites.core.util.Ln
+import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
+import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.dixon.dlibrary.util.FontUtil
 import kotlinx.android.synthetic.main.activity_entry.*
+import org.greenrobot.eventbus.EventBus
 import kotlin.properties.Delegates
 
 class EntryActivity : BaseActivity() {
@@ -156,5 +160,21 @@ class EntryActivity : BaseActivity() {
             }
             return null
         }
+    }
+
+    // 修改图片Entry选图回调
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        data?.let {
+            if (requestCode == ENTRY_IMAGE_REQUEST) {
+                // 图片收藏选图成功
+                it.data?.let { uri ->
+                    Ln.i("ImageResult", "$uri")
+                    EventBus.getDefault().post(CategoryImageCompleteEvent(uri))
+                }
+            } else {
+                // do nothing
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }

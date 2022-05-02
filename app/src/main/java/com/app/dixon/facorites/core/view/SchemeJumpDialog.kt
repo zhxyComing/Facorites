@@ -52,6 +52,7 @@ class SchemeJumpDialog(context: Context, val scheme: String, val entryId: Long, 
             ToastUtil.toast("已保存跳转外链，下次可在收藏卡片直接跳转")
             val entryBean = DataService.getEntryList(categoryId)?.findByCondition { it.date == entryId }
             entryBean?.let {
+                // 只有链接才能保存scheme
                 (entryBean as? LinkEntryBean)?.let {
                     it.schemeJump = scheme
                     DataService.updateEntry(entryBean, entryBean)

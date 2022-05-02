@@ -50,8 +50,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         setOnClickListener { }
 
         tvJump.setOnClickListener {
-            // 跳转
-            // TODO
+            // 跳转 只有链接才能跳转
             (bean as? LinkEntryBean)?.let { linkBean ->
                 if (linkBean.link.isValidUrl()) {
                     val uri: Uri = Uri.parse(linkBean.link)
@@ -66,7 +65,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
 
         tvUpdate.setOnClickListener {
             // 修改
-            (bean as? LinkEntryBean)?.let {
+            bean?.let {
                 CreateEntryDialog(context, it).show()
             }
         }
@@ -85,6 +84,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
 
         tvCopy.setOnClickListener {
+            // 只有链接才能复制
             (bean as? LinkEntryBean)?.let { linkBean ->
                 ClipUtil.copyToClip(context, linkBean.link)
                 ToastUtil.toast("已复制到剪贴板")
@@ -137,12 +137,13 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         this.bean = bean
         icon.setActualImageResource(R.drawable.app_image_for_entry)
         title.text = bean.title
+        tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
         initImageUi()
     }
 
     private fun initImageUi() {
         tvJump.hide()
-        tvUpdate.hide()
+        tvUpdate.show()
         tvCopy.hide()
         ivBrowse.show()
         tvDelete.show()
