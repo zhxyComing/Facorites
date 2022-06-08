@@ -57,6 +57,12 @@ class CreateEntryDialog(
     // 选图
     private var imagePath: String? = null
 
+    // 图片转存状态
+    private var imageImporting: Boolean = false
+
+    // 是否点击了确认
+    private var hasSave = false
+
     // 更新用构造函数
     constructor(
         context: Context, entry: BaseEntryBean,
@@ -182,7 +188,7 @@ class CreateEntryDialog(
                         title = title,
                         remark = remark,
                         date = Date().time,
-                        belongTo = spinner.selectedItemId
+                        belongTo = spinner.selectedItemId,
                     ),
                     callback
                 )
@@ -196,12 +202,14 @@ class CreateEntryDialog(
                             remark = remark,
                             schemeJump = it.schemeJump,
                             date = it.date,
-                            belongTo = spinner.selectedItemId
+                            belongTo = spinner.selectedItemId,
+                            star = it.star
                         ),
                         callback
                     )
                 }
             }
+            hasSave = true
             dismiss()
         } else {
             // 未填数据提示
@@ -214,7 +222,7 @@ class CreateEntryDialog(
     private fun saveOrUpdateImage() {
         val title = etImageTitle.text.toString()
         val path = imagePath
-        if (title.isNotEmpty() && !path.isNullOrEmpty()) {
+        if (title.isNotEmpty() && !path.isNullOrEmpty() && !imageImporting) {
             if (editType == EDIT_TYPE_CREATE) {
                 DataService.createEntry(
                     ImageEntryBean(
@@ -233,16 +241,19 @@ class CreateEntryDialog(
                             path = path,
                             title = title,
                             date = it.date,
-                            belongTo = spinner.selectedItemId
+                            belongTo = spinner.selectedItemId,
+                            star = it.star
                         ),
                         callback
                     )
                 }
             }
+            hasSave = true
             dismiss()
         } else {
             etImageTitle.shakeTipIfEmpty()
-            if (path.isNullOrEmpty()) {
+            // 没选图或者导入过程中均不允许创建或更新
+            if (path.isNullOrEmpty() || imageImporting) {
                 selectImage.shakeTip()
             }
         }
@@ -308,20 +319,43 @@ class CreateEntryDialog(
     }
 
     override fun onDetachedFromWindow() {
+        if (!hasSave) {
+            deleteExpiredImportImage()
+        }
         super.onDetachedFromWindow()
         EventBus.getDefault().unregister(this)
     }
 
+    // 删除过期的导入图片
+    private fun deleteExpiredImportImage() {
+        imagePath?.let {
+            var deleteExpiredImage = true
+            (tapeEntry as? ImageEntryBean)?.let { tapeImageBean ->
+                // 带入更新的图片在确认修改之前不删除
+                if (tapeImageBean.path == it) {
+                    deleteExpiredImage = false
+                }
+            }
+            if (deleteExpiredImage) {
+                BitmapIOService.deleteBitmap(it)
+            }
+        }
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onImageSelectComplete(event: CategoryImageCompleteEvent) {
+        // 转存之前先把之前导入的图片删掉
+        deleteExpiredImportImage()
         // 转存图片到本地
         val bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(event.uri))
         val absolutePath = BitmapIOService.createBitmapSavePath()
-        tvTip.text = "导入中，请耐心等待"
+        tvTip.text = "转存图片中，请耐心等待"
+        imageImporting = true
         selectImage.isEnabled = false
         BitmapIOService.saveBitmap(absolutePath, bitmap, object : Callback<String> {
             override fun onSuccess(data: String) {
                 ToastUtil.toast("图片转存成功")
+                imageImporting = false
                 imagePath = data
                 bgView.setImageByUri(event.uri)
                 tvTip.text = "从相册选取图片"
@@ -330,6 +364,7 @@ class CreateEntryDialog(
 
             override fun onFail(msg: String) {
                 ToastUtil.toast("图片转存失败，请更换图片后重新尝试")
+                imageImporting = false
                 tvTip.text = "从相册选取图片"
                 selectImage.isEnabled = true
             }

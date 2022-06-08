@@ -48,6 +48,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal">
 
         <TextView
@@ -65,6 +66,7 @@
             android:layout_weight="1" />
 
         <TextView
+            android:id="@+id/viewAll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -75,61 +77,61 @@
 
     </LinearLayout>
 
-    <!-- 显示最近三个收藏 -->
-
-    <com.app.dixon.facorites.core.view.EntryView
-        android:id="@+id/cardFirst"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/app_shape_home_entry_card" />
-
-    <com.app.dixon.facorites.core.view.EntryView
-        android:id="@+id/cardSecond"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/app_shape_home_entry_card" />
-
-    <com.app.dixon.facorites.core.view.EntryView
-        android:id="@+id/cardThird"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/app_shape_home_entry_card" />
-
-    <com.app.dixon.facorites.core.view.EntryView
-        android:id="@+id/cardFourth"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/app_shape_home_entry_card" />
-
-    <com.app.dixon.facorites.core.view.EntryView
-        android:id="@+id/cardFifth"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/app_shape_home_entry_card" />
-
-    <TextView
-        android:id="@+id/entryTip"
+    <LinearLayout
+        android:id="@+id/emptyTip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:text="-- 仅展示最近五条 --"
-        android:textColor="#E0E0E0"
-        android:textSize="12sp" />
+        android:layout_marginTop="80dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/app_star_empty" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="-- 你的收藏空空如也 --"
+            android:textColor="#cdcdcd"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <!-- 显示最近N个收藏 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/cardLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@+id/entryTip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:text="-- 仅展示最近五条 --"
+                android:textColor="#E0E0E0"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

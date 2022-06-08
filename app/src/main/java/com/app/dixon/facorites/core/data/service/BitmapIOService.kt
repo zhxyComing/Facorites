@@ -61,4 +61,13 @@ object BitmapIOService : IService {
      * 创建图片的保存路径
      */
     fun createBitmapSavePath() = FileUtils.createBitmapSavePath("$ROOT_PATH/${Date().time}.png")
+
+    /**
+     * 删除图片
+     */
+    fun deleteBitmap(absolutePath: String) {
+        ioService.postEvent {
+            FileUtils.deleteBitmap(absolutePath)
+        }
+    }
 }

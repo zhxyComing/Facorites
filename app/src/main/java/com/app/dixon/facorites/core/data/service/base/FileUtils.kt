@@ -12,6 +12,9 @@ import java.io.*
  * 类描述：用于在指定根目录下读写文件(data/data/xxx/file)
  * 创建人：xuzheng
  * 创建时间：3/18/22 11:53 AM
+ *
+ * 字符串使用相对路径 方便规范数据存储
+ * 图片使用绝对路径 方便外部通过Uri去调用
  */
 object FileUtils {
 
@@ -189,4 +192,16 @@ object FileUtils {
         }
         return file.absolutePath
     }
+
+    /**
+     * 删除图片
+     */
+    fun deleteBitmap(absolutePath: String): Boolean {
+        val file = File(absolutePath)
+        if (!file.exists()) {
+            return false
+        }
+        return file.delete()
+    }
+
 }

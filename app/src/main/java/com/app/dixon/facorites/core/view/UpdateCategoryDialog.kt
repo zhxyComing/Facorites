@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.Uri
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
+import com.app.dixon.facorites.core.data.bean.ImageEntryBean
+import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.setImageByUri
 import com.app.dixon.facorites.core.ex.shakeTip
@@ -27,6 +29,8 @@ class UpdateCategoryDialog(context: Context, val categoryInfoBean: CategoryInfoB
     BaseDialog(context) {
 
     private var bgUri: Uri? = null
+
+    private var hasSave: Boolean = false
 
     override fun heightPx(): Int = PX_AUTO
 
@@ -53,6 +57,7 @@ class UpdateCategoryDialog(context: Context, val categoryInfoBean: CategoryInfoB
                 if (it != -1L) {
                     ToastUtil.toast("更新收藏夹成功")
                 }
+                hasSave = true
                 dismiss()
             }
         }
@@ -67,13 +72,33 @@ class UpdateCategoryDialog(context: Context, val categoryInfoBean: CategoryInfoB
     }
 
     override fun onDetachedFromWindow() {
+        if (!hasSave) {
+            deleteExpiredImportImage()
+        }
         super.onDetachedFromWindow()
         EventBus.getDefault().unregister(this)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onImageSelectComplete(event: CategoryImageCompleteEvent) {
+        deleteExpiredImportImage()
         bgUri = event.uri
         bgView.setImageByUri(bgUri)
+    }
+
+    // 删除过期的导入图片
+    private fun deleteExpiredImportImage() {
+        bgUri?.path?.let {
+            var deleteExpiredImage = true
+            categoryInfoBean.bgPath?.let { bg ->
+                // 带入更新的图片在确认修改之前不删除
+                if (bg == it) {
+                    deleteExpiredImage = false
+                }
+            }
+            if (deleteExpiredImage) {
+                BitmapIOService.deleteBitmap(it)
+            }
+        }
     }
 }

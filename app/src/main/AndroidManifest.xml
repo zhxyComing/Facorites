@@ -16,6 +16,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
         <activity
+            android:name=".page.edit.EditActivity"
+            android:exported="false" />
+        <activity
+            android:name=".page.entry.AllEntryActivity"
+            android:exported="false" />
+        <activity
             android:name=".page.image.ImageActivity"
             android:exported="false" />
         <activity

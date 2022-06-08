@@ -9,7 +9,7 @@ package com.app.dixon.facorites.core.data.bean
  * @param date 既是创建日期，也是ID
  * @param belongTo 所属分类ID
  */
-open class BaseEntryBean(val date: Long, val belongTo: Long) {
+open class BaseEntryBean(val date: Long, val belongTo: Long, val star : Boolean) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -24,6 +24,6 @@ open class BaseEntryBean(val date: Long, val belongTo: Long) {
     }
 
     override fun toString(): String {
-        return "BaseEntryBean(date=$date, belongTo=$belongTo)"
+        return "BaseEntryBean(date=$date, belongTo=$belongTo, star=$star)"
     }
 }

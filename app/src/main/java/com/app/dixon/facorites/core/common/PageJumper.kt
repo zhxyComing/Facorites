@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.page.browse.BrowseActivity
+import com.app.dixon.facorites.page.edit.EditActivity
+import com.app.dixon.facorites.page.entry.AllEntryActivity
 import com.app.dixon.facorites.page.entry.EntryActivity
 import com.app.dixon.facorites.page.home.HomeActivity
 import com.app.dixon.facorites.page.image.ImageActivity
@@ -54,6 +56,16 @@ object PageJumper {
     }
 
     /**
+     * 打开所有收藏列表页
+     */
+    fun openAllEntryPage(asContext: Any, requestCode: Int = -1) {
+        resultJump(asContext) {
+            val intent = Intent(it, AllEntryActivity::class.java)
+            startActivity(it, intent, requestCode)
+        }
+    }
+
+    /**
      * 打开浏览页
      */
     fun openBrowsePage(asContext: Any, categoryId: Long, entryId: Long, link: String, requestCode: Int = -1) {
@@ -75,6 +87,16 @@ object PageJumper {
             val intent = Intent(it, ImageActivity::class.java).apply {
                 putExtra(IMAGE_PATH, path)
             }
+            startActivity(it, intent, requestCode)
+        }
+    }
+
+    /**
+     * 打开设置页
+     */
+    fun openEditPage(asContext: Any, requestCode: Int = -1) {
+        resultJump(asContext) {
+            val intent = Intent(it, EditActivity::class.java)
             startActivity(it, intent, requestCode)
         }
     }

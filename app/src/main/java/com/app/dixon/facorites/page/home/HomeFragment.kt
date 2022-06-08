@@ -1,22 +1,29 @@
 package com.app.dixon.facorites.page.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import androidx.core.view.forEachIndexed
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.VisibleExtensionFragment
+import com.app.dixon.facorites.core.common.LAST_ENTRY_NUM
+import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
-import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.hide
 import com.app.dixon.facorites.core.ex.process
 import com.app.dixon.facorites.core.ex.show
 import com.app.dixon.facorites.core.util.CollectionUtil
 import com.app.dixon.facorites.core.view.EntryView
+import com.app.dixon.facorites.page.edit.event.LastEntryNumUpdateEvent
+import com.dixon.dlibrary.util.SharedUtil
 import com.facebook.drawee.view.SimpleDraweeView
 import kotlinx.android.synthetic.main.app_fragment_home_content.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 /**
  * 全路径：com.app.dixon.facorites.page.home
@@ -26,81 +33,87 @@ import kotlinx.android.synthetic.main.app_fragment_home_content.*
  *
  * 展示最近的三个收藏
  */
-
-private const val MAX_ENTRY_NUM = 5
-
 class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged {
 
     // 仅包含最近的前N个元素
     private val entries = mutableListOf<BaseEntryBean>()
-    private lateinit var cards: List<EntryView>
+    private var maxEntryNum = 5
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View = inflater.inflate(R.layout.app_fragment_home_content, container, false).apply {
-        val cards = mutableListOf<EntryView>()
-        cards.add(findViewById(R.id.cardFirst))
-        cards.add(findViewById(R.id.cardSecond))
-        cards.add(findViewById(R.id.cardThird))
-        cards.add(findViewById(R.id.cardFourth))
-        cards.add(findViewById(R.id.cardFifth))
-        this@HomeFragment.cards = cards
-
-        // TODO 测试删除
-        cards.forEachIndexed { index, linkCardView ->
-            linkCardView.setOnClickListener {
-                Log.i("testkkk", "$index")
-                hideSubCard(index)
-            }
-        }
+        // 注册监听
+        EventBus.getDefault().register(this@HomeFragment)
+        maxEntryNum = SharedUtil.getInt(LAST_ENTRY_NUM, 5)
     }
 
-    private fun hideSubCard(target: Int) {
-        cards.forEachIndexed { index, linkCardView ->
-            if (target != index) {
-                linkCardView.hideSubCard()
+    // 添加条目卡片View
+    private fun LinearLayout.addCardView(): EntryView {
+        val entryView = LayoutInflater.from(context).inflate(R.layout.app_home_fragment_entry_card, this, false) as EntryView
+        addView(entryView)
+        val entryIndex = indexOfChild(entryView)
+        if (entryIndex == 0) {
+            val params = entryView.layoutParams as ViewGroup.MarginLayoutParams
+            params.topMargin = 0
+            entryView.layoutParams = params
+        }
+        entryView.setOnClickListener {
+            this.forEachIndexed { index, view ->
+                if (entryIndex != index) {
+                    (view as? EntryView)?.hideSubCard()
+                }
             }
         }
+        return entryView
     }
 
     override fun onVisibleFirst() {
         super.onVisibleFirst()
         DataService.register(this)
-        initData()
         initBanner()
-        initEntries()
+        initEntryData()
+        initEntryView()
+        initOtherView()
+    }
+
+    private fun initOtherView() {
+        viewAll.setOnClickListener {
+            context?.let {
+                PageJumper.openAllEntryPage(it)
+            }
+        }
     }
 
     private fun initBanner() {
-        val images = listOf("https://imgs.699pic.com/01/500/340/209/500340209.jpg!list2x.v1", "https://pic.5tu.cn/uploads/allimg/1605/251507157490.jpg")
+//        val images = listOf("https://imgs.699pic.com/01/500/340/209/500340209.jpg!list2x.v1", "https://pic.5tu.cn/uploads/allimg/1605/251507157490.jpg")
+        val images = listOf(R.drawable.app_guide_cover_1)
         banner.setParams(images, { inflate, container, bean ->
             val item = inflate.inflate(R.layout.app_item_banner_home, container, false)
             val imageView = item.findViewById<SimpleDraweeView>(R.id.ivImage)
-            imageView.setImageURI(bean)
+//            imageView.setImageURI(bean)
+            imageView.setActualImageResource(bean)
             item
         })
     }
 
-    private fun initData() {
+    private fun initEntryData() {
         obtainLastEntry()
     }
 
-    private fun initEntries() {
-        for (index in 0 until MAX_ENTRY_NUM) {
+    private fun initEntryView() {
+        cardLayout.removeAllViews()
+        for (index in 0 until maxEntryNum) {
             (entries.getOrNull(index))?.let {
+                val cardView = cardLayout.addCardView()
                 it.process({ linkEntry ->
                     // link 类型
-                    cards[index].setLinkEntry(linkEntry)
+                    cardView.setLinkEntry(linkEntry)
                 }, { imageEntry ->
                     // image 类型
-                    cards[index].setImageEntry(imageEntry)
+                    cardView.setImageEntry(imageEntry)
                 })
-                cards[index].show()
-            } ?: let {
-                cards[index].hide()
-                cards[index].clear()
             }
         }
         updateEntryTip()
@@ -108,16 +121,21 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
 
     private fun updateEntryTip() {
         when {
-            entries.size >= MAX_ENTRY_NUM -> {
-                entryTip.text = "-- 仅展示最近五条 --"
+            // 数量达到或超过展示限制
+            entries.size >= maxEntryNum -> {
+                entryTip.text = "-- 仅展示最近${maxEntryNum}条 --"
                 entryTip.show()
+                emptyTip.hide()
             }
+            // 数量为空
             entries.isEmpty() -> {
-                entryTip.text = "-- 您的收藏空空如也～ --"
-                entryTip.show()
+                entryTip.hide()
+                emptyTip.show()
             }
+            // 数量不为空且未达展示上限
             else -> {
                 entryTip.hide()
+                emptyTip.hide()
             }
         }
     }
@@ -132,7 +150,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
             }
         }
         allEntry.sortByDescending { it.date }
-        val size = minOf(allEntry.size, MAX_ENTRY_NUM)
+        val size = minOf(allEntry.size, maxEntryNum)
         for (index in 0 until size) {
             entries.add(allEntry[index])
         }
@@ -140,25 +158,40 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
 
     override fun onDataCreated(bean: BaseEntryBean) {
         // 更新数据
-        CollectionUtil.insertDataToHead(entries, bean, MAX_ENTRY_NUM)
-        initEntries()
+        CollectionUtil.insertDataToHead(entries, bean, maxEntryNum)
+        initEntryView()
     }
 
     override fun onDataDeleted(bean: BaseEntryBean) {
         if (entries.contains(bean)) {
             obtainLastEntry()
-            initEntries()
+            initEntryView()
         }
     }
 
     override fun onDataUpdated(bean: BaseEntryBean) {
         val index = entries.indexOf(bean)
         if (index != -1) {
+            val cardView = cardLayout.getChildAt(index) as? EntryView
             bean.process({
-                cards[index].setLinkEntry(it)
+                cardView?.setLinkEntry(it)
             }, {
-                cards[index].setImageEntry(it)
+                cardView?.setImageEntry(it)
             })
+            // indexOf只是使用ID判断，并不代表内容一致，需要更新内容
+            entries[index] = bean
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        EventBus.getDefault().unregister(this)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onLastEntryNumUpdate(event: LastEntryNumUpdateEvent) {
+        maxEntryNum = event.num
+        initEntryData()
+        initEntryView()
     }
 }

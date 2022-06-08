@@ -25,8 +25,13 @@ import com.dixon.dlibrary.util.ToastUtil
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.drawee.interfaces.DraweeController
+import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.image.ImageInfo
+import com.facebook.imagepipeline.request.ImageRequestBuilder
+import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import kotlinx.android.synthetic.main.app_view_link_card.view.*
+import java.io.File
+
 
 /**
  * 全路径：com.app.dixon.facorites.core.view
@@ -103,6 +108,38 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                 PageJumper.openImagePage(context, imageEntry.path)
             })
         }
+
+        // 点击标星
+        ivStar.setOnClickListener {
+            bean?.let {
+                val star = !it.star
+                bean?.process({ linkEntry ->
+                    DataService.updateEntry(
+                        it,
+                        LinkEntryBean(
+                            link = linkEntry.link,
+                            title = linkEntry.title,
+                            remark = linkEntry.remark,
+                            schemeJump = linkEntry.schemeJump,
+                            date = linkEntry.date,
+                            belongTo = linkEntry.belongTo,
+                            star = star
+                        )
+                    )
+                }, { imageEntry ->
+                    DataService.updateEntry(
+                        it,
+                        ImageEntryBean(
+                            path = imageEntry.path,
+                            title = imageEntry.title,
+                            date = imageEntry.date,
+                            belongTo = imageEntry.belongTo,
+                            star = star
+                        )
+                    )
+                })
+            }
+        }
     }
 
     fun setLinkEntry(bean: LinkEntryBean) {
@@ -122,7 +159,17 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                 SchemeJumper.jumpByScheme(context, scheme)
             }
         } ?: tvSchemeJump.hide()
+        updateStarIcon()
         initLinkUi()
+    }
+
+    private fun updateStarIcon() {
+        bean?.let {
+            if (it.star)
+                ivStar.setImageResource(R.drawable.app_star_real)
+            else
+                ivStar.setImageResource(R.drawable.app_star_hollow)
+        }
     }
 
     private fun initLinkUi() {
@@ -131,13 +178,19 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         tvCopy.show()
         ivBrowse.show()
         tvDelete.show()
+        entryBg.hide()
+        entryBgMask.hide()
     }
 
     fun setImageEntry(bean: ImageEntryBean) {
         this.bean = bean
-        icon.setActualImageResource(R.drawable.app_image_for_entry)
+        // 加载缩略图
+        Ln.i("ImagePath", bean.path)
+        icon.setImageByPath(bean.path, 12, 12)
+        entryBg.setImageByPath(bean.path, 300, 30)
         title.text = bean.title
         tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
+        updateStarIcon()
         initImageUi()
     }
 
@@ -147,6 +200,8 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         tvCopy.hide()
         ivBrowse.show()
         tvDelete.show()
+        entryBg.show()
+        entryBgMask.show()
     }
 
     fun clear() {

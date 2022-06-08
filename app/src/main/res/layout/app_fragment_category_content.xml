@@ -7,6 +7,7 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/TopBar"
         android:layout_width="match_parent"
         android:layout_height="160dp"
         android:background="@drawable/app_shape_fragment_category_top_bar"
@@ -34,11 +35,6 @@
                     android:textColor="@color/white"
                     android:textSize="32sp" />
 
-                <ImageView
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_marginStart="5dp"
-                    android:src="@drawable/app_category_icon" />
             </LinearLayout>
 
             <TextView
@@ -47,7 +43,7 @@
                 android:layout_marginStart="2dp"
                 android:layout_marginTop="10dp"
                 android:text="管理你的收藏集"
-                android:textColor="#F0F0F0"
+                android:textColor="#90FFFFFF"
                 android:textSize="10sp" />
         </LinearLayout>
 

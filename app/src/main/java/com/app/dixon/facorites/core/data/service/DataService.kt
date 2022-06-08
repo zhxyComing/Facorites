@@ -4,6 +4,7 @@ import android.net.Uri
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
+import com.app.dixon.facorites.core.data.bean.ImageEntryBean
 import com.app.dixon.facorites.core.data.bean.io.toEntry
 import com.app.dixon.facorites.core.data.bean.io.toJson
 import com.app.dixon.facorites.core.data.service.base.FileUtils
@@ -186,6 +187,15 @@ object DataService : IService {
                         }
                     }
                 }
+                // 删除图片 包括分类自身的 和条目的
+                deleteCategoryInfo.bgPath?.let {
+                    BitmapIOService.deleteBitmap(it)
+                }
+                deleteEntries?.forEach {
+                    (it as? ImageEntryBean)?.let { _ ->
+                        BitmapIOService.deleteBitmap(it.path)
+                    }
+                }
             } else {
                 Ln.e("DeleteCategory", "分类文件删除失败")
                 // 未找到该分类
@@ -234,6 +244,11 @@ object DataService : IService {
             categoryList[index] = originBean
             Ln.e("UpdateCategory", "分类文件更新失败")
             callback?.backUi { invoke(-1L) }
+            callback?.backUi { invoke(-1L) }
+        }
+        // 删除旧的封面图
+        if (originBean.bgPath != null && originBean.bgPath != newBean.bgPath) {
+            BitmapIOService.deleteBitmap(originBean.bgPath)
         }
     }
 
@@ -358,6 +373,14 @@ object DataService : IService {
                 }
             }
         }
+        // 图片条目，如果更新了图片，则删除旧图片
+        (origin as? ImageEntryBean)?.let { originImageBean ->
+            (updater as? ImageEntryBean)?.let { updaterImageBean ->
+                if (originImageBean.path != updaterImageBean.path) {
+                    BitmapIOService.deleteBitmap(originImageBean.path)
+                }
+            }
+        }
     }
 
     private fun doCreateEntry(
@@ -433,6 +456,10 @@ object DataService : IService {
                     callbackRegister(globalEntryCallbacks) {
                         it.onDataDeleted(bean)
                     }
+                }
+                // 如果是图片Entry，删除本地转存的图片
+                (bean as? ImageEntryBean)?.let {
+                    BitmapIOService.deleteBitmap(it.path)
                 }
             } else {
                 callback?.backUi { onFail("文件写入失败") }

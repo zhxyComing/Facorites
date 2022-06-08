@@ -7,7 +7,12 @@ import android.view.animation.CycleInterpolator
 import android.view.animation.TranslateAnimation
 import android.widget.TextView
 import com.app.dixon.facorites.base.BaseApplication
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.drawee.controller.BaseControllerListener
+import com.facebook.drawee.interfaces.DraweeController
 import com.facebook.drawee.view.SimpleDraweeView
+import com.facebook.imagepipeline.common.ResizeOptions
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 import java.io.File
 
 /**
@@ -157,4 +162,25 @@ fun SimpleDraweeView.setImageByPath(path: String?) {
 fun SimpleDraweeView.setImageByUri(uri: Uri?) {
     if (uri == null) return
     setImageURI(uri, BaseApplication.application)
+}
+
+/**
+ * 安全的使用SimpleDraweeView，加载缩略图，并防止内存泄漏
+ */
+fun SimpleDraweeView.setImageByPath(path: String?, widthDp: Int, heightDp: Int) {
+    if (path.isNullOrEmpty()) return
+    val uri = if (path.startsWith("file://") || path.startsWith("http")) {
+        Uri.parse(path)
+    } else {
+        Uri.fromFile(File(path))
+    }
+    val request = ImageRequestBuilder.newBuilderWithSource(uri)
+        .setResizeOptions(ResizeOptions(widthDp.dp, heightDp.dp))
+        .build()
+    val controller: DraweeController = Fresco.newDraweeControllerBuilder()
+        .setImageRequest(request)
+        .setOldController(this.controller)
+        .setControllerListener(BaseControllerListener())
+        .build()
+    this.controller = controller
 }

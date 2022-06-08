@@ -5,6 +5,37 @@
       <map>
         <entry key="../../.gradle/caches/transforms-2/files-2.1/2f809c7cbfc4b19f4c3023044b44b844/jetified-ucrop-2.2.6/res/layout/ucrop_activity_photobox.xml" value="0.190625" />
         <entry key="../../.gradle/caches/transforms-2/files-2.1/2f809c7cbfc4b19f4c3023044b44b844/jetified-ucrop-2.2.6/res/layout/ucrop_controls.xml" value="0.3170289855072464" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_select_edit_top_bar_back.xml" value="0.3045" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_select_edit_top_bar_save.xml" value="0.3045" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_select_link_card_option.xml" value="0.1" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_create_entry_add.xml" value="0.1" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_create_entry_input.xml" value="0.1" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_edit.xml" value="0.268" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_edit_top_bar.xml" value="0.3375" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_edit_top_bar_back.xml" value="0.3375" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_edit_top_bar_back_normal.xml" value="0.3045" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_edit_top_bar_back_press.xml" value="0.3045" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_edit_top_bar_save_normal.xml" value="0.1895" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_edit_top_bar_save_press.xml" value="0.3045" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_fragment_category_top_bar.xml" value="0.2175" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_fragment_mine_top_bar.xml" value="0.211" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_home_entry_card.xml" value="0.1" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_mask_image_entry.xml" value="0.1705" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_mask_left.xml" value="0.1" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_mask_mine_bg.xml" value="0.1705" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_round_rect_green.xml" value="0.2175" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_select.xml" value="0.3045" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/drawable/app_shape_select_normal.xml" value="0.3045" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/layout/activity_all_entry.xml" value="0.14108409321175278" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/layout/activity_edit.xml" value="0.33" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/layout/activity_entry.xml" value="0.146875" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/layout/app_fragment_category_content.xml" value="0.3619791666666667" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/layout/app_fragment_empty_content.xml" value="0.14817629179331307" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/layout/app_fragment_home_content.xml" value="0.146875" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/layout/app_fragment_mine_content.xml" value="0.25" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/layout/app_home_fragment_entry_card.xml" value="0.5494791666666666" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/layout/app_item_entry.xml" value="0.14635416666666667" />
+        <entry key="..\:/Work/Facorites/app/src/main/res/layout/app_view_link_card.xml" value="0.33" />
         <entry key="app/src/main/res/drawable/app_shape_create_entry_add.xml" value="0.190625" />
         <entry key="app/src/main/res/drawable/app_shape_create_entry_cancel.xml" value="0.190625" />
         <entry key="app/src/main/res/drawable/app_shape_fragment_category_top_bar.xml" value="0.3609375" />
@@ -37,7 +68,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_12" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

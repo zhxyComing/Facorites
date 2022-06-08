@@ -6,6 +6,8 @@ import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.CommonCallback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
+import com.app.dixon.facorites.core.data.bean.ImageEntryBean
+import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.setImageByUri
 import com.app.dixon.facorites.core.ex.shakeTip
@@ -28,6 +30,8 @@ class CreateCategoryDialog(context: Context, private val callback: Callback<Base
 
     private var bgUri: Uri? = null
 
+    private var hasSave: Boolean = false
+
     override fun heightPx(): Int = PX_AUTO
 
     override fun widthPx(): Int = ScreenUtil.getDisplayWidth(context)
@@ -48,6 +52,7 @@ class CreateCategoryDialog(context: Context, private val callback: Callback<Base
                         ToastUtil.toast("创建收藏夹成功")
                     }
                 }
+                hasSave = true
                 dismiss()
             } else {
                 etInput.shakeTip()
@@ -60,13 +65,24 @@ class CreateCategoryDialog(context: Context, private val callback: Callback<Base
     }
 
     override fun onDetachedFromWindow() {
+        if (!hasSave) {
+            deleteExpiredImportImage()
+        }
         super.onDetachedFromWindow()
         EventBus.getDefault().unregister(this)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onImageSelectComplete(event: CategoryImageCompleteEvent) {
+        deleteExpiredImportImage()
         bgUri = event.uri
         bgView.setImageByUri(bgUri)
+    }
+
+    // 删除过期的导入图片
+    private fun deleteExpiredImportImage() {
+        bgUri?.path?.let {
+            BitmapIOService.deleteBitmap(it)
+        }
     }
 }

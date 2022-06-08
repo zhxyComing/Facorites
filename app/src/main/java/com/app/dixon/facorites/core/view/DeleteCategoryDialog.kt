@@ -28,6 +28,11 @@ class DeleteCategoryDialog(context: Context, val categoryInfoBean: CategoryInfoB
     override fun initDialog() {
         tvTipTitle.text = "确认删除${categoryInfoBean.name}?"
         tvDelete.setOnClickListener {
+            if (DataService.getCategoryList().size == 1) {
+                ToastUtil.toast("请至少保留一个收藏夹！")
+                dismiss()
+                return@setOnClickListener
+            }
             // 注意回调里的方法不能使用 data[position]，因为位置可能变（比如增删），但是回调里用的是 final 数据是不变的。
             DataService.deleteCategory(categoryInfoBean.id) {
                 if (it != -1L) {

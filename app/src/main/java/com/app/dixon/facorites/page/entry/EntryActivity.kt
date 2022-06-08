@@ -12,7 +12,9 @@ import com.app.dixon.facorites.core.common.SORT_TYPE_TIME_ORDER
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.ex.hide
 import com.app.dixon.facorites.core.ex.setImageByPath
+import com.app.dixon.facorites.core.ex.show
 import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
@@ -69,6 +71,21 @@ class EntryActivity : BaseActivity() {
         categoryInfo.bgPath?.let {
             bgView.setImageByPath(it)
         }
+
+        // 显示空页面
+        updateEmptyTip()
+    }
+
+    private fun updateEmptyTip() {
+        if (data.isEmpty()) {
+            emptyTip.show()
+            sort.hide()
+            rvCategory.hide()
+        } else {
+            emptyTip.hide()
+            sort.show()
+            rvCategory.show()
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -103,6 +120,7 @@ class EntryActivity : BaseActivity() {
             }
             rvCategory.adapter?.notifyDataSetChanged()
             updateEntryNum()
+            updateEmptyTip()
         }
 
         override fun onDataDeleted(bean: BaseEntryBean) {
@@ -112,6 +130,7 @@ class EntryActivity : BaseActivity() {
                 data.removeAt(index)
                 rvCategory.adapter?.notifyItemRemoved(index)
                 updateEntryNum()
+                updateEmptyTip()
             }
         }
 
@@ -150,6 +169,7 @@ class EntryActivity : BaseActivity() {
                 }
             }
             updateEntryNum()
+            updateEmptyTip()
         }
 
         private fun find(bean: BaseEntryBean): Int? {
