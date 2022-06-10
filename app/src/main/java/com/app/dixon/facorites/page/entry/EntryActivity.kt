@@ -48,6 +48,8 @@ class EntryActivity : BaseActivity() {
         initView()
     }
 
+    override fun useStatusTransparent(): Boolean = true
+
     private fun initView() {
         DataService.getEntryList(categoryInfo.id)?.forEach {
             data.add(Openable(data = it))

@@ -7,6 +7,7 @@ import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.ImageEntryBean
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.dixon.dlibrary.util.SharedUtil
+import java.lang.ref.WeakReference
 import java.net.URL
 import java.util.regex.Pattern
 
@@ -154,5 +155,19 @@ fun BaseEntryBean.process(linkAction: (linkEntry: LinkEntryBean) -> Unit, imageA
     }
     (this as? ImageEntryBean)?.let {
         imageAction.invoke(it)
+    }
+}
+
+/**
+ * 依次获取列表里的数据，执行action
+ * 如果列表里数据已过期，则移除
+ */
+fun <T> callbackRegister(list: ArrayList<WeakReference<T>>, action: (T) -> Unit) {
+    val iterator = list.iterator()
+    while (iterator.hasNext()) {
+        val register = iterator.next().get()
+        register?.let {
+            action.invoke(it)
+        } ?: iterator.remove()
     }
 }

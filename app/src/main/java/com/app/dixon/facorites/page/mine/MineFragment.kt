@@ -1,21 +1,12 @@
 package com.app.dixon.facorites.page.mine
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.VisibleExtensionFragment
 import com.app.dixon.facorites.core.common.PageJumper
-import com.app.dixon.facorites.core.data.bean.BaseEntryBean
-import com.app.dixon.facorites.core.data.bean.LinkEntryBean
-import com.app.dixon.facorites.core.data.service.DataService
-import com.app.dixon.facorites.core.ex.*
-import com.app.dixon.facorites.core.util.CollectionUtil
-import com.app.dixon.facorites.core.view.EntryView
-import com.facebook.drawee.view.SimpleDraweeView
-import kotlinx.android.synthetic.main.app_fragment_home_content.*
 import kotlinx.android.synthetic.main.app_fragment_mine_content.*
 
 /**
@@ -40,5 +31,11 @@ class MineFragment : VisibleExtensionFragment() {
         appEdit.setOnClickListener {
             PageJumper.openEditPage(this)
         }
+
+        appAbout.setOnClickListener {
+            PageJumper.openAboutPage(this)
+        }
+
     }
+
 }

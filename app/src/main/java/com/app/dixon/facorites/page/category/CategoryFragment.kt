@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import android.view.animation.LayoutAnimationController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.VisibleExtensionFragment
@@ -59,6 +61,8 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
             dataList.addAll(DataService.getCategoryList())
             dataList.sortByDescending { data -> data.id } // 新创建的收藏夹排前边
             val adapter = CategoryAdapter(it, dataList)
+            val controller: LayoutAnimationController = AnimationUtils.loadLayoutAnimation(it, R.anim.app_rv_in_anim)
+            rvCategory.layoutAnimation = controller
             rvCategory.layoutManager = LinearLayoutManager(it)
             rvCategory.adapter = adapter
         }

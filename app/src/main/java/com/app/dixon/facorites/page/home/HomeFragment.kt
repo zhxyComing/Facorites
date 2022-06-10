@@ -87,13 +87,17 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
     }
 
     private fun initBanner() {
-//        val images = listOf("https://imgs.699pic.com/01/500/340/209/500340209.jpg!list2x.v1", "https://pic.5tu.cn/uploads/allimg/1605/251507157490.jpg")
+        // TODO 目前是强制跳转关于页
         val images = listOf(R.drawable.app_guide_cover_1)
         banner.setParams(images, { inflate, container, bean ->
             val item = inflate.inflate(R.layout.app_item_banner_home, container, false)
             val imageView = item.findViewById<SimpleDraweeView>(R.id.ivImage)
-//            imageView.setImageURI(bean)
             imageView.setActualImageResource(bean)
+            imageView.setOnClickListener {
+                context?.let {
+                    PageJumper.openAboutPage(it)
+                }
+            }
             item
         })
     }

@@ -1,5 +1,6 @@
 apply from: "${rootProject.rootDir}/config.gradle"
 apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'kotlin-android'
 project.ext.setAppDefaultConfig project
 
 // 读取本地数据 如密钥、签名
@@ -50,4 +51,6 @@ dependencies {
     implementation 'com.github.yalantis:ucrop:2.2.6'
     // 图片查看器
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+    // markdown
+    implementation 'com.github.tiagohm.MarkdownView:library:0.19.0'
 }

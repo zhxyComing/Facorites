@@ -204,4 +204,17 @@ object FileUtils {
         return file.delete()
     }
 
+    /**
+     * 获取文件夹下所有文件的内容
+     */
+    fun readDir(path: String): List<String> {
+        val file = File(ROOT_CATEGORY, path)
+        val files = file.listFiles() ?: return listOf()
+        val result: MutableList<String> = ArrayList()
+        for (i in files.indices) {
+            val content = File(files[i].absolutePath).readText()
+            result.add(content)
+        }
+        return result
+    }
 }

@@ -22,8 +22,8 @@
                 android:paddingStart="12dp"
                 android:paddingTop="12dp"
                 android:paddingEnd="12dp"
-                android:paddingBottom="14dp"
-                android:src="@drawable/app_close" />
+                android:paddingBottom="12dp"
+                android:src="@drawable/app_icon_close" />
 
             <TextView
                 android:id="@+id/tvTitle"
@@ -32,12 +32,34 @@
                 android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginStart="60dp"
                 android:layout_marginEnd="60dp"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="9dp"
+                android:background="@drawable/app_shape_round_rect_web_title"
+                android:paddingStart="12dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="6dp"
                 android:singleLine="true"
-                android:textColor="#404040"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textColor="#606060"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/ivMore"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="end|bottom"
+                android:paddingStart="12dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="12dp"
+                android:src="@drawable/app_icon_more" />
         </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/app_split" />
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -78,10 +100,10 @@
             android:textSize="16sp" />
 
         <LinearLayout
-            android:layout_gravity="center"
             android:id="@+id/llSaveStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginTop="14dp"
             android:gravity="center"
             android:orientation="horizontal">
@@ -95,9 +117,9 @@
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_marginEnd="5dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
+                android:layout_marginEnd="5dp"
                 android:text="将唤起应用保存为快捷方式"
                 android:textColor="#D0D0D0"
                 android:textSize="12sp" />
@@ -109,38 +131,37 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
             android:layout_marginBottom="16dp"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvCancel"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:background="@drawable/app_shape_create_entry_cancel"
+                android:gravity="center"
                 android:paddingStart="18dp"
                 android:paddingTop="6dp"
                 android:paddingEnd="18dp"
                 android:paddingBottom="6dp"
-                android:text="取消"
+                android:text="取消，仅保存快捷方式"
                 android:textColor="#FFF"
                 android:textSize="12sp" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/tvJump"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/app_shape_create_entry_add"
+                android:gravity="center"
                 android:paddingStart="18dp"
                 android:paddingTop="6dp"
                 android:paddingEnd="18dp"
                 android:paddingBottom="6dp"
-                android:text="跳转"
+                android:text="前往，并保存快捷方式"
                 android:textColor="#FFF"
                 android:textSize="12sp" />
         </LinearLayout>

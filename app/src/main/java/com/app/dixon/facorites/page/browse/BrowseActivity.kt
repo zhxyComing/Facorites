@@ -2,13 +2,19 @@ package com.app.dixon.facorites.page.browse
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import android.widget.PopupWindow
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.BaseActivity
+import com.app.dixon.facorites.base.ContextAssistant
 import com.app.dixon.facorites.core.common.BROWSE_LINK
 import com.app.dixon.facorites.core.common.CATEGORY_ID
 import com.app.dixon.facorites.core.common.ENTRY_ID
@@ -16,10 +22,15 @@ import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.data.service.JSoupService
 import com.app.dixon.facorites.core.ex.*
+import com.app.dixon.facorites.core.util.ClipUtil
+import com.app.dixon.facorites.core.view.ClipSaveDialog
+import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.dixon.dlibrary.util.AnimationUtil
 import com.dixon.dlibrary.util.FontUtil
 import com.dixon.dlibrary.util.ToastUtil
 import kotlinx.android.synthetic.main.activity_browse.*
+import kotlinx.android.synthetic.main.app_content_web_pop.view.*
+
 
 class BrowseActivity : BaseActivity() {
 
@@ -27,6 +38,10 @@ class BrowseActivity : BaseActivity() {
     private var categoryId: Long = 0
     private lateinit var link: String
     private var saveSchemeJump = true
+
+    private val clipboardDog = ClipboardDog()
+
+    private lateinit var morePop: PopupWindow
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,16 +51,73 @@ class BrowseActivity : BaseActivity() {
 
         initView()
         initData()
+        initClipService()
+    }
+
+    // 监听浏览器的复制/剪切操作
+    private fun initClipService() {
+        clipboardDog.register { content ->
+            ContextAssistant.asContext { context ->
+                // 是链接的话 则弹出收藏窗口
+                if (content.startsWith("http")) {
+                    CreateEntryDialog(context, content.tryExtractHttpByMatcher()).show()
+                    return@asContext
+                }
+                // 否则弹出笔记窗口
+                // 复制/剪切回调
+                ClipSaveDialog(context, content, entryId).show()
+            }
+        }
+    }
+
+    /**
+     * 注销监听，避免内存泄漏。
+     */
+    override fun onDestroy() {
+        super.onDestroy()
+        clipboardDog.unregister()
     }
 
     private fun initView() {
         initWebView()
         initTitle()
+        initMorePop()
 
         // 关闭按钮
         ivClose.setOnClickListener {
             finish()
         }
+
+        // 更多按钮
+        ivMore.setOnClickListener {
+            morePop.showAsDropDown(ivMore)
+        }
+    }
+
+    private fun initMorePop() {
+        val contentView: View = LayoutInflater.from(this).inflate(R.layout.app_content_web_pop, null)
+        // 添加至收藏
+        contentView.llSave.setOnClickListener {
+            ContextAssistant.asContext { context ->
+                CreateEntryDialog(context, webView.url).show()
+            }
+        }
+        contentView.llCopy.setOnClickListener {
+            clipboardDog.shield {
+                ClipUtil.copyToClip(this, webView.url.toString())
+                ToastUtil.toast(webView.url.toString())
+            }
+        }
+        morePop = PopupWindow(this)
+        morePop.contentView = contentView
+        morePop.width = ViewGroup.LayoutParams.WRAP_CONTENT
+        morePop.height = ViewGroup.LayoutParams.WRAP_CONTENT
+
+        // popWindow 显示时，点击外部优先关闭 window
+        morePop.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        morePop.isOutsideTouchable = true
+        morePop.isTouchable = true
+//        morePop.isFocusable = true
     }
 
     private fun initData() {
@@ -55,18 +127,24 @@ class BrowseActivity : BaseActivity() {
     private fun initTitle() {
         JSoupService.askTitle(link.try2URL(), { data ->
             tvTitle.text = data
+            tvTitle.show()
+            AnimationUtil.alpha(tvTitle, 0f, 1f).start()
         }, {
             tvTitle.text = link
+            tvTitle.show()
+            AnimationUtil.alpha(tvTitle, 0f, 1f).start()
         })
     }
-
 
     private fun initWebView() {
         webView.webChromeClient = CustomWebChromeClient()
         webView.setOnSchemeJumpListener { scheme ->
             if (schemeJumpLayout.isGone()) {
-                showSchemeJumpLayout()
-                initSchemeJumpLayout(scheme)
+                // 有的网站会在打开App的时候复制内容 比如B站
+                clipboardDog.shield {
+                    showSchemeJumpLayout()
+                    initSchemeJumpLayout(scheme)
+                }
                 // 8s后自动消失
                 backUi(8000) {
                     hideSchemeJumpLayout()
@@ -97,8 +175,12 @@ class BrowseActivity : BaseActivity() {
     private fun setSchemeSaveIcon() {
         if (saveSchemeJump) {
             ivSaveStatus.setImageResource(R.drawable.app_select_press)
+            tvCancel.text = "取消，仅保存快捷方式"
+            tvJump.text = "前往，并保存快捷方式"
         } else {
             ivSaveStatus.setImageResource(R.drawable.app_select_normal)
+            tvCancel.text = "取消"
+            tvJump.text = "前往"
         }
     }
 

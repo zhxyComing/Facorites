@@ -4,6 +4,9 @@
     package="com.app.dixon.facorites">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
     <application
         android:name=".base.BaseApplication"
@@ -16,23 +19,37 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
         <activity
+            android:name=".page.edit.AboutActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".page.edit.EditActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".page.entry.AllEntryActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".page.image.ImageActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".page.crop.CropActivity"
-            android:exported="false" />
-        <activity android:name=".page.browse.BrowseActivity" />
-        <activity android:name=".page.entry.EntryActivity" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".page.browse.BrowseActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".page.entry.EntryActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".page.home.HomeActivity"
             android:exported="true"
-            android:launchMode="singleTask">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -61,6 +78,15 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="image/*" />
+            </intent-filter>
+            <!--  友盟 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="um.62a33c8e05844627b5ab258d" />
             </intent-filter>
         </activity>
     </application>

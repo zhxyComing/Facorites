@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.page.browse.BrowseActivity
+import com.app.dixon.facorites.page.edit.AboutActivity
 import com.app.dixon.facorites.page.edit.EditActivity
 import com.app.dixon.facorites.page.entry.AllEntryActivity
 import com.app.dixon.facorites.page.entry.EntryActivity
@@ -97,6 +98,16 @@ object PageJumper {
     fun openEditPage(asContext: Any, requestCode: Int = -1) {
         resultJump(asContext) {
             val intent = Intent(it, EditActivity::class.java)
+            startActivity(it, intent, requestCode)
+        }
+    }
+
+    /**
+     * 打开关于页
+     */
+    fun openAboutPage(asContext: Any, requestCode: Int = -1) {
+        resultJump(asContext) {
+            val intent = Intent(it, AboutActivity::class.java)
             startActivity(it, intent, requestCode)
         }
     }

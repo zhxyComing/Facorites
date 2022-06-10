@@ -20,11 +20,12 @@ import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
 import com.app.dixon.facorites.page.category.CategoryFragment
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
-import com.app.dixon.facorites.page.empty.EmptyFragment
 import com.app.dixon.facorites.page.mine.MineFragment
+import com.app.dixon.facorites.page.note.NoteFragment
 import com.dixon.dlibrary.util.FontUtil
 import com.yalantis.ucrop.UCrop
 import org.greenrobot.eventbus.EventBus
+
 
 const val CATEGORY_BG_IMAGE_REQUEST = 100
 
@@ -36,7 +37,7 @@ class HomeActivity : BaseActivity() {
     private val pages = listOf<Fragment>(
         HomeFragment(),
         CategoryFragment(),
-        EmptyFragment(),
+        NoteFragment(),
         MineFragment()
     )
 

@@ -9,11 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:background="@drawable/app_shape_fragment_mine_top_bar" />
-
         <ImageView
             android:id="@+id/ivBack"
             android:layout_width="30dp"
@@ -23,30 +18,46 @@
             android:layout_marginTop="48dp"
             android:background="@drawable/app_select_edit_top_bar_back"
             android:padding="3dp"
-            android:src="@drawable/app_edit_back" />
+            android:src="@drawable/app_icon_close" />
 
         <TextView
             android:id="@+id/ivSave"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="48dp"
             android:layout_marginEnd="20dp"
             android:background="@drawable/app_select_edit_top_bar_save"
             android:gravity="center"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
+            android:paddingStart="8dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="6dp"
             android:text="保存并退出"
             android:textColor="@color/white"
-            android:textSize="12sp" />
+            android:textSize="10sp" />
+
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="10dp"
+        android:background="@color/app_split" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/app_background_color_v2"
+        android:orientation="vertical">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="108dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            app:cardBackgroundColor="#F0F2F0"
+            app:cardBackgroundColor="#E9EAE9"
             app:cardCornerRadius="8dp"
             app:cardElevation="0dp">
 
@@ -162,6 +173,6 @@
 
         </androidx.cardview.widget.CardView>
 
-    </FrameLayout>
+    </LinearLayout>
 
 </LinearLayout>

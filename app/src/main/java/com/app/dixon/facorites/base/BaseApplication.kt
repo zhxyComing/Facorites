@@ -8,7 +8,9 @@ import com.app.dixon.facorites.BuildConfig
 import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.data.service.JSoupService
+import com.app.dixon.facorites.core.data.service.NoteService
 import com.facebook.drawee.backends.pipeline.Fresco
+import com.umeng.commonsdk.UMConfigure
 import java.lang.ref.WeakReference
 
 /**
@@ -33,6 +35,11 @@ open class BaseApplication : Application() {
     }
 
     private fun init() {
+        // 友盟初始化
+        UMConfigure.setLogEnabled(BuildConfig.DEBUG)
+        UMConfigure.preInit(this, "62a33c8e05844627b5ab258d", "android")
+        UMConfigure.init(this, UMConfigure.DEVICE_TYPE_PHONE, "")
+
         DUtil.init(this)
         if (BuildConfig.DEBUG) {
             DUtil.setDebug(true)
@@ -43,6 +50,7 @@ open class BaseApplication : Application() {
         DataService.runService()
         JSoupService.runService()
         BitmapIOService.runService()
+        NoteService.runService()
 
         Fresco.initialize(this)
         initLifecycle()

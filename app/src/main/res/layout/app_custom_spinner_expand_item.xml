@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/itemContainer"
+    android:layout_width="240dp"
+    android:layout_height="wrap_content"
+    android:background="#F0F0F0">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/bgView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="80dp"
+        android:alpha="0.6"
+        android:visibility="gone"
+        app:roundBottomRight="true"
+        app:roundTopRight="true"
+        app:roundedCornerRadius="45dp" />
+
+    <FrameLayout
+        android:id="@+id/maskView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="80dp"
+        android:background="@drawable/app_shape_mask_image_entry"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:padding="14dp"
+            android:textColor="#404040" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/app_split" />
+
+    </LinearLayout>
+
+</FrameLayout>

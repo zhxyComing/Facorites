@@ -3,7 +3,7 @@
     <corners
         android:bottomRightRadius="45dp"
         android:topRightRadius="45dp" />
-    <solid android:color="#F0F2F0" />
+    <solid android:color="#E9EAE9" />
 <!--    <stroke-->
 <!--        android:width="1px"-->
 <!--        android:color="@color/app_theme_green" />-->

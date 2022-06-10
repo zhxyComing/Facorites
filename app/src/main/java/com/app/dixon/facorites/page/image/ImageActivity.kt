@@ -28,4 +28,6 @@ class ImageActivity : BaseActivity() {
             path = it
         } ?: finish()
     }
+
+    override fun statusBarColor(): Int = R.color.black
 }

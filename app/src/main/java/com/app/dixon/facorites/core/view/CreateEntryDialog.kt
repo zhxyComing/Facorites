@@ -2,10 +2,6 @@ package com.app.dixon.facorites.core.view
 
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.BaseAdapter
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.CommonCallback
@@ -23,7 +19,6 @@ import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
 import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
-import kotlinx.android.synthetic.main.app_item_category_spinner.view.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -114,7 +109,7 @@ class CreateEntryDialog(
                     spinnerIndex = index
                 }
             }
-            spinnerIndex?.let { index -> spinner.setSelection(index) }
+            spinnerIndex?.let { index -> categoryChoose.setSelection(index) }
         }
         // 切换数据类型
         layoutChange.setOnClickListener {
@@ -180,7 +175,8 @@ class CreateEntryDialog(
         val text = etEntryInput.text.toString()
         val title = etEntryTitle.text.toString()
         val remark = etEntryRemark.text.toString()
-        if (text.isNotEmpty() && title.isNotEmpty()) {
+        val categoryId = categoryChoose.getSelectionData<CategoryInfoBean>()?.id
+        if (text.isNotEmpty() && title.isNotEmpty() && categoryId != null) {
             if (editType == EDIT_TYPE_CREATE) {
                 DataService.createEntry(
                     LinkEntryBean(
@@ -188,7 +184,7 @@ class CreateEntryDialog(
                         title = title,
                         remark = remark,
                         date = Date().time,
-                        belongTo = spinner.selectedItemId,
+                        belongTo = categoryId,
                     ),
                     callback
                 )
@@ -202,7 +198,7 @@ class CreateEntryDialog(
                             remark = remark,
                             schemeJump = it.schemeJump,
                             date = it.date,
-                            belongTo = spinner.selectedItemId,
+                            belongTo = categoryId,
                             star = it.star
                         ),
                         callback
@@ -222,14 +218,15 @@ class CreateEntryDialog(
     private fun saveOrUpdateImage() {
         val title = etImageTitle.text.toString()
         val path = imagePath
-        if (title.isNotEmpty() && !path.isNullOrEmpty() && !imageImporting) {
+        val categoryId = categoryChoose.getSelectionData<CategoryInfoBean>()?.id
+        if (title.isNotEmpty() && !path.isNullOrEmpty() && !imageImporting && categoryId != null) {
             if (editType == EDIT_TYPE_CREATE) {
                 DataService.createEntry(
                     ImageEntryBean(
                         path = path,
                         title = title,
                         date = Date().time,
-                        belongTo = spinner.selectedItemId
+                        belongTo = categoryId
                     ),
                     callback
                 )
@@ -241,7 +238,7 @@ class CreateEntryDialog(
                             path = path,
                             title = title,
                             date = it.date,
-                            belongTo = spinner.selectedItemId,
+                            belongTo = categoryId,
                             star = it.star
                         ),
                         callback
@@ -289,33 +286,12 @@ class CreateEntryDialog(
 
     // 下拉选择框
     private fun initSpinner() {
-        val adapter = SpinnerAdapter(context, DataService.getCategoryList())
-        spinner.adapter = adapter
-        spinner.setSelection(0)
-    }
-
-    private class SpinnerAdapter(val context: Context, val data: List<CategoryInfoBean>) : BaseAdapter() {
-
-        override fun getCount(): Int = data.size
-
-        override fun getItem(position: Int): Any = data[position]
-
-        override fun getItemId(position: Int): Long = data[position].id
-
-        override fun getView(position: Int, originView: View?, parent: ViewGroup?): View {
-            val contentView = originView ?: LayoutInflater.from(context).inflate(R.layout.app_item_category_spinner, parent, false)
-            val holder = originView?.let {
-                (it.tag as ViewHolder)
-            } ?: let {
-                ViewHolder(contentView).apply {
-                    contentView.tag = this
-                }
-            }
-            holder.itemView.tvName.text = data[position].name
-            return contentView
+        val expendInfoList = mutableListOf<CustomSpinner.ExpandInfo<CategoryInfoBean>>()
+        DataService.getCategoryList().forEach {
+            expendInfoList.add(CustomSpinner.ExpandInfo(it.name, it.bgPath, it))
         }
-
-        class ViewHolder(val itemView: View)
+        categoryChoose.setData(expendInfoList)
+        categoryChoose.setShowPos(CustomSpinner.ShowPos.TOP)
     }
 
     override fun onDetachedFromWindow() {

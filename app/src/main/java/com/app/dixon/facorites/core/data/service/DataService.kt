@@ -11,6 +11,7 @@ import com.app.dixon.facorites.core.data.service.base.FileUtils
 import com.app.dixon.facorites.core.data.service.base.IService
 import com.app.dixon.facorites.core.data.service.base.WorkService
 import com.app.dixon.facorites.core.ex.backUi
+import com.app.dixon.facorites.core.ex.callbackRegister
 import com.app.dixon.facorites.core.ex.findByCondition
 import com.app.dixon.facorites.core.ex.removeByCondition
 import com.app.dixon.facorites.core.util.Ln
@@ -516,16 +517,6 @@ object DataService : IService {
      */
     fun register(globalEntryChanged: IGlobalEntryChanged) {
         globalEntryCallbacks.add(WeakReference(globalEntryChanged))
-    }
-
-    private fun <T> callbackRegister(list: ArrayList<WeakReference<T>>, action: (T) -> Unit) {
-        val iterator = list.iterator()
-        while (iterator.hasNext()) {
-            val register = iterator.next().get()
-            register?.let {
-                action.invoke(it)
-            } ?: iterator.remove()
-        }
     }
 
     interface IDataChanged<T> {

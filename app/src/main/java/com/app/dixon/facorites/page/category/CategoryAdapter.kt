@@ -23,7 +23,6 @@ import kotlinx.android.synthetic.main.app_item_category.view.*
  * 创建人：xuzheng
  * 创建时间：4/7/22 11:23 AM
  *
- * TODO 选择收藏夹封面
  */
 class CategoryAdapter(val context: Context, val data: List<CategoryInfoBean>) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 

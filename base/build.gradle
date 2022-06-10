@@ -34,4 +34,7 @@ dependencies {
     api "org.greenrobot:eventbus:3.2.0"
     // 内存泄漏检测
     debugApi 'com.squareup.leakcanary:leakcanary-android:2.7'
+    // 友盟配置 统计
+    api 'com.umeng.umsdk:common:9.4.7'// 必选
+    api 'com.umeng.umsdk:asms:1.4.0'// 必选
 }
