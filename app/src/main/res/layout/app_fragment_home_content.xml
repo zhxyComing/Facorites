@@ -5,23 +5,40 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/etSearch"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/app_shape_search"
-        android:drawableStart="@drawable/app_search_icon"
-        android:drawablePadding="6dp"
-        android:hint="搜索"
-        android:paddingStart="12dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="12dp"
-        android:paddingBottom="8dp"
-        android:textColor="#909090"
-        android:textSize="14sp" />
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/app_shape_search"
+            android:drawableStart="@drawable/app_search_icon"
+            android:drawablePadding="6dp"
+            android:hint="搜索"
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="32dp"
+            android:paddingBottom="8dp"
+            android:singleLine="true"
+            android:textColor="#909090"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/ivSearchClear"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="20dp"
+            android:alpha="0.3"
+            android:padding="10dp"
+            android:src="@drawable/app_icon_shut" />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tvGuide"

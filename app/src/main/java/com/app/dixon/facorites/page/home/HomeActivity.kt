@@ -16,6 +16,7 @@ import com.app.dixon.facorites.core.ex.dp
 import com.app.dixon.facorites.core.function.fromshare.FromShareHelper
 import com.app.dixon.facorites.core.util.ImageSelectHelper
 import com.app.dixon.facorites.core.util.Ln
+import com.app.dixon.facorites.core.view.AgreementDialog
 import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
 import com.app.dixon.facorites.page.category.CategoryFragment
@@ -50,6 +51,14 @@ class HomeActivity : BaseActivity() {
 
         initLogic()
         autoParse()
+        agreementLogic()
+    }
+
+    /*
+     * 隐私协议
+     */
+    private fun agreementLogic() {
+        AgreementDialog(this).show()
     }
 
     /*

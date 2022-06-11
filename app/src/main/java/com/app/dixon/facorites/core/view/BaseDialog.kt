@@ -23,7 +23,7 @@ abstract class BaseDialog(context: Context, themeResId: Int = R.style.Dialog) : 
         val window: Window? = window
         if (window != null) {
             val lp: WindowManager.LayoutParams = window.attributes
-            lp.gravity = Gravity.BOTTOM
+            lp.gravity = gravity()
             if (widthPx() != PX_AUTO) {
                 lp.width = widthPx()
             }
@@ -52,4 +52,6 @@ abstract class BaseDialog(context: Context, themeResId: Int = R.style.Dialog) : 
     protected abstract fun isCancelOnOutSide(): Boolean
 
     protected abstract fun contentLayout(): Int
+
+    protected open fun gravity(): Int = Gravity.BOTTOM
 }

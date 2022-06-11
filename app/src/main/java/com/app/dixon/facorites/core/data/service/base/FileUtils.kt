@@ -1,8 +1,10 @@
 package com.app.dixon.facorites.core.data.service.base
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.app.dixon.facorites.base.BaseApplication
+import com.app.dixon.facorites.base.ContextAssistant
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.util.Ln
 import java.io.*
@@ -216,5 +218,28 @@ object FileUtils {
             result.add(content)
         }
         return result
+    }
+
+    /**
+     * 读取Assets下的文件内容
+     */
+    fun readAssets(assetName: String): String? {
+        var result: String? = ""
+        try {
+            //获取输入流
+            val mAssets: InputStream = ContextAssistant.application().assets.open(assetName)
+            //获取文件的字节数
+            val length = mAssets.available()
+            //创建byte数组
+            val buffer = ByteArray(length)
+            //将文件中的数据写入到字节数组中
+            mAssets.read(buffer)
+            mAssets.close()
+            result = String(buffer)
+            return result
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return result
+        }
     }
 }

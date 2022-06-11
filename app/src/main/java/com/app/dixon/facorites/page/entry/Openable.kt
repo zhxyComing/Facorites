@@ -6,4 +6,4 @@ package com.app.dixon.facorites.page.entry
  * 创建人：xuzheng
  * 创建时间：4/14/22 4:28 PM
  */
-data class Openable<T>(var isOpen: Boolean = false, val data: T)
+data class Openable<T>(var isOpen: Boolean = false, var data: T)

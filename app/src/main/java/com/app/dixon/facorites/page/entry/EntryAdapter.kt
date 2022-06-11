@@ -4,10 +4,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
-import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.ex.process
 import kotlinx.android.synthetic.main.app_item_entry.view.*
 
@@ -17,9 +18,14 @@ import kotlinx.android.synthetic.main.app_item_entry.view.*
  * 创建人：xuzheng
  * 创建时间：4/7/22 5:03 PM
  */
-class EntryAdapter(val context: Context, val data: List<Openable<BaseEntryBean>>) : RecyclerView.Adapter<EntryAdapter.EntryViewHolder>() {
+class EntryAdapter(val context: Context, val data: List<Openable<BaseEntryBean>>) : RecyclerView.Adapter<EntryAdapter.EntryViewHolder>(), Filterable {
 
     class EntryViewHolder(item: View) : RecyclerView.ViewHolder(item)
+
+    // 过滤的子数据
+    var filterData: MutableList<Openable<BaseEntryBean>>? = null
+
+    var onFilterEmptyListener: (() -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
         val item = LayoutInflater.from(context).inflate(R.layout.app_item_entry, parent, false)
@@ -27,7 +33,7 @@ class EntryAdapter(val context: Context, val data: List<Openable<BaseEntryBean>>
     }
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
-        val openable = data[position]
+        val openable = obtainData()[position]
         val entry = openable.data
         entry.process({ linkEntry ->
             holder.itemView.linkCard.setLinkEntry(linkEntry)
@@ -43,7 +49,7 @@ class EntryAdapter(val context: Context, val data: List<Openable<BaseEntryBean>>
                 // 2. 如果是打开卡片，则把旧的已开卡片关闭，并记录新的
                 if (openable.isOpen) {
                     if (openIndex != -1) {
-                        data[openIndex].isOpen = false
+                        obtainData()[openIndex].isOpen = false
                         notifyItemChanged(openIndex)
                     }
                 }
@@ -57,7 +63,7 @@ class EntryAdapter(val context: Context, val data: List<Openable<BaseEntryBean>>
     }
 
     private fun findOpenIndex(): Int {
-        data.forEachIndexed { index, openable ->
+        obtainData().forEachIndexed { index, openable ->
             if (openable.isOpen) {
                 return index
             }
@@ -65,5 +71,51 @@ class EntryAdapter(val context: Context, val data: List<Openable<BaseEntryBean>>
         return -1
     }
 
-    override fun getItemCount(): Int = data.size
+    override fun getItemCount(): Int = obtainData().size
+
+    private fun obtainData() = filterData ?: let { data }
+
+    // 支持筛选
+    override fun getFilter(): Filter = object : Filter() {
+
+        override fun performFiltering(constraint: CharSequence?): FilterResults {
+            val charString: String = constraint.toString()
+            filterData ?: let {
+                filterData = mutableListOf()
+            }
+            filterData?.clear()
+            if (charString.isEmpty()) {
+                //没有过滤的内容，则使用源数据
+                filterData?.addAll(data)
+            } else {
+                data.forEach {
+                    it.data.process({ linkEntry ->
+                        if (linkEntry.title.toLowerCase().contains(charString.toLowerCase()) ||
+                            linkEntry.link.toLowerCase().contains(charString.toLowerCase())
+                        ) {
+                            filterData?.add(it)
+                        }
+                    }, { imageEntry ->
+                        if (imageEntry.title.toLowerCase().contains(charString.toLowerCase())) {
+                            filterData?.add(it)
+                        }
+                    })
+                }
+            }
+
+            val filterResults = FilterResults()
+            filterResults.values = filterData
+            return filterResults
+        }
+
+        override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+            (results?.values as? MutableList<Openable<BaseEntryBean>>)?.let {
+                filterData = it
+                notifyDataSetChanged()
+                if (filterData?.isEmpty() == true) {
+                    onFilterEmptyListener?.invoke()
+                }
+            }
+        }
+    }
 }

@@ -25,7 +25,7 @@ import kotlin.math.abs
 
 /**
  * 全路径：com.app.dixon.facorites.core.view
- * 类描述：
+ * 类描述：选择框
  * 创建人：xuzheng
  * 创建时间：6/10/22 11:22 AM
  */
