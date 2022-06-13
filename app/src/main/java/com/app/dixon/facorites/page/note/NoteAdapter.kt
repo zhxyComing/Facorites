@@ -30,7 +30,7 @@ class NoteAdapter(val context: Context, val data: List<NoteBean>) : RecyclerView
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val item = LayoutInflater.from(context).inflate(R.layout.app_item_note, parent, false)
-        FontUtil.font(item)
+        FontUtil.font(item.tvTip)
         return NoteViewHolder(item)
     }
 

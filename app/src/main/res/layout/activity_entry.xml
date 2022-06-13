@@ -11,11 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="160dp">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/app_shape_fragment_category_top_bar" />
-
         <com.app.dixon.facorites.core.view.GradientSimpleDraweeView
             android:id="@+id/bgView"
             android:layout_width="match_parent"
@@ -73,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/app_star_empty" />
+            android:src="@drawable/app_icon_empty" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -81,7 +76,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="28dp"
             android:text="啊咧，收藏夹竟然是空的"
-            android:textColor="#cdcdcd"
+            android:textColor="#A0A0A0"
             android:textSize="12sp" />
 
     </LinearLayout>

@@ -4,9 +4,9 @@
     package="com.app.dixon.facorites">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name=".base.BaseApplication"
@@ -18,8 +18,9 @@
         android:theme="@style/Theme.Facorites.AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
+        <activity android:name=".page.edit.CourseActivity"></activity>
         <activity
-            android:name=".page.edit.AboutActivity"
+            android:name=".page.edit.MarkdownActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -79,7 +80,7 @@
 
                 <data android:mimeType="image/*" />
             </intent-filter>
-            <!--  友盟 -->
+            <!-- 友盟 -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

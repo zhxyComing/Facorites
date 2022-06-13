@@ -11,6 +11,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.BaseActivity
 import com.app.dixon.facorites.core.bean.CropInfo
+import com.app.dixon.facorites.core.common.AGREEMENT_CONFIRM
 import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.ex.dp
 import com.app.dixon.facorites.core.function.fromshare.FromShareHelper
@@ -24,6 +25,7 @@ import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.app.dixon.facorites.page.mine.MineFragment
 import com.app.dixon.facorites.page.note.NoteFragment
 import com.dixon.dlibrary.util.FontUtil
+import com.dixon.dlibrary.util.SharedUtil
 import com.yalantis.ucrop.UCrop
 import org.greenrobot.eventbus.EventBus
 
@@ -58,7 +60,9 @@ class HomeActivity : BaseActivity() {
      * 隐私协议
      */
     private fun agreementLogic() {
-        AgreementDialog(this).show()
+        if (!SharedUtil.getBoolean(AGREEMENT_CONFIRM, false)) {
+            AgreementDialog(this).show()
+        }
     }
 
     /*

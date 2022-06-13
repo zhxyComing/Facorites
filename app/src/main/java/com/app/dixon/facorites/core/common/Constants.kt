@@ -24,3 +24,7 @@ const val SORT_TYPE_TIME = "sort_time"
 const val SORT_TYPE_NAME = "sort_name"
 
 const val SORT_TYPE_TIME_ORDER = "sort_time_order"
+
+const val AGREEMENT_CONFIRM = "agreement_confirm"
+
+const val MARKDOWN_ASSETS_NAME = "markdown_assets_name"

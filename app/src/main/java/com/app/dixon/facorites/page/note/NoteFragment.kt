@@ -11,6 +11,8 @@ import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.VisibleExtensionFragment
 import com.app.dixon.facorites.core.data.bean.NoteBean
 import com.app.dixon.facorites.core.data.service.NoteService
+import com.app.dixon.facorites.core.ex.hide
+import com.app.dixon.facorites.core.ex.show
 import kotlinx.android.synthetic.main.app_fragment_note_content.*
 
 
@@ -44,19 +46,33 @@ class NoteFragment : VisibleExtensionFragment(), NoteService.INoteChanged {
             rvNotes.layoutManager = LinearLayoutManager(it)
             rvNotes.adapter = adapter
         }
+        updateTip()
+    }
+
+    private fun updateTip() {
+        if (notes.isEmpty()) {
+            emptyTip.show()
+            rvNotes.hide()
+        } else {
+            emptyTip.hide()
+            rvNotes.show()
+        }
     }
 
     override fun onDataCreated(bean: NoteBean) {
         notes.add(0, bean)
         adapter?.notifyDataSetChanged()
+        updateTip()
     }
 
     override fun onDataDeleted(bean: NoteBean) {
         val index = notes.indexOf(bean)
         notes.remove(bean)
         adapter?.notifyItemRemoved(index)
+        updateTip()
     }
 
     override fun onDataUpdated(bean: NoteBean) {
+
     }
 }

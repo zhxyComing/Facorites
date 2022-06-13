@@ -2,6 +2,7 @@ package com.app.dixon.facorites.page.entry
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.dixon.facorites.R
@@ -14,6 +15,7 @@ import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.hide
 import com.app.dixon.facorites.core.ex.setImageByPath
+import com.app.dixon.facorites.core.ex.setImageByUri
 import com.app.dixon.facorites.core.ex.show
 import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
@@ -72,7 +74,7 @@ class EntryActivity : BaseActivity() {
         // 设置背景图
         categoryInfo.bgPath?.let {
             bgView.setImageByPath(it)
-        }
+        } ?: bgView.setImageByUri(Uri.parse("res://com.app.dixon.facorites/" + R.drawable.app_icon_category_bg))
 
         // 显示空页面
         updateEmptyTip()

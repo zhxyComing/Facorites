@@ -33,9 +33,8 @@ class MineFragment : VisibleExtensionFragment() {
         }
 
         appAbout.setOnClickListener {
-            PageJumper.openAboutPage(this)
+            PageJumper.openMarkdownPage(this, "about.md")
         }
-
     }
 
 }

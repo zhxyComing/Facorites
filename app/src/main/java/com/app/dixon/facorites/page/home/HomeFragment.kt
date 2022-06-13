@@ -200,7 +200,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
     }
 
     private fun initBanner() {
-        // TODO 目前是强制跳转关于页
+        // TODO 目前是强制跳转教程页
         val images = listOf(R.drawable.app_guide_cover_1)
         banner.setParams(images, { inflate, container, bean ->
             val item = inflate.inflate(R.layout.app_item_banner_home, container, false)
@@ -208,7 +208,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
             imageView.setActualImageResource(bean)
             imageView.setOnClickListener {
                 context?.let {
-                    PageJumper.openAboutPage(it)
+                    PageJumper.openCoursePage(it)
                 }
             }
             item

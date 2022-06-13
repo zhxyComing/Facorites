@@ -2,6 +2,7 @@ package com.app.dixon.facorites.page.category
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.setImageByPath
+import com.app.dixon.facorites.core.ex.setImageByUri
 import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.util.TimeUtils
 import com.app.dixon.facorites.core.view.EditCategoryDialog
@@ -47,7 +49,7 @@ class CategoryAdapter(val context: Context, val data: List<CategoryInfoBean>) : 
         info.bgPath?.let {
             Ln.i("CategoryAdapter", it)
             holder.itemView.bgView.setImageByPath(it)
-        } ?: holder.itemView.bgView.setImageByPath("https://pic.5tu.cn/uploads/allimg/1605/251507157490.jpg")
+        } ?: holder.itemView.bgView.setImageByUri(Uri.parse("res://com.app.dixon.facorites/" + R.drawable.app_icon_category_bg))
     }
 
     override fun getItemCount(): Int = data.size
