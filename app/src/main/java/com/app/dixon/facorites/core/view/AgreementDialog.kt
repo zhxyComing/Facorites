@@ -10,13 +10,16 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.Gravity
 import android.view.View
+import com.app.dixon.facorites.BuildConfig
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.ContextAssistant
 import com.app.dixon.facorites.core.common.AGREEMENT_CONFIRM
 import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.data.service.base.FileUtils
 import com.app.dixon.facorites.core.ex.dp
+import com.app.dixon.facorites.core.util.DeviceUtil
 import com.dixon.dlibrary.util.SharedUtil
+import com.tencent.bugly.crashreport.CrashReport
 import com.umeng.commonsdk.UMConfigure
 import kotlinx.android.synthetic.main.app_dialog_agreement_content.*
 
@@ -50,6 +53,9 @@ class AgreementDialog(context: Context) : BaseDialog(context) {
             SharedUtil.putBoolean(AGREEMENT_CONFIRM, true)
             // 初次进入 因为隐私协议不同意 所以要延迟初始化
             UMConfigure.init(context, UMConfigure.DEVICE_TYPE_PHONE, "")
+            CrashReport.initCrashReport(ContextAssistant.application(), "1a7de272df", BuildConfig.DEBUG)
+            CrashReport.setDeviceModel(ContextAssistant.application(), DeviceUtil.getDeviceKeyInfo())
+            CrashReport.setDeviceId(ContextAssistant.application(), DeviceUtil.getDeviceID())
             dismiss()
         }
 

@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.page.browse.BrowseActivity
+import com.app.dixon.facorites.page.edit.AboutActivity
 import com.app.dixon.facorites.page.edit.CourseActivity
 import com.app.dixon.facorites.page.edit.MarkdownActivity
 import com.app.dixon.facorites.page.edit.EditActivity
@@ -104,7 +105,7 @@ object PageJumper {
     }
 
     /**
-     * 打开关于页
+     * 打开MD页
      */
     fun openMarkdownPage(asContext: Any, assetsName: String, requestCode: Int = -1) {
         resultJump(asContext) {
@@ -114,6 +115,17 @@ object PageJumper {
             startActivity(it, intent, requestCode)
         }
     }
+
+    /**
+     * 打开关于页
+     */
+    fun openAboutPage(asContext: Any, requestCode: Int = -1) {
+        resultJump(asContext) {
+            val intent = Intent(it, AboutActivity::class.java)
+            startActivity(it, intent, requestCode)
+        }
+    }
+
 
     /**
      * 打开使用帮助页

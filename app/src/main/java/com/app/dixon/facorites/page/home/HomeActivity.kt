@@ -26,6 +26,7 @@ import com.app.dixon.facorites.page.mine.MineFragment
 import com.app.dixon.facorites.page.note.NoteFragment
 import com.dixon.dlibrary.util.FontUtil
 import com.dixon.dlibrary.util.SharedUtil
+import com.tencent.bugly.crashreport.CrashReport
 import com.yalantis.ucrop.UCrop
 import org.greenrobot.eventbus.EventBus
 

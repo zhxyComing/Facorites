@@ -97,7 +97,7 @@
                             android:layout_marginEnd="10dp"
                             android:layout_marginBottom="6dp"
                             android:lineSpacingExtra="4dp"
-                            android:text="自动从原始文案中解析出有效链接，关闭后将保存原文案，且可能导致标题解析失败."
+                            android:text="从原始字符中解析链接，关闭后将保存原文案，并且可能导致标题解析失败."
                             android:textColor="#909090"
                             android:textSize="10sp" />
                     </LinearLayout>
@@ -110,8 +110,9 @@
                         android:layout_marginEnd="15dp"
                         android:background="@drawable/app_shape_edit"
                         android:elevation="0dp"
-                        android:textColor="@color/white"
-                        android:textSize="12sp" />
+                        android:textColor="#404040"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
@@ -164,8 +165,9 @@
                         android:inputType="number"
                         android:maxLength="3"
                         android:text="5"
-                        android:textColor="@color/white"
-                        android:textSize="14sp" />
+                        android:textColor="#404040"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 

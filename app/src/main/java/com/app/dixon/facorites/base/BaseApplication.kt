@@ -9,9 +9,11 @@ import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.data.service.JSoupService
 import com.app.dixon.facorites.core.data.service.NoteService
+import com.app.dixon.facorites.core.util.DeviceUtil
 import com.dixon.dlibrary.util.DUtil
 import com.dixon.dlibrary.util.SharedUtil
 import com.facebook.drawee.backends.pipeline.Fresco
+import com.tencent.bugly.crashreport.CrashReport
 import com.umeng.commonsdk.UMConfigure
 import java.lang.ref.WeakReference
 
@@ -57,6 +59,12 @@ open class BaseApplication : Application() {
         UMConfigure.preInit(this, "62a33c8e05844627b5ab258d", "android")
         if (SharedUtil.getBoolean(AGREEMENT_CONFIRM, false)) {
             UMConfigure.init(this, UMConfigure.DEVICE_TYPE_PHONE, "")
+            CrashReport.initCrashReport(applicationContext, "1a7de272df", BuildConfig.DEBUG)
+            // 设置为开发设备
+//            CrashReport.setIsDevelopmentDevice(applicationContext, BuildConfig.DEBUG)
+            // 设置设备信息
+            CrashReport.setDeviceModel(applicationContext, DeviceUtil.getDeviceKeyInfo())
+            CrashReport.setDeviceId(applicationContext, DeviceUtil.getDeviceID())
         }
     }
 
