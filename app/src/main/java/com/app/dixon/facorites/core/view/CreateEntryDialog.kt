@@ -15,6 +15,7 @@ import com.app.dixon.facorites.core.data.service.JSoupService
 import com.app.dixon.facorites.core.enum.EntryType
 import com.app.dixon.facorites.core.ex.*
 import com.app.dixon.facorites.core.util.ImageSelectHelper
+import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
@@ -92,6 +93,7 @@ class CreateEntryDialog(
     // 3.选择分类；
     private fun initCommonLogic() {
         EventBus.getDefault().register(this)
+        llContainer.normalFont()
         tvCreate.setOnClickListener {
             if (dataType == EntryType.LINK) {
                 saveOrUpdateLink()

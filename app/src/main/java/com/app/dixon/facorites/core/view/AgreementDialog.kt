@@ -18,6 +18,8 @@ import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.data.service.base.FileUtils
 import com.app.dixon.facorites.core.ex.dp
 import com.app.dixon.facorites.core.util.DeviceUtil
+import com.app.dixon.facorites.core.util.mediumFont
+import com.app.dixon.facorites.core.util.normalFont
 import com.dixon.dlibrary.util.SharedUtil
 import com.tencent.bugly.crashreport.CrashReport
 import com.umeng.commonsdk.UMConfigure
@@ -41,6 +43,8 @@ class AgreementDialog(context: Context) : BaseDialog(context) {
 
     @SuppressLint("SetTextI18n")
     override fun initDialog() {
+        llContainer.mediumFont()
+
         // 富文本内容
         val content = FileUtils.readAssets("agreement.txt")
         val textSpanned = SpannableString(content)

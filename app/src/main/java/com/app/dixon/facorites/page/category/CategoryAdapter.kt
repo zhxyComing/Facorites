@@ -15,6 +15,8 @@ import com.app.dixon.facorites.core.ex.setImageByPath
 import com.app.dixon.facorites.core.ex.setImageByUri
 import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.util.TimeUtils
+import com.app.dixon.facorites.core.util.mediumFont
+import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.core.view.EditCategoryDialog
 import com.dixon.dlibrary.util.FontUtil
 import kotlinx.android.synthetic.main.app_item_category.view.*
@@ -30,7 +32,8 @@ class CategoryAdapter(val context: Context, val data: List<CategoryInfoBean>) : 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val item = LayoutInflater.from(context).inflate(R.layout.app_item_category, parent, false)
-        FontUtil.font(item)
+        item.normalFont()
+        item.tvTitle.mediumFont()
         return CategoryViewHolder(item)
     }
 

@@ -15,6 +15,8 @@ import com.app.dixon.facorites.core.data.service.NoteService
 import com.app.dixon.facorites.core.ex.process
 import com.app.dixon.facorites.core.util.ClipUtil
 import com.app.dixon.facorites.core.util.TimeUtils
+import com.app.dixon.facorites.core.util.mediumFont
+import com.app.dixon.facorites.core.util.normalFont
 import com.dixon.dlibrary.util.FontUtil
 import com.dixon.dlibrary.util.ToastUtil
 import kotlinx.android.synthetic.main.app_item_note.view.*
@@ -30,7 +32,8 @@ class NoteAdapter(val context: Context, val data: List<NoteBean>) : RecyclerView
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val item = LayoutInflater.from(context).inflate(R.layout.app_item_note, parent, false)
-        FontUtil.font(item.tvTip)
+        item.normalFont()
+        item.tvTip.mediumFont()
         return NoteViewHolder(item)
     }
 

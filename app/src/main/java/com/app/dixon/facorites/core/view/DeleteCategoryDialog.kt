@@ -5,6 +5,7 @@ import android.content.Context
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.util.normalFont
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
 import kotlinx.android.synthetic.main.app_dialog_category_delete_content.*
@@ -26,6 +27,7 @@ class DeleteCategoryDialog(context: Context, val categoryInfoBean: CategoryInfoB
 
     @SuppressLint("SetTextI18n")
     override fun initDialog() {
+        llContainer.normalFont()
         tvTipTitle.text = "确认删除${categoryInfoBean.name}?"
         tvDelete.setOnClickListener {
             if (DataService.getCategoryList().size == 1) {

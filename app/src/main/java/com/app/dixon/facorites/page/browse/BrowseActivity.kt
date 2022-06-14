@@ -23,6 +23,7 @@ import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.data.service.JSoupService
 import com.app.dixon.facorites.core.ex.*
 import com.app.dixon.facorites.core.util.ClipUtil
+import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.core.view.ClipSaveDialog
 import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.dixon.dlibrary.util.AnimationUtil
@@ -46,7 +47,7 @@ class BrowseActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browse)
-        FontUtil.font(window.decorView)
+        normalFont()
         parseIntentData()
 
         initView()
@@ -145,8 +146,8 @@ class BrowseActivity : BaseActivity() {
                     showSchemeJumpLayout()
                     initSchemeJumpLayout(scheme)
                 }
-                // 8s后自动消失
-                backUi(8000) {
+                // 5s后自动消失
+                backUi(5000) {
                     hideSchemeJumpLayout()
                 }
             }

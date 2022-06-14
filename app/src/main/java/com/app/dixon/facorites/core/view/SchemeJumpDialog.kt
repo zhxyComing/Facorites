@@ -5,6 +5,7 @@ import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.findByCondition
+import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.page.browse.SchemeJumper
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
@@ -26,6 +27,7 @@ class SchemeJumpDialog(context: Context, val scheme: String, val entryId: Long, 
     override fun windowAnimStyle(): Int = R.style.DialogAnimStyle
 
     override fun initDialog() {
+        llContainer.normalFont()
         tvJump.setOnClickListener {
             saveSchemeJumpIfNecessary()
             SchemeJumper.jumpByScheme(context, scheme)

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
+import com.app.dixon.facorites.core.util.normalFont
 import com.dixon.dlibrary.util.ScreenUtil
 import kotlinx.android.synthetic.main.app_dialog_category_edit_content.*
 
@@ -22,6 +23,7 @@ class EditCategoryDialog(context: Context, val categoryInfoBean: CategoryInfoBea
 
     @SuppressLint("SetTextI18n")
     override fun initDialog() {
+        llContainer.normalFont()
         tvDelete.setOnClickListener {
             // 打开删除提醒弹窗
             DeleteCategoryDialog(context, categoryInfoBean).show()

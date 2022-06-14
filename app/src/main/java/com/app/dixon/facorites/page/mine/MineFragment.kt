@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.VisibleExtensionFragment
 import com.app.dixon.facorites.core.common.PageJumper
+import com.app.dixon.facorites.core.util.normalFont
 import kotlinx.android.synthetic.main.app_fragment_mine_content.*
 
 /**
@@ -22,7 +23,9 @@ class MineFragment : VisibleExtensionFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.app_fragment_mine_content, container, false)
+    ): View = inflater.inflate(R.layout.app_fragment_mine_content, container, false).apply {
+        normalFont()
+    }
 
     override fun onVisibleFirst() {
         super.onVisibleFirst()

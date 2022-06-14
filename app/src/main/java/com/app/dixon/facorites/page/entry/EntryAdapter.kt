@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.ex.process
+import com.app.dixon.facorites.core.util.normalFont
 import kotlinx.android.synthetic.main.app_item_entry.view.*
 
 /**
@@ -29,6 +30,7 @@ class EntryAdapter(val context: Context, val data: List<Openable<BaseEntryBean>>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
         val item = LayoutInflater.from(context).inflate(R.layout.app_item_entry, parent, false)
+        item.normalFont()
         return EntryViewHolder(item)
     }
 

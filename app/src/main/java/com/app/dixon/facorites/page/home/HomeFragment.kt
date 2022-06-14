@@ -20,9 +20,7 @@ import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.*
-import com.app.dixon.facorites.core.util.CollectionUtil
-import com.app.dixon.facorites.core.util.KeyboardUtil
-import com.app.dixon.facorites.core.util.Ln
+import com.app.dixon.facorites.core.util.*
 import com.app.dixon.facorites.core.view.EntryView
 import com.app.dixon.facorites.page.edit.event.LastEntryNumUpdateEvent
 import com.app.dixon.facorites.page.entry.EntryAdapter
@@ -65,6 +63,8 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         // 注册监听
         EventBus.getDefault().register(this@HomeFragment)
         maxEntryNum = SharedUtil.getInt(LAST_ENTRY_NUM, 5)
+        normalFont()
+        findViewById<View>(R.id.tvLastCollection).mediumFont()
     }
 
     // 添加条目卡片View

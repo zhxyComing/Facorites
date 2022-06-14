@@ -18,8 +18,14 @@
         android:theme="@style/Theme.Facorites.AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
-        <activity android:name=".page.edit.AboutActivity"></activity>
-        <activity android:name=".page.edit.CourseActivity" />
+        <activity
+            android:name=".page.edit.AboutActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".page.edit.CourseActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".page.edit.MarkdownActivity"
             android:exported="false"

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.BaseActivity
@@ -18,6 +19,8 @@ import com.app.dixon.facorites.core.ex.setImageByPath
 import com.app.dixon.facorites.core.ex.setImageByUri
 import com.app.dixon.facorites.core.ex.show
 import com.app.dixon.facorites.core.util.Ln
+import com.app.dixon.facorites.core.util.mediumFont
+import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.dixon.dlibrary.util.FontUtil
@@ -38,7 +41,8 @@ class EntryActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry)
-        FontUtil.font(window.decorView)
+        normalFont()
+        findViewById<View>(R.id.sort).mediumFont()
 
         intent.getParcelableExtra<CategoryInfoBean>(CATEGORY_INFO)?.let {
             categoryInfo = it

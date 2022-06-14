@@ -5,6 +5,8 @@ import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.BaseActivity
 import com.app.dixon.facorites.core.common.AUTO_PARSE_LINK
 import com.app.dixon.facorites.core.common.LAST_ENTRY_NUM
+import com.app.dixon.facorites.core.util.mediumFont
+import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.page.edit.event.LastEntryNumUpdateEvent
 import com.dixon.dlibrary.util.SharedUtil
 import kotlinx.android.synthetic.main.activity_edit.*
@@ -19,6 +21,7 @@ class EditActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
+        normalFont()
 
         initCacheParams()
         initView()
@@ -38,6 +41,9 @@ class EditActivity : BaseActivity() {
     private fun initView() {
         linkParse.isChecked = cacheParseLink
         entryNum.setText(cacheEntryNum.toString())
+
+        linkParse.mediumFont()
+        entryNum.mediumFont()
     }
 
     private fun initCacheParams() {

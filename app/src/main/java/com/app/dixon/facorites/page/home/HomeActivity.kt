@@ -17,6 +17,7 @@ import com.app.dixon.facorites.core.ex.dp
 import com.app.dixon.facorites.core.function.fromshare.FromShareHelper
 import com.app.dixon.facorites.core.util.ImageSelectHelper
 import com.app.dixon.facorites.core.util.Ln
+import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.core.view.AgreementDialog
 import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
@@ -50,7 +51,7 @@ class HomeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        FontUtil.font(window.decorView)
+        normalFont()
 
         initLogic()
         autoParse()

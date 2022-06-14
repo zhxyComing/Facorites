@@ -43,7 +43,7 @@ open class BaseApplication : Application() {
         if (BuildConfig.DEBUG) {
             DUtil.setDebug(true)
         }
-        DUtil.setDefaultFont("Yun-Book.ttf")
+        DUtil.setDefaultFont("MiSans-Normal.ttf")
         DUtil.setSharedPreference(this, "facorites")
 
         DataService.runService()

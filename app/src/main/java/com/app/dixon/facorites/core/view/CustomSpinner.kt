@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.ex.setImageByPath
 import com.app.dixon.facorites.core.ex.show
+import com.app.dixon.facorites.core.util.normalFont
 import com.dixon.dlibrary.util.FontUtil
 import kotlinx.android.synthetic.main.app_custom_spinner_expand.view.*
 import kotlinx.android.synthetic.main.app_custom_spinner_expand_item.view.*
@@ -122,6 +123,7 @@ class CustomSpinner @JvmOverloads constructor(context: Context, attrs: Attribute
 
     private fun initExpand() {
         val contentView: View = LayoutInflater.from(context).inflate(R.layout.app_custom_spinner_expand, null)
+        contentView.normalFont()
         with(contentView.rvExpand) {
             this.layoutManager = LinearLayoutManager(context)
             this.adapter = ExpandAdapter(context, data as List<ExpandInfo<Any>>) { index, _ ->
