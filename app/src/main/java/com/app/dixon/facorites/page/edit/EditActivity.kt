@@ -52,7 +52,7 @@ class EditActivity : BaseActivity() {
     }
 
     // 判断参数有没有发生变化
-    private fun checkParamsChanged(): Boolean = linkParse.isChecked != cacheParseLink || entryNum.text.toString().toInt() != cacheEntryNum
+    private fun checkParamsChanged(): Boolean = linkParse.isChecked != cacheParseLink || (entryNum.text.toString().isNotEmpty() && entryNum.text.toString().toInt() != cacheEntryNum)
 
     private fun updateConfig() {
         if (linkParse.isChecked != cacheParseLink) {

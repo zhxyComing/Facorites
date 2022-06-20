@@ -49,6 +49,11 @@ class BrowseActivity : BaseActivity() {
         setContentView(R.layout.activity_browse)
         normalFont()
         parseIntentData()
+        if (link.isEmpty()) {
+            // TODO 后续修改为进入首页
+            finish()
+            return
+        }
 
         initView()
         initData()
@@ -202,7 +207,9 @@ class BrowseActivity : BaseActivity() {
     private fun parseIntentData() {
         intent.getStringExtra(BROWSE_LINK)?.let {
             link = it
-        } ?: finish()
+        } ?: let {
+            link = ""
+        }
         entryId = intent.getLongExtra(ENTRY_ID, 0)
         categoryId = intent.getLongExtra(CATEGORY_ID, 0)
     }

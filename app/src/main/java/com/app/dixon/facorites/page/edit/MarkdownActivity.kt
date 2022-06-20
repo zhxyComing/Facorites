@@ -18,7 +18,10 @@ class MarkdownActivity : BaseActivity() {
 
         intent.getStringExtra(MARKDOWN_ASSETS_NAME)?.let {
             assetsName = it
-        } ?: finish()
+        } ?: let {
+            finish()
+            return
+        }
 
         initView()
     }

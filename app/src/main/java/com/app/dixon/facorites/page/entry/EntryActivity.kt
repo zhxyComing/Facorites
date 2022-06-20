@@ -46,7 +46,10 @@ class EntryActivity : BaseActivity() {
 
         intent.getParcelableExtra<CategoryInfoBean>(CATEGORY_INFO)?.let {
             categoryInfo = it
-        } ?: finish()
+        } ?: let {
+            finish()
+            return
+        }
 
         // 注意：Callback不能使用局部变量，否则有页面还在、Callback被回收的风险
         callback = DataChangedCallback(categoryInfo.id)

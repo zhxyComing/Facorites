@@ -14,19 +14,18 @@ class ImageActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image)
-        parseIntent()
+        intent.getStringExtra(IMAGE_PATH)?.let {
+            path = it
+        } ?: let {
+            finish()
+            return
+        }
 
         initView()
     }
 
     private fun initView() {
         photoView.setImageURI(Uri.parse(path))
-    }
-
-    private fun parseIntent() {
-        intent.getStringExtra(IMAGE_PATH)?.let {
-            path = it
-        } ?: finish()
     }
 
     override fun statusBarColor(): Int = R.color.black

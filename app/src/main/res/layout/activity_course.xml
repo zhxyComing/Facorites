@@ -128,7 +128,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="20dp"
                         android:lineSpacingExtra="4dp"
-                        android:text="点击分享到收藏，会自动跳转到收藏夹子并弹出添加收藏弹窗，点击保存即可。此后，你可以选择直接在收藏夹子内、跳转浏览器或跳转到收藏所在应用，以继续浏览你的收藏内容。"
+                        android:text="点击分享到收藏，会自动跳转到收藏夹子并弹出添加收藏弹窗，点击保存即可。此后，你可以选择直接在收藏夹子内、跳转浏览器或跳转到收藏所在应用，以继续浏览你的收藏内容。\n\n部分应用没有对外分享功能，比如微信，这种情况选择【更多-复制链接】，并手动粘贴到收藏夹子，收藏夹子会自动提取有效链接并解析其他关键参数。"
                         android:textColor="#404040"
                         android:textSize="13sp"
                         android:textStyle="bold" />
