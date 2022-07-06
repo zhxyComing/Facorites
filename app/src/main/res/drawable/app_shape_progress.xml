@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--  设置背景色  -->
+    <item
+        android:id="@android:id/background"
+        android:drawable="@color/app_theme_transparent" />
+
+    <!--  设置进度条颜色  -->
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <corners android:radius="45dp" />
+                <gradient
+                    android:endColor="@color/md_red_500"
+                    android:startColor="@color/md_red_200" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>

@@ -17,6 +17,8 @@ import java.util.*
  * 创建人：xuzheng
  * 创建时间：2022/4/24 17:17
  *
+ * 需要优先启动的服务
+ *
  * (data/data/xxx/file/note)
  */
 object NoteService : IService {

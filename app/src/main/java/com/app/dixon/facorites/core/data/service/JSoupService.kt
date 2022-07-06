@@ -15,6 +15,8 @@ import java.io.IOException
  * 类描述：爬虫 用于爬取网页信息
  * 创建人：xuzheng
  * 创建时间：3/29/22 5:03 PM
+ *
+ * 需要优先启动的服务
  */
 object JSoupService : IService {
 

@@ -1,6 +1,5 @@
 package com.app.dixon.facorites.core.data.service.base
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.app.dixon.facorites.base.BaseApplication
@@ -43,6 +42,26 @@ object FileUtils {
     }
 
     /**
+     * 在绝对目录下创建文件夹
+     */
+    fun createDirAbs(absolutePath: String): Boolean {
+        val file = File(absolutePath)
+        if (!file.exists()) {
+            val result: Boolean // 文件是否创建成功
+            try {
+                result = file.mkdirs()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return false
+            }
+            if (!result) {
+                return false
+            }
+        }
+        return true
+    }
+
+    /**
      * 保存字符串
      */
     fun saveString(path: String, str: String): Boolean {
@@ -64,10 +83,53 @@ object FileUtils {
     }
 
     /**
+     * 保存字符串
+     */
+    fun saveStringAbs(absolutePath: String, str: String): Boolean {
+        val file = File(absolutePath)
+        if (!file.exists()) {
+            val result: Boolean // 文件是否创建成功
+            try {
+                result = file.createNewFile()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return false
+            }
+            if (!result) {
+                return false
+            }
+        }
+        file.writeText(str)
+        return true
+    }
+
+
+    /**
      * 追加字符串
      */
     fun appendString(path: String, str: String): Boolean {
         val file = File(ROOT_CATEGORY, path)
+        if (!file.exists()) {
+            val result: Boolean // 文件是否创建成功
+            try {
+                result = file.createNewFile()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return false
+            }
+            if (!result) {
+                return false
+            }
+        }
+        file.appendText(str)
+        return true
+    }
+
+    /**
+     * 追加字符串
+     */
+    fun appendStringAbs(absolutePath: String, str: String): Boolean {
+        val file = File(absolutePath)
         if (!file.exists()) {
             val result: Boolean // 文件是否创建成功
             try {
@@ -96,10 +158,35 @@ object FileUtils {
     }
 
     /**
+     * 读取字符串
+     */
+    fun readStringAbs(absolutePath: String): String {
+        val file = File(absolutePath)
+        if (!file.exists()) {
+            return ""
+        }
+        return file.readText()
+    }
+
+    /**
      * 按行读取字符串
      */
     fun readStringByLine(path: String): List<String> {
         val file = File(ROOT_CATEGORY, path)
+        if (!file.exists()) {
+            return listOf()
+        }
+        val lineList = mutableListOf<String>()
+        val inputStream: InputStream = file.inputStream()
+        inputStream.bufferedReader().forEachLine { lineList.add(it) }
+        return lineList
+    }
+
+    /**
+     * 按行读取字符串
+     */
+    fun readStringByLineAbs(absolutePath: String): List<String> {
+        val file = File(absolutePath)
         if (!file.exists()) {
             return listOf()
         }
@@ -118,6 +205,14 @@ object FileUtils {
     }
 
     /**
+     * 判断文件是否存在
+     */
+    fun existsAbs(absolutePath: String): Boolean {
+        val file = File(absolutePath)
+        return file.exists()
+    }
+
+    /**
      * 创建空文件
      */
     fun createNewFile(path: String): Boolean {
@@ -126,10 +221,26 @@ object FileUtils {
     }
 
     /**
+     * 创建空文件
+     */
+    fun createNewFileAbs(absolutePath: String): Boolean {
+        val file = File(absolutePath)
+        return file.createNewFile()
+    }
+
+    /**
      * 删除文件
      */
     fun deleteFile(path: String): Boolean {
         val file = File(ROOT_CATEGORY, path)
+        return file.delete()
+    }
+
+    /**
+     * 删除文件
+     */
+    fun deleteFileAbs(absolutePath: String): Boolean {
+        val file = File(absolutePath)
         return file.delete()
     }
 
@@ -196,6 +307,18 @@ object FileUtils {
     }
 
     /**
+     * 创建一个空文件用于保存图片
+     */
+    fun createBitmapSavePathAbs(absolutePath: String): String {
+        val file = File(absolutePath)
+        if (!file.exists()) {
+            file.createNewFile()
+        }
+        return file.absolutePath
+    }
+
+
+    /**
      * 删除图片
      */
     fun deleteBitmap(absolutePath: String): Boolean {
@@ -211,6 +334,20 @@ object FileUtils {
      */
     fun readDir(path: String): List<String> {
         val file = File(ROOT_CATEGORY, path)
+        val files = file.listFiles() ?: return listOf()
+        val result: MutableList<String> = ArrayList()
+        for (i in files.indices) {
+            val content = File(files[i].absolutePath).readText()
+            result.add(content)
+        }
+        return result
+    }
+
+    /**
+     * 获取文件夹下所有文件的内容
+     */
+    fun readDirAbs(absolutePath: String): List<String> {
+        val file = File(absolutePath)
         val files = file.listFiles() ?: return listOf()
         val result: MutableList<String> = ArrayList()
         for (i in files.indices) {

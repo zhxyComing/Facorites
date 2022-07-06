@@ -25,9 +25,7 @@ import com.app.dixon.facorites.page.category.CategoryFragment
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.app.dixon.facorites.page.mine.MineFragment
 import com.app.dixon.facorites.page.note.NoteFragment
-import com.dixon.dlibrary.util.FontUtil
 import com.dixon.dlibrary.util.SharedUtil
-import com.tencent.bugly.crashreport.CrashReport
 import com.yalantis.ucrop.UCrop
 import org.greenrobot.eventbus.EventBus
 
@@ -42,6 +40,7 @@ class HomeActivity : BaseActivity() {
     private val pages = listOf<Fragment>(
         HomeFragment(),
         CategoryFragment(),
+//        BrowseFragment(),
         NoteFragment(),
         MineFragment()
     )
@@ -112,6 +111,7 @@ class HomeActivity : BaseActivity() {
                 tabs[position].isSelected = true
             }
         })
+        pager.offscreenPageLimit = 3
     }
 
     /*

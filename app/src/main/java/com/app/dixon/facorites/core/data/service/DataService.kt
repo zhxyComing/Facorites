@@ -1,6 +1,5 @@
 package com.app.dixon.facorites.core.data.service
 
-import android.net.Uri
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
@@ -28,6 +27,8 @@ import kotlin.collections.HashMap
  * 类描述：数据存取服务
  * 创建人：xuzheng
  * 创建时间：3/17/22 8:09 PM
+ *
+ * 需要优先启动的服务
  *
  * (data/data/xxx/file/mark)
  *
