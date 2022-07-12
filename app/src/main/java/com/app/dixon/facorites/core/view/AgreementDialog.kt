@@ -27,7 +27,7 @@ import kotlinx.android.synthetic.main.app_dialog_agreement_content.*
 
 
 // 隐私协议弹窗
-class AgreementDialog(context: Context) : BaseDialog(context) {
+class AgreementDialog(context: Context, private val onSureClick: (() -> Unit)? = null) : BaseDialog(context) {
 
     override fun heightPx(): Int = PX_AUTO
 
@@ -60,6 +60,7 @@ class AgreementDialog(context: Context) : BaseDialog(context) {
             CrashReport.initCrashReport(ContextAssistant.application(), "1a7de272df", BuildConfig.DEBUG)
             CrashReport.setDeviceModel(ContextAssistant.application(), DeviceUtil.getDeviceKeyInfo())
             CrashReport.setDeviceId(ContextAssistant.application(), DeviceUtil.getDeviceID())
+            onSureClick?.invoke()
             dismiss()
         }
 

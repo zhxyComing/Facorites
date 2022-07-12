@@ -189,53 +189,7 @@
                         android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:layout_marginEnd="10dp"
-                        android:alpha="0.4"
-                        android:padding="8dp"
-                        android:src="@drawable/app_icon_edit_info" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:background="@color/white" />
-
-                <LinearLayout
-                    android:id="@+id/appExportBackup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:orientation="horizontal"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="10dp"
-                        android:padding="2dp"
-                        android:src="@drawable/app_icon_export" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:text="导出备份"
-                        android:textColor="#404040"
-                        android:textSize="14sp" />
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
-
-                    <ImageView
-                        android:id="@+id/ivExportBackupTip"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center"
-                        android:layout_marginEnd="10dp"
-                        android:alpha="0.4"
+                        android:alpha="0.6"
                         android:padding="8dp"
                         android:src="@drawable/app_icon_edit_info" />
                 </LinearLayout>
@@ -276,31 +230,46 @@
                     android:layout_height="1px"
                     android:background="@color/white" />
 
-                <LinearLayout
-                    android:id="@+id/appImportBackup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:orientation="horizontal"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp">
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/appExportBackup"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:background="?android:attr/selectableItemBackground"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:paddingTop="4dp"-->
+<!--                    android:paddingBottom="4dp">-->
 
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="10dp"
-                        android:padding="2dp"
-                        android:src="@drawable/app_icon_import" />
+<!--                    <ImageView-->
+<!--                        android:layout_width="20dp"-->
+<!--                        android:layout_height="20dp"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginStart="10dp"-->
+<!--                        android:padding="2dp"-->
+<!--                        android:src="@drawable/app_icon_export_buckup" />-->
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:text="导入备份"
-                        android:textColor="#404040"
-                        android:textSize="14sp" />
-                </LinearLayout>
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_margin="10dp"-->
+<!--                        android:text="导出备份（暂不可用）"-->
+<!--                        android:textColor="#404040"-->
+<!--                        android:textSize="14sp" />-->
+
+<!--                    <View-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="0dp"-->
+<!--                        android:layout_weight="1" />-->
+
+<!--                    <ImageView-->
+<!--                        android:id="@+id/ivExportBackupTip"-->
+<!--                        android:layout_width="30dp"-->
+<!--                        android:layout_height="30dp"-->
+<!--                        android:layout_gravity="center"-->
+<!--                        android:layout_marginEnd="10dp"-->
+<!--                        android:alpha="0.6"-->
+<!--                        android:padding="8dp"-->
+<!--                        android:src="@drawable/app_icon_edit_info" />-->
+<!--                </LinearLayout>-->
 
             </LinearLayout>
 

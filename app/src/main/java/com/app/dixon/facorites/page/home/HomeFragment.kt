@@ -1,8 +1,10 @@
 package com.app.dixon.facorites.page.home
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -90,11 +92,21 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
     override fun onVisibleFirst() {
         super.onVisibleFirst()
         DataService.register(this)
+        var initStartTime = System.currentTimeMillis()
         initBanner()
+        Ln.i("HomeFragmentInit", "initBanner ${System.currentTimeMillis() - initStartTime}")
+        initStartTime = System.currentTimeMillis()
         initEntryData()
+        Ln.i("HomeFragmentInit", "initEntryData ${System.currentTimeMillis() - initStartTime}")
+        initStartTime = System.currentTimeMillis()
         initEntryView()
+        Ln.i("HomeFragmentInit", "initEntryView ${System.currentTimeMillis() - initStartTime}")
+        initStartTime = System.currentTimeMillis()
         initOtherView()
+        Ln.i("HomeFragmentInit", "initOtherView ${System.currentTimeMillis() - initStartTime}")
+        initStartTime = System.currentTimeMillis()
         initSearchView()
+        Ln.i("HomeFragmentInit", "initSearchView ${System.currentTimeMillis() - initStartTime}")
     }
 
     private fun initSearchView() {
@@ -107,7 +119,6 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
             }
             // 搜索下拉框
             initSearchExpand()
-
             // 搜索监听
             etSearch.addTextChangedListener({ _, _, _, _ -> },
                 { charSequence, _, _, _ ->
@@ -170,12 +181,17 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         searchExpandList.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 //        searchExpandList.isOutsideTouchable = true
 //        searchExpandList.isTouchable = true
-
+        val initStartTime = System.currentTimeMillis()
+        // 警告：耗时方法，列表越长越耗时
         // 在展示之前先执行一次测量 避免后续获取宽高为0
-        searchExpandList.contentView.measure(
-            makeDropDownMeasureSpec(searchExpandList.width),
-            makeDropDownMeasureSpec(searchExpandList.height)
-        )
+        // TODO IO线程类
+        Thread {
+            searchExpandList.contentView.measure(
+                makeDropDownMeasureSpec(searchExpandList.width),
+                makeDropDownMeasureSpec(searchExpandList.height)
+            )
+        }.start()
+        Ln.i("HomeFragmentInit", "${System.currentTimeMillis() - initStartTime}")
 
         searchExpandList.setOnDismissListener {
             searchExpandShow = false
@@ -257,7 +273,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         }
     }
 
-    // 获取最近的前三个Entry
+    // 获取最近的前n个Entry
     private fun obtainLastEntry() {
         entries.clear()
         val allEntry = mutableListOf<BaseEntryBean>()
@@ -271,6 +287,20 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         for (index in 0 until size) {
             entries.add(allEntry[index])
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    override fun onDataRefresh() {
+        obtainLastEntry()
+        initEntryView()
+        // 更新所有数据
+        allEntries.clear()
+        DataService.getCategoryList().forEach { category ->
+            DataService.getEntryList(category.id)?.forEach { entry ->
+                allEntries.add(Openable(false, entry))
+            }
+        }
+        searchEntryAdapter?.notifyDataSetChanged()
     }
 
     override fun onDataCreated(bean: BaseEntryBean) {

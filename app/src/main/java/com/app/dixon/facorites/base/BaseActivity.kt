@@ -10,6 +10,7 @@ import android.view.WindowManager
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentActivity
 import com.app.dixon.facorites.R
+import com.app.dixon.facorites.core.data.service.base.DocumentFileUtils
 import com.app.dixon.facorites.core.util.Ln
 import com.dixon.dlibrary.util.StatusBarUtil
 
@@ -63,4 +64,12 @@ open class BaseActivity : FragmentActivity() {
 
     // 透明沉浸式状态栏 状态栏不再占空间 同时颜色也变成半透明
     open fun useStatusTransparent(): Boolean = false
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (data == null) {
+            return
+        }
+        DocumentFileUtils.askPermissionCallback(contentResolver, requestCode, data)
+    }
 }

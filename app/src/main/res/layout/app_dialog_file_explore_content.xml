@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/llContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_shape_round_rect_grey"
+    android:orientation="vertical">
+
+    <com.app.dixon.facorites.core.view.FileExploreView
+        android:id="@+id/fileExploreView"
+        android:layout_width="match_parent"
+        android:layout_height="460dp" />
+
+</LinearLayout>

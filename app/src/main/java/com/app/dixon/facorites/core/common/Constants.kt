@@ -27,4 +27,10 @@ const val SORT_TYPE_TIME_ORDER = "sort_time_order"
 
 const val AGREEMENT_CONFIRM = "agreement_confirm"
 
+const val VERSION_UPDATE_TIP = "version_update_tip"
+
 const val MARKDOWN_ASSETS_NAME = "markdown_assets_name"
+
+const val EXPORT_ROOT_CATEGORY = "收藏夹子"
+
+const val REQUEST_CODE_FOR_SAF_DIR = 0x0080

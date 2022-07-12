@@ -16,11 +16,8 @@ import com.app.dixon.facorites.core.ex.removeByCondition
 import com.app.dixon.facorites.core.util.Ln
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import java.io.*
 import java.lang.ref.WeakReference
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * 全路径：com.app.dixon.facorites.core.data.save
@@ -64,6 +61,7 @@ object DataService : IService {
     override fun runService() {
         ioService.runService()
         ioService.postEvent {
+            val initStartTime = System.currentTimeMillis()
             // 0.检测是不是首次启动 首次启动初始化
             if (!FileUtils.exists("$ROOT_PATH/$CATEGORY_INFO_PATH")) {
                 if (FileUtils.createDir(ROOT_PATH)) {
@@ -100,6 +98,7 @@ object DataService : IService {
                     "init category entry: ${category.name} ${entryMap[category.id]}"
                 )
             }
+            Ln.i("DataService", "init cost time ${System.currentTimeMillis() - initStartTime}")
         }
     }
 
@@ -256,12 +255,19 @@ object DataService : IService {
 
     /**
      * 创建新条目
-     *
-     * @param categoryId 分类id
      */
     fun createEntry(bean: BaseEntryBean, callback: Callback<BaseEntryBean>? = null) {
         ioService.postEvent {
             doCreateEntry(bean, callback)
+        }
+    }
+
+    /**
+     * 创建新条目
+     */
+    fun createEntry(beanList: List<BaseEntryBean>, callback: Callback<List<BaseEntryBean>>? = null) {
+        ioService.postEvent {
+            doCreateEntry(beanList, callback)
         }
     }
 
@@ -420,6 +426,40 @@ object DataService : IService {
         Ln.i("DataService") { "创建条目后的条目数据：${FileUtils.readString("$ROOT_PATH/$categoryId")}" }
     }
 
+    private fun doCreateEntry(
+        beanList: List<BaseEntryBean>,
+        callback: Callback<List<BaseEntryBean>>? = null
+    ) {
+        val successList = mutableListOf<BaseEntryBean>()
+        beanList.forEach { bean ->
+            val categoryId = bean.belongTo
+            val list = entryMap[categoryId]
+            // 存在指定ID的分类才能添加条目
+            list?.let {
+                val result = bean.toJson() + "\n"
+                Ln.i("DataService", "保存条目：$result 当前线程 ${Thread.currentThread()}")
+                val isSuccess = FileUtils.appendString("$ROOT_PATH/$categoryId", result)
+                if (isSuccess) {
+                    // 文件写入成功后，才能更新内存数据
+                    it.add(bean)
+                    successList.add(bean)
+                    // 回调对应ID的EntryCreate事件
+                    callbackRegister(entryCallbacks) { register ->
+                        if (register.id == categoryId) {
+                            register.backUi { onDataCreated(bean) }
+                        }
+                    }
+                }
+            }
+            Ln.i("DataService") { "创建条目后的条目数据：${FileUtils.readString("$ROOT_PATH/$categoryId")}" }
+        }
+        callback?.backUi { onSuccess(successList) }
+        // 回调全局EntryCreate事件
+        callbackRegister(globalEntryCallbacks) { register ->
+            register.backUi { onDataRefresh() }
+        }
+    }
+
     private fun doDeleteEntry(bean: BaseEntryBean, callback: Callback<BaseEntryBean>?) {
         val categoryId = bean.belongTo
         val filter = categoryList.filter { it.id == categoryId }
@@ -536,10 +576,14 @@ object DataService : IService {
     abstract class IEntryChanged(val id: Long) : IDataChanged<BaseEntryBean>
 
     // 全局任一Entry变化时的回调
-    interface IGlobalEntryChanged : IDataChanged<BaseEntryBean>
+    interface IGlobalEntryChanged : IDataChanged<BaseEntryBean> {
+
+        // 全局数据需要刷新的回调
+        fun onDataRefresh()
+    }
 
     override fun toString(): String {
-        callbackRegister(globalEntryCallbacks){
+        callbackRegister(globalEntryCallbacks) {
 
         }
         return "$globalEntryCallbacks "

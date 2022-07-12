@@ -13,6 +13,6 @@ package com.app.dixon.facorites.core.data.bean
 class LinkEntryBean(val link: String, val title: String, val remark: String, var schemeJump: String? = null, date: Long, belongTo: Long, star: Boolean = false) : BaseEntryBean(date, belongTo, star) {
 
     override fun toString(): String {
-        return "LinkEntryBean(link='$link', title='$title', remark='$remark', schemeJump='$schemeJump')"
+        return "LinkEntryBean(link='$link', title='$title', remark='$remark', schemeJump=$schemeJump) ${super.toString()}"
     }
 }

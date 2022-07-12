@@ -2,6 +2,7 @@ package com.app.dixon.facorites.page.home
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -12,6 +13,7 @@ import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.BaseActivity
 import com.app.dixon.facorites.core.bean.CropInfo
 import com.app.dixon.facorites.core.common.AGREEMENT_CONFIRM
+import com.app.dixon.facorites.core.common.VERSION_UPDATE_TIP
 import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.ex.dp
 import com.app.dixon.facorites.core.function.fromshare.FromShareHelper
@@ -21,6 +23,7 @@ import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.core.view.AgreementDialog
 import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
+import com.app.dixon.facorites.core.view.TipDialog
 import com.app.dixon.facorites.page.category.CategoryFragment
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.app.dixon.facorites.page.mine.MineFragment
@@ -55,6 +58,21 @@ class HomeActivity : BaseActivity() {
         initLogic()
         autoParse()
         agreementLogic()
+        versionUpdateTip()
+    }
+
+    // 版本更新提示
+    private fun versionUpdateTip() {
+        val pi = packageManager.getPackageInfo(packageName, 0)
+        val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pi.longVersionCode.toInt() else pi.versionCode
+        val versionName = pi.versionName
+        // 隐私协议已同意、并且没有显示过最新版本的更新提示
+        if (SharedUtil.getBoolean(AGREEMENT_CONFIRM, false) &&
+            SharedUtil.getInt(VERSION_UPDATE_TIP, 0) < versionCode
+        ) {
+            TipDialog(this, resources.getString(R.string.app_version_update_tip_1_0_3), "版本更新提醒（$versionName）").show()
+            SharedUtil.putInt(VERSION_UPDATE_TIP, versionCode)
+        }
     }
 
     /*
@@ -62,7 +80,9 @@ class HomeActivity : BaseActivity() {
      */
     private fun agreementLogic() {
         if (!SharedUtil.getBoolean(AGREEMENT_CONFIRM, false)) {
-            AgreementDialog(this).show()
+            AgreementDialog(this) {
+                versionUpdateTip()
+            }.show()
         }
     }
 

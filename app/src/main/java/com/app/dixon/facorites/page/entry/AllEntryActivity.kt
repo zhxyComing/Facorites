@@ -105,6 +105,28 @@ class AllEntryActivity : BaseActivity() {
     }
 
     private inner class DataChangedCallback() : DataService.IGlobalEntryChanged {
+        // 刷新页面
+        @SuppressLint("NotifyDataSetChanged")
+        override fun onDataRefresh() {
+            data.clear()
+            val allEntry = mutableListOf<BaseEntryBean>()
+            DataService.getCategoryList().forEach { category ->
+                DataService.getEntryList(category.id)?.let { entryList ->
+                    allEntry.addAll(entryList)
+                }
+            }
+            allEntry.forEach {
+                data.add(Openable(data = it))
+            }
+            if (sortType == SORT_TYPE_TIME) {
+                data.sortByDescending { it.data.date }
+                sort.text = "最近创建排序"
+            } else if (sortType == SORT_TYPE_TIME_ORDER) {
+                data.sortBy { it.data.date }
+                sort.text = "创建时间排序"
+            }
+            rvCategory.adapter?.notifyDataSetChanged()
+        }
 
         override fun onDataCreated(bean: BaseEntryBean) {
             if (sortType == SORT_TYPE_TIME) {

@@ -1,14 +1,21 @@
 package com.app.dixon.facorites.core.ie
 
-import android.os.Environment
-import com.app.dixon.facorites.core.common.SuccessCallback
+import androidx.documentfile.provider.DocumentFile
+import com.app.dixon.facorites.core.common.Callback
+import com.app.dixon.facorites.core.common.EXPORT_ROOT_CATEGORY
+import com.app.dixon.facorites.core.data.bean.BaseEntryBean
+import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.data.service.base.DocumentFileUtils
 import com.app.dixon.facorites.core.data.service.base.FileUtils
 import com.app.dixon.facorites.core.data.service.base.IService
 import com.app.dixon.facorites.core.data.service.base.WorkService
 import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.core.ex.process
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.regex.Pattern
 
 /**
  * 全路径：com.app.dixon.facorites.core.ie
@@ -20,19 +27,9 @@ import java.io.File
  */
 object IEService : IService {
 
-    private val ROOT_PATH = "${getSDPath()}/收藏夹子"
+    private val ROOT_PATH = "${FileUtils.getSDPath()}/$EXPORT_ROOT_CATEGORY"
 
     private val ioService: WorkService = WorkService()
-
-    private fun getSDPath(): String {
-        var sdDir: File? = null
-        val sdCardExist = (Environment.getExternalStorageState()
-                == Environment.MEDIA_MOUNTED) //判断sd卡是否存在
-        if (sdCardExist) {
-            sdDir = Environment.getExternalStorageDirectory() //获取根目录
-        }
-        return sdDir.toString()
-    }
 
     override fun runService() {
         ioService.runService()
@@ -94,12 +91,179 @@ object IEService : IService {
     }
 
     // 导入书签
-    fun importBookmark(callback: SuccessCallback<String>) = execute {
-        realImportBookmark(callback)
+    fun importBookmark(file: File, onProgress: ((progress: Int) -> Unit)? = null, onFail: ((msg: String) -> Unit)? = null, onSuccess: () -> Unit) = execute {
+        realImportBookmark(file, onProgress, onFail, onSuccess)
     }
 
-    private fun realImportBookmark(callback: SuccessCallback<String>) {
-        // TODO
+    private fun realImportBookmark(file: File, onProgress: ((progress: Int) -> Unit)? = null, onFail: ((msg: String) -> Unit)? = null, onSuccess: () -> Unit) {
+        val size = parseLinkNumber(FileUtils.readStringAbs(file.absolutePath))
+        if (size == 0) {
+            backUi { onFail?.invoke("未找到有效链接") }
+            return
+        }
+        val lineList = FileUtils.readStringByLineAbs(file.absolutePath)
+        val currentTimeFormat = SimpleDateFormat("yyyy_MM_dd", Locale.CHINA).format(Date())
+        DataService.createCategory("导入的书签_$currentTimeFormat") { id ->
+            execute {
+                var index = 0
+                val baseID = System.currentTimeMillis()
+                val importList = mutableListOf<BaseEntryBean>()
+                lineList.forEach {
+                    // 说明是收藏条目
+                    val trimString = it.trimStart()
+                    if (trimString.contains("<DT><A HREF")) {
+                        val title = parseTextFromLinkCode(trimString)
+                        val link = parseLinkFromLinkCode(trimString)
+                        importList.add(
+                            LinkEntryBean(
+                                link = link,
+                                title = title,
+                                remark = "",
+                                date = baseID + index,
+                                belongTo = id
+                            )
+                        )
+                        index++
+                        backUi { onProgress?.invoke(50) }
+                    }
+                }
+                DataService.createEntry(
+                    importList,
+                    callback = object : Callback<List<BaseEntryBean>> {
+                        override fun onSuccess(data: List<BaseEntryBean>) {
+                            backUi { onProgress?.invoke(100) }
+                            backUi { onSuccess.invoke() }
+                        }
+
+                        override fun onFail(msg: String) {
+                            backUi { onFail?.invoke("收藏创建失败") }
+                        }
+                    }
+                )
+            }
+        }
     }
 
+    // 导入书签
+    fun importBookmark(file: DocumentFile, onProgress: ((progress: Int) -> Unit)? = null, onFail: ((msg: String) -> Unit)? = null, onSuccess: () -> Unit) = execute {
+        realImportBookmark(file, onProgress, onFail, onSuccess)
+    }
+
+    private fun realImportBookmark(documentFile: DocumentFile, onProgress: ((progress: Int) -> Unit)? = null, onFail: ((msg: String) -> Unit)? = null, onSuccess: () -> Unit) {
+        if (!documentFile.canRead()) {
+            backUi { onFail?.invoke("文件不可读") }
+            return
+        }
+        // 转存DocumentFile到File，方便操作
+        val tempFilePath = FileUtils.createTempFile()
+        if (tempFilePath == null) {
+            backUi { onFail?.invoke("临时缓存文件创建失败") }
+            return
+        }
+        val executableFile = DocumentFileUtils.exchangeDFtoFile(documentFile, tempFilePath)
+        backUi { onProgress?.invoke(10) } // 转存完文件 进度+10
+        executableFile?.let { file ->
+            val size = parseLinkNumber(FileUtils.readStringAbs(file.absolutePath))
+            if (size == 0) {
+                backUi { onFail?.invoke("未找到有效链接") }
+                file.delete()
+                return
+            }
+            val lineList = FileUtils.readStringByLineAbs(file.absolutePath)
+            val currentTimeFormat = SimpleDateFormat("yyyy_MM_dd", Locale.CHINA).format(Date())
+            DataService.createCategory("导入的书签_$currentTimeFormat") { id ->
+                // 这里回到了主线程
+                execute {
+                    var index = 0
+                    val baseID = System.currentTimeMillis()
+                    val importList = mutableListOf<BaseEntryBean>()
+                    lineList.forEach {
+                        // 说明是收藏条目
+                        val trimString = it.trimStart()
+                        if (trimString.contains("<DT><A HREF")) {
+                            val title = parseTextFromLinkCode(trimString)
+                            val link = parseLinkFromLinkCode(trimString)
+                            importList.add(
+                                LinkEntryBean(
+                                    link = link,
+                                    title = title,
+                                    remark = "",
+                                    date = baseID + index,
+                                    belongTo = id
+                                )
+                            )
+                            index++
+                            backUi { onProgress?.invoke(50) }
+                        }
+                    }
+                    DataService.createEntry(
+                        importList,
+                        callback = object : Callback<List<BaseEntryBean>> {
+                            override fun onSuccess(data: List<BaseEntryBean>) {
+                                backUi { onProgress?.invoke(100) }
+                                backUi { onSuccess.invoke() }
+                                // 删除临时文件
+                                file.delete()
+                            }
+
+                            override fun onFail(msg: String) {
+                                backUi { onFail?.invoke("收藏创建失败") }
+                                // 删除临时文件
+                                file.delete()
+                            }
+                        }
+                    )
+                }
+            }
+        } ?: backUi { onFail?.invoke("文件转存失败") }
+    }
+
+    // 从类似下面的代码中解析出内容
+    // <DT><A HREF="https://www.gamersky.com/news/202206/1494920.shtml" ADD_DATE="1656470590007" >xxx</A>
+    // 原理是找到<>区间内的字符串并删掉，剩余的就是有效内容
+    private fun parseTextFromLinkCode(str: String): String {
+        val stringBuilder = StringBuilder()
+        var ignore = false
+        str.forEach {
+            if (it == '<') {
+                ignore = true
+                return@forEach
+            } else if (it == '>') {
+                ignore = false
+                return@forEach
+            }
+            if (!ignore) {
+                stringBuilder.append(it)
+            }
+        }
+        return stringBuilder.toString()
+    }
+
+    // 从类似下面的代码中解析出链接（该链接不一定是URL）
+    // <DT><A HREF="https://www.gamersky.com/news/202206/1494920.shtml" ADD_DATE="1656470590007" >xxx</A>
+    private fun parseLinkFromLinkCode(str: String): String {
+        val regex =
+            "HREF=\\\"((?!\\\").)+\\\""
+        val matcher = Pattern.compile(regex).matcher(str)
+        if (matcher.find()) {
+            val temp = matcher.group()
+            // 去掉 HREF=" "
+            return temp.substring(6, temp.length - 1)
+        }
+        return ""
+    }
+
+    private fun parseLinkNumber(str: String): Int {
+        val regex =
+            "HREF=\\\"((?!\\\").)+\\\""
+        val matcher = Pattern.compile(regex).matcher(str)
+        var count = 0
+        while (matcher.find()) {
+            val temp = matcher.group()
+            if (!temp.isNullOrEmpty()) {
+                count++
+            }
+        }
+        return count
+    }
 }

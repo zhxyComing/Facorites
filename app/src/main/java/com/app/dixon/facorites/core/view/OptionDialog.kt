@@ -6,6 +6,7 @@ import android.view.Gravity
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.ex.dp
 import com.app.dixon.facorites.core.util.mediumFont
+import com.app.dixon.facorites.core.util.normalFont
 import com.dixon.dlibrary.util.FontUtil
 import kotlinx.android.synthetic.main.app_dialog_option.*
 
@@ -37,7 +38,8 @@ class OptionDialog(
     @SuppressLint("SetTextI18n")
     override fun initDialog() {
         llContainer.mediumFont()
-        FontUtil.font("Yun-Book.ttf", tvDetail)
+        tvDetail.normalFont()
+//        FontUtil.font("Yun-Book.ttf", tvDetail)
         tvTitle.text = title
         tvDetail.text = desc
         btnRight.text = rightString

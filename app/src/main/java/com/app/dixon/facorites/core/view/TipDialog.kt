@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.app_dialog_tip.*
 
 
 // 提示用弹窗
-class TipDialog(context: Context, val content: String) : BaseDialog(context) {
+class TipDialog(context: Context, val content: String, val title: String? = null) : BaseDialog(context) {
 
     override fun heightPx(): Int = PX_AUTO
 
@@ -28,6 +28,9 @@ class TipDialog(context: Context, val content: String) : BaseDialog(context) {
     override fun initDialog() {
         llContainer.mediumFont()
         tvContent.text = content
+        title?.let {
+            tvTitle.text = it
+        }
     }
 
 }

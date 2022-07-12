@@ -2,17 +2,21 @@ package com.app.dixon.facorites.page.mine
 
 import ShareUtil
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.documentfile.provider.DocumentFile
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.ContextAssistant
 import com.app.dixon.facorites.base.VisibleExtensionFragment
+import com.app.dixon.facorites.core.bean.FileBox
 import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.core.ie.IEService
 import com.app.dixon.facorites.core.util.ClipUtil
 import com.app.dixon.facorites.core.util.normalFont
+import com.app.dixon.facorites.core.view.FileExploreDialog
 import com.app.dixon.facorites.core.view.OptionDialog
 import com.app.dixon.facorites.core.view.ProgressDialog
 import com.app.dixon.facorites.core.view.TipDialog
@@ -58,11 +62,11 @@ class MineFragment : VisibleExtensionFragment() {
             }
         }
 
-        ivExportBackupTip.setOnClickListener {
-            context?.let {
-                TipDialog(it, it.getString(R.string.app_export_backup_tip)).show()
-            }
-        }
+//        ivExportBackupTip.setOnClickListener {
+//            context?.let {
+//                TipDialog(it, it.getString(R.string.app_export_backup_tip)).show()
+//            }
+//        }
 
         appExportBookmark.setOnClickListener {
             // 申请权限
@@ -75,9 +79,17 @@ class MineFragment : VisibleExtensionFragment() {
         appImportBookmark.setOnClickListener {
             // 申请权限
             requestStoragePermission {
-
+                context?.let {
+                    FileExploreDialog(it) { file, documentFile ->
+                        runImport(FileBox(file, documentFile))
+                    }.show()
+                }
             }
         }
+
+//        appExportBackup.setOnClickListener {
+//            ToastUtil.toast("施工中...")
+//        }
     }
 
     // 请求SD卡读写权限
@@ -128,6 +140,74 @@ class MineFragment : VisibleExtensionFragment() {
                                 // Android 原生分享
                                 ShareUtil.shareFile(context, path)
                             }).show()
+                    }
+                })
+            }
+            progressDialog.show()
+        }
+    }
+
+    private fun runImport(fileBox: FileBox) {
+        fileBox.process({ file ->
+            if (file.name.endsWith(".html")) {
+                runImportBookmark(file)
+            } else {
+                ToastUtil.toast("无法导入，请确保文件正确")
+            }
+        }, { documentFile ->
+            if (documentFile.name?.endsWith(".html") == true) {
+                runImportBookmark(documentFile)
+            } else {
+                ToastUtil.toast("无法导入，请确保文件正确")
+            }
+        })
+    }
+
+    // 导入书签
+    private fun runImportBookmark(file: File) {
+        activity?.let { context ->
+            val progressDialog = ProgressDialog(context, "书签导入")
+            progressDialog.setOnShowListener {
+                IEService.importBookmark(file, onProgress = { progress ->
+                    progressDialog.setProgress(progress)
+                }, onFail = { msg ->
+                    ToastUtil.toast("书签导入失败：$msg")
+                    progressDialog.dismiss()
+                }, onSuccess = {
+                    backUi(500) {
+                        progressDialog.dismiss()
+                        OptionDialog(
+                            context, title = "书签导入成功！",
+                            desc = "请查看收藏集～",
+                            rightString = "确认",
+                            leftString = "关闭"
+                        ).show()
+                    }
+                })
+            }
+            progressDialog.show()
+        }
+    }
+
+    private fun runImportBookmark(documentFile: DocumentFile) {
+        activity?.let { context ->
+            val progressDialog = ProgressDialog(context, "书签导入")
+            progressDialog.setOnShowListener {
+                IEService.importBookmark(documentFile, onProgress = { progress ->
+                    progressDialog.setProgress(progress)
+                }, onFail = { msg ->
+                    ToastUtil.toast("书签导入失败：$msg")
+                    progressDialog.dismiss()
+                }, onSuccess = {
+                    Log.e("testkkk","导入成功")
+                    backUi(500) {
+                        progressDialog.dismiss()
+                        OptionDialog(
+                            context, title = "书签导入成功！",
+                            desc = "请查看收藏集～",
+                            rightString = "确认",
+                            leftString = "关闭"
+                        ).show()
                     }
                 })
             }

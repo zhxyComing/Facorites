@@ -4,4 +4,6 @@
     <string name="app_browse_tip">预览</string>
     <string name="app_export_bookmark_tip">\"导出书签\"选项将把你的链接类型收藏导出为 .html 格式的书签，该书签可以在浏览器预览，或者导入到常见浏览器中。\n\n书签类型的文件存储类型有限，因此你的备注、标星、背景图、笔记等将丢失。\n\n书签的通用性也有特殊的好处，你可以将你在浏览器里的书签导入到收藏夹子里。\n\n备份文件导出至\"SD卡根目录/收藏夹子备份\"目录下，使用前请先授予文件读写权限。</string>
     <string name="app_export_backup_tip">\"导出书签\"选项将会导出你的所有类型收藏。\n\n它不会丢失任何数据，仅作为备份，在你更换设备时方便恢复你过去的收藏。\n\n备份文件导出至\"SD卡根目录/收藏夹子备份\"目录下，使用前请先授予文件读写权限。</string>
+    <string name="app_android_r_storage_ask_tip">由于 Android 11 及以上系统限制，你需要手动授权才可访问 Android/data 目录下的文件。\n\n点击确认跳转授权页，【无需其他操作，直接点击 \"使用此文件夹\"】进行授权。</string>
+    <string name="app_version_update_tip_1.0.3">1.导出/导入 .html 格式的书签。书签可导入到常见浏览器，反之，也可以将常见浏览器的书签导入到收藏夹子；\n\n2.流畅性优化、修复了部分 Bug。</string>
 </resources>

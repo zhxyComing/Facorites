@@ -32,6 +32,11 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
 
     // 有条目变化时 刷新列表的内容 比如收藏数等等
     private val itemContentUpdateListener = object : DataService.IGlobalEntryChanged {
+
+        override fun onDataRefresh() {
+            rvCategory.adapter?.notifyDataSetChanged()
+        }
+
         override fun onDataCreated(bean: BaseEntryBean) {
             rvCategory.adapter?.notifyDataSetChanged()
         }

@@ -2,11 +2,13 @@ package com.app.dixon.facorites.core.data.service.base
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Environment
 import com.app.dixon.facorites.base.BaseApplication
 import com.app.dixon.facorites.base.ContextAssistant
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.util.Ln
 import java.io.*
+import java.util.*
 
 /**
  * 全路径：com.app.dixon.facorites.core.data.service
@@ -307,6 +309,31 @@ object FileUtils {
     }
 
     /**
+     * 创建一个空文件用于保存临时数据
+     */
+    fun createTempFile(): String? {
+        val file = File(ROOT_CATEGORY, "temp/${Date().time}.temp")
+        if (createDir("temp")) {
+            if (!file.exists()) {
+                file.createNewFile()
+            }
+            return file.absolutePath
+        }
+        return null
+    }
+
+    /**
+     * 删除临时文件
+     */
+    fun deleteTempFile(fileName: String): Boolean {
+        val file = File(ROOT_CATEGORY, "temp/$fileName")
+        if (file.exists()) {
+            return file.delete()
+        }
+        return true
+    }
+
+    /**
      * 创建一个空文件用于保存图片
      */
     fun createBitmapSavePathAbs(absolutePath: String): String {
@@ -378,5 +405,40 @@ object FileUtils {
             e.printStackTrace()
             return result
         }
+    }
+
+    /**
+     * 获取SD卡路径
+     */
+    fun getSDPath(): String {
+        var sdDir: File? = null
+        val sdCardExist = (Environment.getExternalStorageState()
+                == Environment.MEDIA_MOUNTED) //判断sd卡是否存在
+        if (sdCardExist) {
+            sdDir = Environment.getExternalStorageDirectory() //获取根目录
+        }
+        return sdDir.toString()
+    }
+
+    /**
+     * 获取路径下的所有文件名
+     */
+    fun getFileNameArrayByPathAbs(absolutePath: String): Array<String>? {
+        val file = File(absolutePath)
+        if (file.exists()) {
+            return file.list()
+        }
+        return null
+    }
+
+    /**
+     * 获取路径下的所有文件
+     */
+    fun getFileArrayByPathAbs(absolutePath: String): Array<File>? {
+        val file = File(absolutePath)
+        if (file.exists()) {
+            return file.listFiles()
+        }
+        return null
     }
 }
