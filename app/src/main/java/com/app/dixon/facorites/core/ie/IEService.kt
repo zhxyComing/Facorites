@@ -58,7 +58,8 @@ object IEService : IService {
 
     private fun realExportBookmark(onProgress: ((progress: Int) -> Unit)? = null, onFail: ((msg: String) -> Unit)? = null, onSuccess: (path: String) -> Unit) {
         // 创建空文件
-        val filePath = "$ROOT_PATH/收藏夹子书签_${System.currentTimeMillis()}.html"
+        val fileName =  SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒", Locale.CHINA).format(Date())
+        val filePath = "$ROOT_PATH/收藏夹子书签_$fileName.html"
         if (!FileUtils.createNewFileAbs(filePath)) {
             backUi { onFail?.invoke("备份文件创建失败") }
             return
