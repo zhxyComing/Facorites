@@ -17,13 +17,17 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.VisibleExtensionFragment
+import com.app.dixon.facorites.core.bean.BannerInfo
 import com.app.dixon.facorites.core.common.LAST_ENTRY_NUM
 import com.app.dixon.facorites.core.common.PageJumper
+import com.app.dixon.facorites.core.common.SEARCH_ENGINE
+import com.app.dixon.facorites.core.common.SEARCH_ENGINE_SOUGOU
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.*
 import com.app.dixon.facorites.core.util.*
 import com.app.dixon.facorites.core.view.EntryView
+import com.app.dixon.facorites.core.view.SearchDialog
 import com.app.dixon.facorites.page.edit.event.LastEntryNumUpdateEvent
 import com.app.dixon.facorites.page.entry.EntryAdapter
 import com.app.dixon.facorites.page.entry.Openable
@@ -216,16 +220,23 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
     }
 
     private fun initBanner() {
-        // TODO 目前是强制跳转教程页
-        val images = listOf(R.drawable.app_guide_cover_1)
-        banner.setParams(images, { inflate, container, bean ->
+        val banners = listOf(BannerInfo(R.drawable.app_guide_cover_1) {
+            // 跳转教程页
+            context?.let {
+                PageJumper.openCoursePage(it)
+            }
+        }, BannerInfo(R.drawable.app_guide_cover_2) {
+            // 跳转浏览器
+            context?.let {
+                SearchDialog(it).show()
+            }
+        })
+        banner.setParams(banners, { inflate, container, bean ->
             val item = inflate.inflate(R.layout.app_item_banner_home, container, false)
             val imageView = item.findViewById<SimpleDraweeView>(R.id.ivImage)
-            imageView.setActualImageResource(bean)
+            imageView.setActualImageResource(bean.imageResId)
             imageView.setOnClickListener {
-                context?.let {
-                    PageJumper.openCoursePage(it)
-                }
+                bean.action.invoke()
             }
             item
         })

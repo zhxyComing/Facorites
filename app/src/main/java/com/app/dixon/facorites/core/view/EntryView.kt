@@ -99,7 +99,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         ivBrowse.setOnClickListener {
             bean?.process({ linkEntry ->
                 if (linkEntry.link.isValidUrl()) {
-                    PageJumper.openBrowsePage(context, linkEntry.belongTo, linkEntry.date, linkEntry.link)
+                    PageJumper.openBrowsePage(context, linkEntry.belongTo, linkEntry.date, linkEntry.link, linkEntry.title)
                 } else {
                     ClipUtil.copyToClip(context, linkEntry.link)
                     ToastUtil.toast("非网页链接，已复制到剪贴板，请自行选择合适程序")

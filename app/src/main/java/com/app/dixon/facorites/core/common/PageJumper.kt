@@ -71,12 +71,13 @@ object PageJumper {
     /**
      * 打开浏览页
      */
-    fun openBrowsePage(asContext: Any, categoryId: Long, entryId: Long, link: String, requestCode: Int = -1) {
+    fun openBrowsePage(asContext: Any, categoryId: Long? = null, entryId: Long? = null, link: String, title: String? = null, requestCode: Int = -1) {
         resultJump(asContext) {
             val intent = Intent(it, BrowseActivity::class.java).apply {
                 putExtra(ENTRY_ID, entryId)
                 putExtra(CATEGORY_ID, categoryId)
                 putExtra(BROWSE_LINK, link)
+                putExtra(BROWSE_TITLE, title)
             }
             startActivity(it, intent, requestCode)
         }

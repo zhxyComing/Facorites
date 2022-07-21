@@ -27,24 +27,27 @@ open class BaseActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         Ln.i("BaseActivity", "onCreate $this")
         val window: Window = window
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (useStatusTransparent()) {
+                Ln.i("StatusBar", "path A")
                 StatusBarUtil.setColorForStatus(this)
             } else {
+                Ln.i("StatusBar", "path B")
                 val decorView = window.decorView
                 val wic = WindowInsetsControllerCompat(window, decorView)
                 wic.isAppearanceLightStatusBars = true
                 window.statusBarColor = resources.getColor(statusBarColor(), null)
             }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        } else {
+            Ln.i("StatusBar", "path C")
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS or WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
             window.statusBarColor = Color.TRANSPARENT
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             getWindow().decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
-        // 隐藏底部横条 navigation bar.
+        // 隐藏底部横条 navigation bar
         window.decorView.apply {
             systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         }

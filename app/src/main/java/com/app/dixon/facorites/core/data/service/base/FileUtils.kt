@@ -3,9 +3,11 @@ package com.app.dixon.facorites.core.data.service.base
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
+import android.util.Log
 import com.app.dixon.facorites.base.BaseApplication
 import com.app.dixon.facorites.base.ContextAssistant
 import com.app.dixon.facorites.core.common.Callback
+import com.app.dixon.facorites.core.common.EXPORT_ROOT_CATEGORY
 import com.app.dixon.facorites.core.util.Ln
 import java.io.*
 import java.util.*
@@ -280,8 +282,8 @@ object FileUtils {
         if (!file.exists()) {
             return null
         }
-        // 最大读取10M图片
-        val buf = ByteArray(1024 * 1024 * 10)
+        // 最大读取30M图片
+        val buf = ByteArray(1024 * 1024 * 30)
         val bitmap: Bitmap?
         try {
             val fis = FileInputStream(file.absolutePath)
@@ -323,14 +325,77 @@ object FileUtils {
     }
 
     /**
-     * 删除临时文件
+     * 创建一个空文件用于保存临时数据 创建在外部SD卡上
      */
-    fun deleteTempFile(fileName: String): Boolean {
-        val file = File(ROOT_CATEGORY, "temp/$fileName")
-        if (file.exists()) {
-            return file.delete()
+    fun createExTempFile(name: String): String? {
+        val file = File("${getSDPath()}/$EXPORT_ROOT_CATEGORY", "cache/${name}")
+        if (createDirAbs("${getSDPath()}/$EXPORT_ROOT_CATEGORY/cache")) {
+            if (!file.exists()) {
+                file.createNewFile()
+            }
+            return file.absolutePath
         }
-        return true
+        return null
+    }
+
+    fun clearExTempDirIfNecessary() {
+        val file = File("${getSDPath()}/$EXPORT_ROOT_CATEGORY", "cache")
+        val fileNumbers = file.listFiles()?.size ?: 0
+        val fileSize = obtainDirSize(file).toDouble() / 1024 / 1024 // M
+        // 缓存大于100M或者数量超过20个，就清空所有旧缓存（没必要学LRU，因为这些缓存大概率是不会再用到的，是分享时转存的数据）
+        if (fileSize > 100 || fileNumbers > 20) {
+            deleteDir(file)
+        }
+    }
+
+    fun isExTempDirContainsFile(name: String) =
+        containsFile(File("${getSDPath()}/$EXPORT_ROOT_CATEGORY", "cache"), name)
+
+    fun getExTempFileAbsolutePath(name: String): String =
+        "${getSDPath()}/$EXPORT_ROOT_CATEGORY/cache/$name"
+
+    private fun obtainDirSize(file: File): Long {
+        var size = 0L
+        if (file.exists()) {
+            if (file.isDirectory) {
+                val fileList = file.listFiles()
+                fileList?.forEach {
+                    size += obtainDirSize(it)
+                }
+            } else {
+                size = file.length()
+            }
+        }
+        return size
+    }
+
+    private fun deleteDir(file: File) {
+        if (file.exists()) {
+            if (file.isDirectory) {
+                val fileList = file.listFiles()
+                fileList?.forEach {
+                    deleteDir(it)
+                }
+            } else {
+                file.delete()
+            }
+        }
+    }
+
+    private fun containsFile(dir: File, name: String): Boolean {
+        if (dir.exists()) {
+            if (dir.isDirectory) {
+                val fileList = dir.listFiles()
+                fileList?.forEach {
+                    if (containsFile(it, name)) {
+                        return true
+                    }
+                }
+            } else {
+                return dir.name == name
+            }
+        }
+        return false
     }
 
     /**

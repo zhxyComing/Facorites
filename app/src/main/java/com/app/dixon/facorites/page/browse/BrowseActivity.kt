@@ -1,5 +1,6 @@
 package com.app.dixon.facorites.page.browse
 
+import ShareUtil
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.graphics.Color
@@ -16,6 +17,7 @@ import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.BaseActivity
 import com.app.dixon.facorites.base.ContextAssistant
 import com.app.dixon.facorites.core.common.BROWSE_LINK
+import com.app.dixon.facorites.core.common.BROWSE_TITLE
 import com.app.dixon.facorites.core.common.CATEGORY_ID
 import com.app.dixon.facorites.core.common.ENTRY_ID
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
@@ -37,6 +39,7 @@ class BrowseActivity : BaseActivity() {
 
     private var entryId: Long = 0
     private var categoryId: Long = 0
+    private var appointTitle: String? = null
     private lateinit var link: String
     private var saveSchemeJump = true
 
@@ -69,9 +72,11 @@ class BrowseActivity : BaseActivity() {
                     CreateEntryDialog(context, content.tryExtractHttpByMatcher()).show()
                     return@asContext
                 }
-                // 否则弹出笔记窗口
-                // 复制/剪切回调
-                ClipSaveDialog(context, content, entryId).show()
+                if (entryId != 0L) {
+                    // 否则弹出笔记窗口
+                    // 复制/剪切回调
+                    ClipSaveDialog(context, content, entryId).show()
+                }
             }
         }
     }
@@ -98,6 +103,11 @@ class BrowseActivity : BaseActivity() {
         ivMore.setOnClickListener {
             morePop.showAsDropDown(ivMore)
         }
+
+        // 关闭页面跳转弹窗
+        ivCloseSchemeJumpLayout.setOnClickListener {
+            hideSchemeJumpLayout()
+        }
     }
 
     private fun initMorePop() {
@@ -113,6 +123,9 @@ class BrowseActivity : BaseActivity() {
                 ClipUtil.copyToClip(this, webView.url.toString())
                 ToastUtil.toast(webView.url.toString())
             }
+        }
+        contentView.llShare.setOnClickListener {
+            ShareUtil.shareUrl(this, webView.url)
         }
         morePop = PopupWindow(this)
         morePop.contentView = contentView
@@ -131,6 +144,11 @@ class BrowseActivity : BaseActivity() {
     }
 
     private fun initTitle() {
+        if (!appointTitle.isNullOrEmpty()) {
+            tvTitle.text = appointTitle
+            tvTitle.show()
+            return
+        }
         JSoupService.askTitle(link.try2URL(), { data ->
             tvTitle.text = data
             tvTitle.show()
@@ -179,6 +197,13 @@ class BrowseActivity : BaseActivity() {
     }
 
     private fun setSchemeSaveIcon() {
+        if (entryId == 0L) {
+            llSaveStatus.hide()
+            tvCancel.text = "取消"
+            tvJump.text = "前往"
+            saveSchemeJump = false // 没有ID 无法保存外链
+            return
+        }
         if (saveSchemeJump) {
             ivSaveStatus.setImageResource(R.drawable.app_select_press)
             tvCancel.text = "取消，仅保存快捷方式"
@@ -212,6 +237,7 @@ class BrowseActivity : BaseActivity() {
         }
         entryId = intent.getLongExtra(ENTRY_ID, 0)
         categoryId = intent.getLongExtra(CATEGORY_ID, 0)
+        appointTitle = intent.getStringExtra(BROWSE_TITLE)
     }
 
     override fun onBackPressed() {
@@ -239,16 +265,20 @@ class BrowseActivity : BaseActivity() {
     }
 
     private fun showSchemeJumpLayout() {
-        schemeJumpLayout.show()
-        AnimationUtil.tranY(schemeJumpLayout, 900f, 0f, 300L, DecelerateInterpolator(), null).start()
+        if (schemeJumpLayout.isGone()) {
+            schemeJumpLayout.show()
+            AnimationUtil.tranY(schemeJumpLayout, 900f, 0f, 300L, DecelerateInterpolator(), null).start()
+        }
     }
 
     private fun hideSchemeJumpLayout() {
-        AnimationUtil.tranY(schemeJumpLayout, 0f, 900f, 300L, DecelerateInterpolator(), object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                schemeJumpLayout.hide()
-            }
-        }).start()
+        if (schemeJumpLayout.isVisible()) {
+            AnimationUtil.tranY(schemeJumpLayout, 0f, 900f, 300L, DecelerateInterpolator(), object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    schemeJumpLayout.hide()
+                }
+            }).start()
+        }
     }
 }

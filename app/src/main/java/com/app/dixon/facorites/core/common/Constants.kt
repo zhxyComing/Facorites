@@ -15,6 +15,8 @@ const val CATEGORY_INFO = "category_info"
 
 const val BROWSE_LINK = "browse_link"
 
+const val BROWSE_TITLE = "browse_title"
+
 const val IMAGE_PATH = "image_path"
 
 const val TRANSIT_LINK = "transit_link"
@@ -34,3 +36,13 @@ const val MARKDOWN_ASSETS_NAME = "markdown_assets_name"
 const val EXPORT_ROOT_CATEGORY = "收藏夹子"
 
 const val REQUEST_CODE_FOR_SAF_DIR = 0x0080
+
+const val SEARCH_ENGINE_SOUGOU = "https://www.sogou.com/"
+
+const val SEARCH_ENGINE_BAIDU = "https://m.baidu.com/"
+
+const val SEARCH_ENGINE_GOOGLE = "https://www.google.com/"
+
+const val SEARCH_ENGINE_BING = "https://cn.bing.com/"
+
+const val SEARCH_ENGINE_YANDEX = "https://yandex.com/"

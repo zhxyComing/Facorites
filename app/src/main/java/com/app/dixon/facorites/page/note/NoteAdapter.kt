@@ -46,7 +46,7 @@ class NoteAdapter(val context: Context, val data: List<NoteBean>) : RecyclerView
             // 找到对应的条目
             findEntry(note.belongTo)?.let { entry ->
                 entry.process({ linkEntry ->
-                    PageJumper.openBrowsePage(context, linkEntry.belongTo, linkEntry.date, linkEntry.link)
+                    PageJumper.openBrowsePage(context, linkEntry.belongTo, linkEntry.date, linkEntry.link, linkEntry.title)
                 }, { imageEntry ->
                     // 暂时不会走到
                     PageJumper.openImagePage(context, imageEntry.path)

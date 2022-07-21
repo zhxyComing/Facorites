@@ -31,8 +31,6 @@ import java.util.*
 
 /**
  * 文件浏览View
- *
- * TODO 优化启动速度
  */
 @SuppressLint("NotifyDataSetChanged")
 class FileExploreView @JvmOverloads constructor(

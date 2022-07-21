@@ -78,94 +78,108 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/schemeJumpLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="80dp"
-        android:background="@drawable/app_shape_round_rect_grey_alpha"
-        android:orientation="vertical"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
         android:visibility="gone">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp"
-            android:text="是否允许唤起外部应用？"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
         <LinearLayout
-            android:id="@+id/llSaveStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="14dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/ivSaveStatus"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:padding="5dp"
-                android:src="@drawable/app_select_press" />
+            android:background="@drawable/app_shape_round_rect_grey_alpha"
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="2dp"
-                android:layout_marginEnd="5dp"
-                android:text="将唤起应用保存为快捷方式"
-                android:textColor="#D0D0D0"
-                android:textSize="12sp" />
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:text="是否允许唤起外部应用？"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:id="@+id/llSaveStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="14dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ivSaveStatus"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:padding="5dp"
+                    android:src="@drawable/app_select_press" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="5dp"
+                    android:text="将唤起应用保存为快捷方式"
+                    android:textColor="#D0D0D0"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvCancel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:background="@drawable/app_shape_create_entry_cancel"
+                    android:gravity="center"
+                    android:paddingStart="18dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="18dp"
+                    android:paddingBottom="6dp"
+                    android:text="取消，仅保存快捷方式"
+                    android:textColor="#FFF"
+                    android:textSize="12sp" />
+
+
+                <TextView
+                    android:id="@+id/tvJump"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/app_shape_create_entry_add"
+                    android:gravity="center"
+                    android:paddingStart="18dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="18dp"
+                    android:paddingBottom="6dp"
+                    android:text="前往，并保存快捷方式"
+                    android:textColor="#FFF"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:layout_marginBottom="16dp"
-            android:orientation="vertical">
+        <ImageView
+            android:id="@+id/ivCloseSchemeJumpLayout"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="end"
+            android:padding="5dp"
+            android:src="@drawable/app_close" />
 
-            <TextView
-                android:id="@+id/tvCancel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:background="@drawable/app_shape_create_entry_cancel"
-                android:gravity="center"
-                android:paddingStart="18dp"
-                android:paddingTop="6dp"
-                android:paddingEnd="18dp"
-                android:paddingBottom="6dp"
-                android:text="取消，仅保存快捷方式"
-                android:textColor="#FFF"
-                android:textSize="12sp" />
-
-
-            <TextView
-                android:id="@+id/tvJump"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/app_shape_create_entry_add"
-                android:gravity="center"
-                android:paddingStart="18dp"
-                android:paddingTop="6dp"
-                android:paddingEnd="18dp"
-                android:paddingBottom="6dp"
-                android:text="前往，并保存快捷方式"
-                android:textColor="#FFF"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-    </LinearLayout>
+    </FrameLayout>
 
 </FrameLayout>

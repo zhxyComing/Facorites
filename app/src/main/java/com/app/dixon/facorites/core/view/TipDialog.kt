@@ -10,13 +10,13 @@ import kotlinx.android.synthetic.main.app_dialog_tip.*
 
 
 // 提示用弹窗
-class TipDialog(context: Context, val content: String, val title: String? = null) : BaseDialog(context) {
+class TipDialog(context: Context, val content: String, val title: String? = null, private val isCancelable: Boolean = true) : BaseDialog(context) {
 
     override fun heightPx(): Int = PX_AUTO
 
     override fun widthPx(): Int = 300.dp
 
-    override fun isCancelOnOutSide(): Boolean = true
+    override fun isCancelOnOutSide(): Boolean = isCancelable
 
     override fun contentLayout(): Int = R.layout.app_dialog_tip
 

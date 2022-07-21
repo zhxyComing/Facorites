@@ -1,6 +1,5 @@
 package com.app.dixon.facorites.core.view
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Handler
 import android.util.AttributeSet
@@ -10,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
+import com.dixon.dlibrary.util.Ln
 
 /**
  * 创建人：xuzheng
@@ -18,7 +18,8 @@ import androidx.viewpager.widget.ViewPager
 class InfiniteBanner @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : ViewPager(context, attrs) {
 
     private val looper = Handler(context.mainLooper)
-    private var loopEnable = true
+    private var loopEnable = false // 是否可循环
+    private var isLooping = false // 是否在循环中
     private var loopDelay = 5000L
 
     override fun setAdapter(adapter: PagerAdapter?) {
@@ -42,9 +43,8 @@ class InfiniteBanner @JvmOverloads constructor(context: Context, attrs: Attribut
         super.setAdapter(adapter)
         adapter.initialize(this)
 
-        if (loop) {
-            startLoop()
-        }
+        loopEnable = loop
+        startLoop()
     }
 
     /**
@@ -56,11 +56,19 @@ class InfiniteBanner @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     private fun startLoop() {
-        looper.postDelayed(loopRunnable, loopDelay)
+        if (!isLooping && loopEnable) {
+            Ln.i("InfiniteBanner", "startLoop")
+            looper.postDelayed(loopRunnable, loopDelay)
+            isLooping = true
+        }
     }
 
     private fun stopLoop() {
-        looper.removeCallbacks(loopRunnable)
+        if (isLooping) {
+            Ln.i("InfiniteBanner", "stopLoop")
+            looper.removeCallbacks(loopRunnable)
+            isLooping = false
+        }
     }
 
     private val loopRunnable = object : Runnable {
@@ -72,18 +80,27 @@ class InfiniteBanner @JvmOverloads constructor(context: Context, attrs: Attribut
                 looper.postDelayed(this, loopDelay)
             } else {
                 currentItem = targetItem
+                Ln.i("InfiniteBanner", "setItem $currentItem")
                 looper.postDelayed(this, loopDelay)
             }
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(ev: MotionEvent?): Boolean {
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         when (ev?.action) {
             MotionEvent.ACTION_DOWN -> stopLoop()
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_POINTER_UP -> if (loopEnable) startLoop()
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_POINTER_UP -> startLoop()
         }
-        return super.onTouchEvent(ev)
+        return super.dispatchTouchEvent(ev)
+    }
+
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        if (visibility == View.VISIBLE) {
+            startLoop()
+        } else {
+            stopLoop()
+        }
     }
 
     /**

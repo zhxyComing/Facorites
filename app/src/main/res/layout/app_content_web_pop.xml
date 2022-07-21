@@ -45,4 +45,26 @@
             android:textSize="14sp" />
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/app_split" />
+
+    <LinearLayout
+        android:id="@+id/llShare"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="分享"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+    </LinearLayout>
+
 </LinearLayout>

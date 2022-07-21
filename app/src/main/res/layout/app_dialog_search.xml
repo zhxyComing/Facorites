@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/llContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_shape_round_rect_grey"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvSearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:lineSpacingExtra="4dp"
+        android:text="在线搜索"
+        android:textColor="#404040"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp">
+
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/app_shape_browse_search"
+            android:hint="搜索或输入网址"
+            android:imeOptions="actionSearch"
+            android:paddingStart="16dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="32dp"
+            android:paddingBottom="10dp"
+            android:singleLine="true"
+            android:textColor="#404040"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/ivSearchClear"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="20dp"
+            android:alpha="0.3"
+            android:padding="10dp"
+            android:src="@drawable/app_icon_shut" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tvGoSearch"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/app_shape_select"
+        android:gravity="center"
+        android:paddingStart="12dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="6dp"
+        android:text="搜索"
+        android:textColor="#FFF"
+        android:textSize="12sp" />
+
+</LinearLayout>

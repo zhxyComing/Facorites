@@ -6,4 +6,6 @@
     <string name="app_export_backup_tip">\"导出书签\"选项将会导出你的所有类型收藏。\n\n它不会丢失任何数据，仅作为备份，在你更换设备时方便恢复你过去的收藏。\n\n备份文件导出至\"SD卡根目录/收藏夹子备份\"目录下，使用前请先授予文件读写权限。</string>
     <string name="app_android_r_storage_ask_tip">由于 Android 11 及以上系统限制，你需要手动授权才可访问 Android/data 目录下的文件。\n\n点击确认跳转授权页，【无需其他操作，直接点击 \"使用此文件夹\"】进行授权。</string>
     <string name="app_version_update_tip_1.0.3">1.导出/导入 .html 格式的书签。书签可导入到常见浏览器，反之，也可以将常见浏览器的书签导入到收藏夹子；\n\n2.流畅性优化、修复了部分 Bug。</string>
+    <string name="app_version_update_tip_1.0.4">1.应用内浏览器。现在可以在首页-搜索引擎在线搜索想要的内容；\n\n2.分享。支持收藏夹子内的网页/图片对外分享；\n\n3.其它细节优化。</string>
+    <string name="app_image_share_tip">图片分享需要存储权限，点击前往授权。</string>
 </resources>
