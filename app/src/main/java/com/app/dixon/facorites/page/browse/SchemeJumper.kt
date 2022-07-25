@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import com.dixon.dlibrary.util.ToastUtil
 import java.lang.Exception
 import java.net.URISyntaxException
@@ -30,8 +31,8 @@ object SchemeJumper {
                     val resolves = context.packageManager.queryIntentActivities(intent, 0)
                     if (resolves.size > 0) {
                         context.startActivity(intent)
+                        return true
                     }
-                    return true
                 } catch (e: URISyntaxException) {
                     e.printStackTrace()
                 }
@@ -43,12 +44,12 @@ object SchemeJumper {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
                     intent.flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                     context.startActivity(intent)
+                    return true
                 } catch (e: Exception) {
                     // 防止没有安装的情况
                     e.printStackTrace()
                     ToastUtil.toast("您所打开的第三方App未安装！")
                 }
-                return true
             }
         } catch (e: Exception) {
             e.printStackTrace()

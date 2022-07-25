@@ -57,6 +57,39 @@
             android:text="修改"
             android:textColor="#FFF"
             android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvTop"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="end"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/app_shape_select"
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="6dp"
+            android:text="置顶"
+            android:textColor="#FFF"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvCancelTop"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="end"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/app_shape_select"
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="6dp"
+            android:text="取消\n置顶"
+            android:textColor="#FFF"
+            android:textSize="12sp"
+            android:visibility="gone" />
     </LinearLayout>
 
 </LinearLayout>

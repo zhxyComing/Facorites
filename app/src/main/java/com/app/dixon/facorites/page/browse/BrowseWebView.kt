@@ -4,11 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.webkit.*
+import com.app.dixon.facorites.core.common.PageJumper
 import com.dixon.dlibrary.util.Ln
 import com.dixon.dlibrary.util.ToastUtil
-import kotlinx.android.synthetic.main.activity_browse.view.*
 
 
 /**
@@ -59,11 +60,37 @@ class BrowseWebView @JvmOverloads constructor(context: Context, attrs: Attribute
         // 监听
         webViewClient = CustomWebViewClient()
         // 下载监听
-        webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+        setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             // TODO 下载器
             ToastUtil.toast("暂不支持下载哦～")
         }
+        addJavascriptInterface(JavascriptInterface(context), "imagelistener")
+        setOnLongClickListener {
+            val result = (it as WebView).hitTestResult
+            val type = result.type
+            Ln.i("WebViewLongClick", parseLongClick(type))
+            if (type == HitTestResult.IMAGE_TYPE) {
+                result.extra?.let { imgUrl ->
+                    PageJumper.openImagePage(context, imgUrl)
+                    return@setOnLongClickListener true
+                }
+            }
+            false
+        }
     }
+
+    private fun parseLongClick(type: Int): String =
+        when (type) {
+            HitTestResult.UNKNOWN_TYPE -> "未知类型"
+            HitTestResult.PHONE_TYPE -> "电话类型"
+            HitTestResult.EMAIL_TYPE -> "电子邮件类型"
+            HitTestResult.GEO_TYPE -> "地图类型"
+            HitTestResult.SRC_ANCHOR_TYPE -> "超链接类型"
+            HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> "带有链接的图片类型"
+            HitTestResult.IMAGE_TYPE -> "单纯的图片类型"
+            HitTestResult.EDIT_TEXT_TYPE -> "选中的文字类型"
+            else -> "未知类型"
+        }
 
     private inner class CustomWebViewClient : WebViewClient() {
 
@@ -81,6 +108,39 @@ class BrowseWebView @JvmOverloads constructor(context: Context, attrs: Attribute
         override fun onReceivedHttpError(view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?) {
             Ln.i("WebViewRequest", "error ${request?.url.toString()}")
             super.onReceivedHttpError(view, request, errorResponse)
+        }
+
+        override fun onPageFinished(view: WebView?, url: String?) {
+            super.onPageFinished(view, url)
+            // 点击查看图片 目前修改为长按查看图片
+//            addImageClickListener()
+        }
+    }
+
+    // 注入js函数监听
+    private fun addImageClickListener() {
+        // 遍历页面中所有img的节点，因为节点里面的图片的url即objs[i].src，保存所有图片的src.
+        // 为每个图片设置点击事件，objs[i].onclick
+        loadUrl(
+            "javascript:(function(){" +
+                    "var objs = document.getElementsByTagName(\"img\"); " +
+                    "for(var i=0;i<objs.length;i++) " +
+                    "{" +
+                    " objs[i].onclick=function() " +
+                    " { " +
+                    " window.imagelistener.openImage(this.src); " +
+                    " } " +
+                    "}" +
+                    "})()"
+        )
+    }
+
+    // js通信接口
+    class JavascriptInterface(val context: Context) {
+
+        @android.webkit.JavascriptInterface
+        fun openImage(clickImg: String) {
+            PageJumper.openImagePage(context, clickImg)
         }
     }
 

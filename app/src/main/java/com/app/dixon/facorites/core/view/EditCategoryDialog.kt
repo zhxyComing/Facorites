@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
+import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.ex.show
 import com.app.dixon.facorites.core.util.normalFont
 import com.dixon.dlibrary.util.ScreenUtil
 import kotlinx.android.synthetic.main.app_dialog_category_edit_content.*
@@ -34,6 +36,21 @@ class EditCategoryDialog(context: Context, val categoryInfoBean: CategoryInfoBea
             // 打开更新弹窗
             UpdateCategoryDialog(context, categoryInfoBean).show()
             dismiss()
+        }
+
+        tvTop.setOnClickListener {
+            val newCategoryInfoBean = CategoryInfoBean(categoryInfoBean.id, categoryInfoBean.name, categoryInfoBean.bgPath, topTimeMs = System.currentTimeMillis())
+            DataService.updateCategory(categoryInfoBean, newCategoryInfoBean)
+            dismiss()
+        }
+
+        if (categoryInfoBean.topTimeMs != 0L) {
+            tvCancelTop.show()
+            tvCancelTop.setOnClickListener {
+                val newCategoryInfoBean = CategoryInfoBean(categoryInfoBean.id, categoryInfoBean.name, categoryInfoBean.bgPath, topTimeMs = 0L)
+                DataService.updateCategory(categoryInfoBean, newCategoryInfoBean)
+                dismiss()
+            }
         }
     }
 }

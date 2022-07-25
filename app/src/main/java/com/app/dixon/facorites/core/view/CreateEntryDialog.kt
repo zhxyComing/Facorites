@@ -1,7 +1,11 @@
 package com.app.dixon.facorites.core.view
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
+import android.os.Build
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.CommonCallback
@@ -17,13 +21,16 @@ import com.app.dixon.facorites.core.ex.*
 import com.app.dixon.facorites.core.util.ImageSelectHelper
 import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
+import com.dixon.dlibrary.util.Ln
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
+import com.umeng.analytics.pro.bm
 import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.util.*
+
 
 const val ENTRY_IMAGE_REQUEST = 101
 
@@ -31,7 +38,8 @@ const val ENTRY_IMAGE_REQUEST = 101
 class CreateEntryDialog(
     context: Context,
     private val linkFromShare: String? = null,
-    private val callback: Callback<BaseEntryBean> = CommonCallback("创建成功！")
+    private val callback: Callback<BaseEntryBean> = CommonCallback("创建成功！"),
+    private val defaultCategory: Long? = null
 ) :
     BaseDialog(context) {
 
@@ -294,6 +302,13 @@ class CreateEntryDialog(
         }
         categoryChoose.setData(expendInfoList)
         categoryChoose.setShowPos(CustomSpinner.ShowPos.TOP)
+        defaultCategory?.let { id ->
+            expendInfoList.findIndexByCondition {
+                it.data.id == id
+            }?.let { index ->
+                categoryChoose.setSelection(index)
+            }
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -324,8 +339,28 @@ class CreateEntryDialog(
     fun onImageSelectComplete(event: CategoryImageCompleteEvent) {
         // 转存之前先把之前导入的图片删掉
         deleteExpiredImportImage()
+        // 图片信息
+        var rotate = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            context.contentResolver.openInputStream(event.uri)?.let {
+                val imageRotation = ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+                if (imageRotation == ExifInterface.ORIENTATION_ROTATE_90 || imageRotation == ExifInterface.ORIENTATION_ROTATE_270) {
+                    rotate = true
+                }
+            }
+        }
         // 转存图片到本地
-        val bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(event.uri))
+        var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(event.uri))
+        // iOS 拍出的图片带旋转角，要在导入时转为旋转后的图片
+        if (rotate) {
+            val m = Matrix()
+            m.setRotate(90f, bitmap.width.toFloat() / 2, bitmap.height.toFloat() / 2)
+            try {
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
+            } catch (ex: OutOfMemoryError) {
+                Ln.e("OutOfMemoryError", "转存图片OOM")
+            }
+        }
         val absolutePath = BitmapIOService.createBitmapSavePath()
         tvTip.text = "转存图片中，请耐心等待"
         imageImporting = true

@@ -88,6 +88,56 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="20dp"
+                        android:text="版本 1.0.5"
+                        android:textColor="@color/md_red_400"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:lineSpacingExtra="4dp"
+                        android:text="发布日期：2022.7.26\n更新日志："
+                        android:textColor="#404040"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="20dp"
+                        android:lineSpacingExtra="4dp"
+                        android:text="1. 体验优化：\n  Ⅰ. 收藏增加所属分类的标签；\n  Ⅱ. 支持在分类下直接添加收藏；\n  Ⅲ. 分类支持置顶；\n  Ⅳ. 浏览器支持长按放大、保存、收藏图片；\n2. 问题修复：\n  Ⅰ. 收藏 iphone 图片倒转问题；\n  Ⅱ. 部分应用无法跳转问题。"
+                        android:textColor="#404040"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:background="@color/white"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="20dp"
                         android:text="版本 1.0.4"
                         android:textColor="@color/md_red_400"
                         android:textSize="15sp"

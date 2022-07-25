@@ -53,4 +53,14 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/topTag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|top"
+        android:layout_margin="10dp"
+        android:text="置顶"
+        android:textColor="@color/white"
+        android:textSize="10sp" />
+
 </androidx.cardview.widget.CardView>

@@ -21,6 +21,7 @@ import com.app.dixon.facorites.core.ex.show
 import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.util.mediumFont
 import com.app.dixon.facorites.core.util.normalFont
+import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.dixon.dlibrary.util.FontUtil
@@ -65,7 +66,7 @@ class EntryActivity : BaseActivity() {
         }
         // 最近时间排序
         data.sortByDescending { it.data.date }
-        rvCategory.adapter = EntryAdapter(this, data)
+        rvCategory.adapter = EntryAdapter(this, data, false)
         rvCategory.layoutManager = LinearLayoutManager(this)
 
         // 设置标题
@@ -85,6 +86,12 @@ class EntryActivity : BaseActivity() {
 
         // 显示空页面
         updateEmptyTip()
+
+        // 设置点击创建收藏
+        addEntry.setOnClickListener {
+            // 创建Entry
+            CreateEntryDialog(this, defaultCategory = categoryInfo.id).show()
+        }
     }
 
     private fun updateEmptyTip() {

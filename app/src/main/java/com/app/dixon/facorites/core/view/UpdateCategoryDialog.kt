@@ -54,7 +54,7 @@ class UpdateCategoryDialog(context: Context, val categoryInfoBean: CategoryInfoB
                 etInput.shakeTip()
                 return@setOnClickListener
             }
-            val newCategoryInfoBean = CategoryInfoBean(categoryInfoBean.id, newTitle, newBgUri?.path)
+            val newCategoryInfoBean = CategoryInfoBean(categoryInfoBean.id, newTitle, newBgUri?.path, categoryInfoBean.topTimeMs)
             DataService.updateCategory(categoryInfoBean, newCategoryInfoBean) {
                 if (it != -1L) {
                     ToastUtil.toast("更新收藏夹成功")

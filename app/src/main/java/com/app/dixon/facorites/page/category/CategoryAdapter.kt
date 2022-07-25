@@ -13,6 +13,7 @@ import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.setImageByPath
 import com.app.dixon.facorites.core.ex.setImageByUri
+import com.app.dixon.facorites.core.ex.showIf
 import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.util.TimeUtils
 import com.app.dixon.facorites.core.util.mediumFont
@@ -34,6 +35,7 @@ class CategoryAdapter(val context: Context, val data: List<CategoryInfoBean>) : 
         val item = LayoutInflater.from(context).inflate(R.layout.app_item_category, parent, false)
         item.normalFont()
         item.tvTitle.mediumFont()
+        item.topTag.mediumFont()
         return CategoryViewHolder(item)
     }
 
@@ -42,6 +44,7 @@ class CategoryAdapter(val context: Context, val data: List<CategoryInfoBean>) : 
         val info = data[position]
         holder.itemView.tvTitle.text = info.name
         holder.itemView.tvDesc.text = "创建于${TimeUtils.friendlyTime(info.id)} · 包含${DataService.getEntryList(info.id)?.size}条收藏"
+        holder.itemView.topTag.showIf(info.topTimeMs != 0L)
         holder.itemView.cardContent.setOnClickListener {
             PageJumper.openEntryPage(context, data[position])
         }

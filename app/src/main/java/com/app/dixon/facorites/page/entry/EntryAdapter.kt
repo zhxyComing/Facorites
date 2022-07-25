@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.app_item_entry.view.*
  * 创建人：xuzheng
  * 创建时间：4/7/22 5:03 PM
  */
-class EntryAdapter(val context: Context, val data: List<Openable<BaseEntryBean>>) : RecyclerView.Adapter<EntryAdapter.EntryViewHolder>(), Filterable {
+class EntryAdapter(val context: Context, val data: List<Openable<BaseEntryBean>>, private val showCategoryTag: Boolean = true) : RecyclerView.Adapter<EntryAdapter.EntryViewHolder>(), Filterable {
 
     class EntryViewHolder(item: View) : RecyclerView.ViewHolder(item)
 
@@ -38,9 +38,9 @@ class EntryAdapter(val context: Context, val data: List<Openable<BaseEntryBean>>
         val openable = obtainData()[position]
         val entry = openable.data
         entry.process({ linkEntry ->
-            holder.itemView.linkCard.setLinkEntry(linkEntry)
+            holder.itemView.linkCard.setLinkEntry(linkEntry, showCategoryTag)
         }, { imageEntry ->
-            holder.itemView.linkCard.setImageEntry(imageEntry)
+            holder.itemView.linkCard.setImageEntry(imageEntry, showCategoryTag)
         })
         holder.itemView.linkCard.apply {
             setOnClickListener {

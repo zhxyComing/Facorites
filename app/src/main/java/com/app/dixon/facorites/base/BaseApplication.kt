@@ -63,7 +63,7 @@ open class BaseApplication : Application() {
             UMConfigure.init(this, UMConfigure.DEVICE_TYPE_PHONE, "")
             CrashReport.initCrashReport(applicationContext, "1a7de272df", BuildConfig.DEBUG)
             // 设置为开发设备
-//            CrashReport.setIsDevelopmentDevice(applicationContext, BuildConfig.DEBUG)
+            CrashReport.setIsDevelopmentDevice(applicationContext, BuildConfig.DEBUG)
             // 设置设备信息
             CrashReport.setDeviceModel(applicationContext, DeviceUtil.getDeviceKeyInfo())
             CrashReport.setDeviceId(applicationContext, DeviceUtil.getDeviceID())

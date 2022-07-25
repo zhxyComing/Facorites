@@ -51,7 +51,8 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
 
     init {
         LayoutInflater.from(context).inflate(R.layout.app_view_link_card, this, true)
-        FontUtil.font(title)
+        container.normalFont()
+
         setOnClickListener { }
 
         tvJump.setOnClickListener {
@@ -142,9 +143,14 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
     }
 
-    fun setLinkEntry(bean: LinkEntryBean) {
+    fun setLinkEntry(bean: LinkEntryBean, categoryTagShow: Boolean = true) {
         this.bean = bean
         title.text = bean.title
+        if (categoryTagShow) {
+            setCategoryTag(bean.belongTo)
+        } else {
+            hideCategoryTag()
+        }
         val iconLink = bean.link.try2IconLink()
         Ln.i("icon_link", iconLink)
         val controller: DraweeController = Fresco.newDraweeControllerBuilder()
@@ -156,7 +162,10 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         bean.schemeJump?.let { scheme ->
             tvSchemeJump.show()
             tvSchemeJump.setOnClickListener {
-                SchemeJumper.jumpByScheme(context, scheme)
+                val jumpSuccess = SchemeJumper.jumpByScheme(context, scheme)
+                if (!jumpSuccess) {
+                    ToastUtil.toast("页面跳转失败，请校验路由的正确性")
+                }
             }
         } ?: tvSchemeJump.hide()
         updateStarIcon()
@@ -182,16 +191,39 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         entryBgMask.hide()
     }
 
-    fun setImageEntry(bean: ImageEntryBean) {
+    fun setImageEntry(bean: ImageEntryBean, categoryTagShow: Boolean = true) {
         this.bean = bean
         // 加载缩略图
         Ln.i("ImagePath", bean.path)
         icon.setImageByPath(bean.path, 12, 12)
         entryBg.setImageByPath(bean.path, 300, 30)
         title.text = bean.title
+        if (categoryTagShow) {
+            setCategoryTag(bean.belongTo)
+        } else {
+            hideCategoryTag()
+        }
         tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
         updateStarIcon()
         initImageUi()
+    }
+
+    private fun setCategoryTag(belongTo: Long) {
+        // 设置分类信息 分类不会很多，找到同一个ID的几乎不耗时
+        DataService.getCategoryList().find {
+            it.id == belongTo
+        }?.let {
+            if (it.name.isNotEmpty()) {
+                tvCategorySimpleName.text = it.name.first().toString()
+            } else {
+                hideCategoryTag()
+            }
+        } ?: hideCategoryTag()
+    }
+
+    private fun hideCategoryTag() {
+        tvCategorySimpleName.hide()
+        tagLine.hide()
     }
 
     private fun initImageUi() {

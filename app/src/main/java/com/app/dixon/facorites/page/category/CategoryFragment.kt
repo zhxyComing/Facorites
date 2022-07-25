@@ -1,5 +1,6 @@
 package com.app.dixon.facorites.page.category
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import com.app.dixon.facorites.core.common.SORT_TYPE_TIME
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.ex.findByCondition
 import com.app.dixon.facorites.core.ex.findIndexByCondition
 import com.app.dixon.facorites.core.util.mediumFont
 import com.app.dixon.facorites.core.util.normalFont
@@ -69,7 +71,7 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
     private fun initView() {
         context?.let {
             dataList.addAll(DataService.getCategoryList())
-            dataList.sortByDescending { data -> data.id } // 新创建的收藏夹排前边
+            sortByLastTime() // 新创建的收藏夹排前边
             val adapter = CategoryAdapter(it, dataList)
             val controller: LayoutAnimationController = AnimationUtils.loadLayoutAnimation(it, R.anim.app_rv_in_anim)
             rvCategory.layoutAnimation = controller
@@ -89,13 +91,13 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
     private fun changeSort() {
         when (sortType) {
             SORT_TYPE_TIME -> {
-                dataList.sortBy { data -> data.name }
+                sortByName()
                 rvCategory.adapter?.notifyDataSetChanged()
                 sortType = SORT_TYPE_NAME
                 sort.text = "名称排序"
             }
             SORT_TYPE_NAME -> {
-                dataList.sortByDescending { data -> data.id }
+                sortByLastTime()
                 rvCategory.adapter?.notifyDataSetChanged()
                 sortType = SORT_TYPE_TIME
                 sort.text = "最近创建排序"
@@ -103,10 +105,30 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
         }
     }
 
+    // 最近创建排序 顺序如下：
+    // 1.最新置顶 2.置顶 3.最新创建 4.创建
+    private fun sortByLastTime() {
+        val topList = dataList.filter { it.topTimeMs != 0L }.sortedByDescending { it.topTimeMs }
+        val normalList = dataList.filter { it.topTimeMs == 0L }.sortedByDescending { it.id }
+        dataList.clear()
+        dataList.addAll(topList)
+        dataList.addAll(normalList)
+    }
+
+    private fun sortByName(){
+        val topList = dataList.filter { it.topTimeMs != 0L }.sortedBy { it.name }
+        val normalList = dataList.filter { it.topTimeMs == 0L }.sortedBy { it.name }
+        dataList.clear()
+        dataList.addAll(topList)
+        dataList.addAll(normalList)
+    }
+
     override fun onDataCreated(bean: CategoryInfoBean) {
         dataList.add(0, bean)
         if (sortType == SORT_TYPE_NAME) {
-            dataList.sortBy { data -> data.name }
+            sortByName()
+        } else {
+            sortByLastTime()
         }
         rvCategory.adapter?.notifyDataSetChanged()
     }
@@ -119,10 +141,47 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onDataUpdated(bean: CategoryInfoBean) {
+        val updateByTopBehavior = 0x0
+        val updateByTopCancelBehavior = 0x1
+        val updateBehavior = 0x2
+        var behavior = updateBehavior
+        dataList.findByCondition { it.id == bean.id }?.let {
+            if (it.topTimeMs != bean.topTimeMs) {
+                behavior = if (bean.topTimeMs != 0L) {
+                    // 说明置顶了，放在第一位
+                    updateByTopBehavior
+                } else {
+                    // 说明取消置顶 重新排序
+                    updateByTopCancelBehavior
+                }
+            }
+        }
         dataList.findIndexByCondition { it.id == bean.id }?.let {
-            dataList[it] = bean
-            rvCategory.adapter?.notifyItemChanged(it)
+            when (behavior) {
+                updateByTopBehavior -> {
+                    // 置顶，更新列表
+                    dataList.removeAt(it)
+                    dataList.add(0, bean)
+                    rvCategory.adapter?.notifyDataSetChanged()
+                }
+                updateByTopCancelBehavior -> {
+                    // 取消置顶，重新排序
+                    dataList[it] = bean
+                    if (sortType == SORT_TYPE_NAME) {
+                        sortByName()
+                    } else {
+                        sortByLastTime()
+                    }
+                    rvCategory.adapter?.notifyDataSetChanged()
+                }
+                else -> {
+                    // 正常更新，刷新Item即可
+                    dataList[it] = bean
+                    rvCategory.adapter?.notifyItemChanged(it)
+                }
+            }
         }
     }
 }

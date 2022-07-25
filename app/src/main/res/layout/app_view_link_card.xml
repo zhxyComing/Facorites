@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -36,18 +37,37 @@
 
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/icon"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
                 android:layout_gravity="center"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 app:placeholderImage="@drawable/app_mine_normal" />
+
+            <TextView
+                android:id="@+id/tvCategorySimpleName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="#909090"
+                android:textSize="10sp"
+                tools:ignore="SmallSp" />
+
+            <View
+                android:id="@+id/tagLine"
+                android:layout_width="7dp"
+                android:layout_height="1px"
+                android:layout_gravity="center"
+                android:layout_marginStart="3dp"
+                android:background="@color/md_grey_500" />
 
             <TextView
                 android:id="@+id/title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="3dp"
                 android:layout_marginEnd="7dp"
                 android:layout_weight="1"
                 android:ellipsize="end"

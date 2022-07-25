@@ -12,6 +12,43 @@
         android:layout_height="match_parent"
         android:background="@color/black" />
 
+    <LinearLayout
+        android:id="@+id/llUrlBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="10dp"
+        android:gravity="end"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:paddingStart="12dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="12dp"
+            android:text="保存"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:paddingStart="12dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="12dp"
+            android:text="收藏"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/tvShare"
         android:layout_width="wrap_content"
@@ -26,5 +63,15 @@
         android:text="分享"
         android:textColor="@color/white"
         android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="图片加载中..."
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:visibility="gone" />
 
 </FrameLayout>
