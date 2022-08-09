@@ -2,6 +2,7 @@ package com.app.dixon.facorites.page.browse
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
@@ -110,8 +111,14 @@ class BrowseWebView @JvmOverloads constructor(context: Context, attrs: Attribute
             super.onReceivedHttpError(view, request, errorResponse)
         }
 
+        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+            super.onPageStarted(view, url, favicon)
+            Ln.i("WebPageControl", "PageStart $url")
+        }
+
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
+            Ln.i("WebPageControl", "PageEnd $url")
             // 点击查看图片 目前修改为长按查看图片
 //            addImageClickListener()
         }

@@ -2,6 +2,7 @@ package com.app.dixon.facorites.core.view
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -13,6 +14,7 @@ import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.common.SuccessCallback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
+import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
 import com.app.dixon.facorites.core.data.bean.ImageEntryBean
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
@@ -20,17 +22,12 @@ import com.app.dixon.facorites.core.ex.*
 import com.app.dixon.facorites.core.util.*
 import com.app.dixon.facorites.page.browse.SchemeJumper
 import com.dixon.dlibrary.util.AnimationUtil
-import com.dixon.dlibrary.util.FontUtil
 import com.dixon.dlibrary.util.ToastUtil
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.drawee.interfaces.DraweeController
-import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.image.ImageInfo
-import com.facebook.imagepipeline.request.ImageRequestBuilder
-import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import kotlinx.android.synthetic.main.app_view_link_card.view.*
-import java.io.File
 
 
 /**
@@ -72,7 +69,11 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         tvUpdate.setOnClickListener {
             // 修改
             bean?.let {
-                CreateEntryDialog(context, it).show()
+                if (it is CategoryEntryBean) {
+                    UpdateChildCategoryDialog(context, it).show()
+                } else {
+                    CreateEntryDialog(context, it).show()
+                }
             }
         }
 
@@ -81,6 +82,23 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
             // 收起面板
             hideSubCard {
                 bean?.let { entry ->
+                    // 文件夹不能直接删除 弹窗提醒
+                    if (bean is CategoryEntryBean) {
+                        OptionDialog(
+                            context = context,
+                            title = "确认删除？",
+                            desc = "收藏夹下所有收藏将被一并删除！",
+                            rightString = "仍要删除",
+                            leftString = "取消删除",
+                            rightClick = {
+                                DataService.deleteEntry(entry, SuccessCallback {
+                                    ToastUtil.toast("删除成功！")
+                                    bean = null
+                                })
+                            },
+                        ).show()
+                        return@let
+                    }
                     DataService.deleteEntry(entry, SuccessCallback {
                         ToastUtil.toast("删除成功！")
                         bean = null
@@ -107,6 +125,8 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                 }
             }, { imageEntry ->
                 PageJumper.openImagePage(context, imageEntry.path)
+            }, { categoryEntry ->
+                PageJumper.openEntryPage(context, categoryEntry.categoryInfoBean)
             })
         }
 
@@ -138,14 +158,85 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                             star = star
                         )
                     )
+                }, { categoryEntry ->
+                    DataService.updateEntry(
+                        it,
+                        CategoryEntryBean(
+                            categoryInfoBean = categoryEntry.categoryInfoBean,
+                            date = categoryEntry.date,
+                            belongTo = categoryEntry.belongTo,
+                            star = star
+                        )
+                    )
+                })
+            }
+        }
+
+        // 点击隐藏背景
+        tvHideBg.setOnClickListener {
+            bean?.let {
+                bean?.process({
+                    // 链接没有背景 所以也没隐藏背景功能
+                }, { imageEntry ->
+                    DataService.updateEntry(
+                        it,
+                        ImageEntryBean(
+                            path = imageEntry.path,
+                            title = imageEntry.title,
+                            hideBg = !imageEntry.hideBg,
+                            date = imageEntry.date,
+                            belongTo = imageEntry.belongTo,
+                            star = imageEntry.star
+                        )
+                    )
+                }, {
+                    // 暂不支持文件夹隐藏背景
                 })
             }
         }
     }
 
+    @SuppressLint("SetTextI18n")
+    fun setCategoryEntry(bean: CategoryEntryBean, categoryTagShow: Boolean = true) {
+        initCategoryUi()
+        this.bean = bean
+        title.text = bean.categoryInfoBean.name
+        title.mediumFont()
+        if (categoryTagShow) {
+            setCategoryTag(bean.belongTo)
+        } else {
+            hideCategoryTag()
+        }
+        icon.setActualImageResource(R.drawable.app_category_icon)
+        bean.categoryInfoBean.bgPath?.let { bg ->
+            entryBg.show()
+            entryBgMask.show()
+            entryBg.setImageByPath(bg, 300, 30)
+        } ?: let {
+            entryBg.hide()
+            entryBgMask.hide()
+        }
+        tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
+        updateStarIcon()
+    }
+
+    private fun initCategoryUi() {
+        tvJump.hide()
+        tvHideBg.hide()
+        tvUpdate.show()
+        tvCopy.hide()
+        ivBrowse.show()
+        tvDelete.show()
+        entryBg.show()
+        entryBgMask.show()
+        categoryTag.show()
+    }
+
     fun setLinkEntry(bean: LinkEntryBean, categoryTagShow: Boolean = true) {
+        initLinkUi()
         this.bean = bean
         title.text = bean.title
+        title.normalFont()
         if (categoryTagShow) {
             setCategoryTag(bean.belongTo)
         } else {
@@ -169,7 +260,6 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
             }
         } ?: tvSchemeJump.hide()
         updateStarIcon()
-        initLinkUi()
     }
 
     private fun updateStarIcon() {
@@ -183,21 +273,34 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
 
     private fun initLinkUi() {
         tvJump.show()
+        tvHideBg.hide()
         tvUpdate.show()
         tvCopy.show()
         ivBrowse.show()
         tvDelete.show()
         entryBg.hide()
         entryBgMask.hide()
+        categoryTag.hide()
     }
 
     fun setImageEntry(bean: ImageEntryBean, categoryTagShow: Boolean = true) {
+        initImageUi()
         this.bean = bean
         // 加载缩略图
         Ln.i("ImagePath", bean.path)
         icon.setImageByPath(bean.path, 12, 12)
-        entryBg.setImageByPath(bean.path, 300, 30)
+        // 显示/隐藏背景图
+        tvHideBgText.text = if (bean.hideBg) "显示背景" else "隐藏背景"
+        if (bean.hideBg) {
+            entryBg.hide()
+            entryBgMask.hide()
+        } else {
+            entryBg.show()
+            entryBgMask.show()
+            entryBg.setImageByPath(bean.path, 300, 30)
+        }
         title.text = bean.title
+        title.normalFont()
         if (categoryTagShow) {
             setCategoryTag(bean.belongTo)
         } else {
@@ -205,7 +308,6 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
         tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
         updateStarIcon()
-        initImageUi()
     }
 
     private fun setCategoryTag(belongTo: Long) {
@@ -227,13 +329,16 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
     }
 
     private fun initImageUi() {
+        tvSchemeJump.hide()
         tvJump.hide()
+        tvHideBg.show()
         tvUpdate.show()
         tvCopy.hide()
         ivBrowse.show()
         tvDelete.show()
         entryBg.show()
         entryBgMask.show()
+        categoryTag.hide()
     }
 
     fun clear() {
@@ -259,21 +364,25 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         if (animMonitor.canOpen()) {
             animMonitor.setOpening()
             ivBrowse.invisible()
-            subCard.show()
-            subCard.alpha = 0f
-            val heightAnim = AnimationUtil.height(subCard, 0f, 24.dpF, 300, DecelerateInterpolator(), null)
-            val alphaAnim = AnimationUtil.alpha(subCard, 0f, 1f, 300, DecelerateInterpolator(), object : AnimatorListenerAdapter() {
+            subCard.invisible()
+            val heightAnim = AnimationUtil.height(subCard, 0f, 60.dpF, 300, DecelerateInterpolator(), object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    subCard.show()
+                }
+            })
+            val tranXAnim = AnimationUtil.tranX(subCard, (-300).dpF, 0f, 300, DecelerateInterpolator(), object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
                     animMonitor.setOpen()
                     runOnUiComplete?.invoke()
                 }
             })
-            animChain = AnimChain().addAnimator(heightAnim).addAnimator(alphaAnim).apply { start() }
+            animChain = AnimChain().addAnimator(heightAnim).addAnimator(tranXAnim).apply { start() }
         } else if (animMonitor.canClose()) {
             animMonitor.setClosing()
-            val alphaAnim = AnimationUtil.alpha(subCard, 1f, 0f, 300, DecelerateInterpolator(), null)
-            val heightAnim = AnimationUtil.height(subCard, 24.dpF, 0f, 300, DecelerateInterpolator(), object : AnimatorListenerAdapter() {
+            val tranXAnim = AnimationUtil.tranX(subCard, 0f, (-300).dpF, 300, DecelerateInterpolator(), null)
+            val heightAnim = AnimationUtil.height(subCard, 60.dpF, 0f, 300, DecelerateInterpolator(), object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
                     animMonitor.setClose()
@@ -282,7 +391,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                     runOnUiComplete?.invoke()
                 }
             })
-            animChain = AnimChain().addAnimator(alphaAnim).addAnimator(heightAnim).apply { start() }
+            animChain = AnimChain().addAnimator(tranXAnim).addAnimator(heightAnim).apply { start() }
         }
     }
 
@@ -301,7 +410,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         } else if (animMonitor.isOpening()) {
             // 直接取消动画 收起面板
             animChain?.cancel()
-            val alphaAnim = AnimationUtil.alpha(subCard, subCard.alpha, 0f, 300, DecelerateInterpolator(), null)
+            val tranXAnim = AnimationUtil.tranX(subCard, 0f, (-300).dpF, 300, DecelerateInterpolator(), null)
             val heightAnim = AnimationUtil.height(subCard, subCard.height.toFloat(), 0f, 300, DecelerateInterpolator(), object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
@@ -311,7 +420,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                     runOnUiComplete?.invoke()
                 }
             })
-            animChain = AnimChain().addAnimator(alphaAnim).addAnimator(heightAnim).apply { start() }
+            animChain = AnimChain().addAnimator(tranXAnim).addAnimator(heightAnim).apply { start() }
         }
     }
 
@@ -328,9 +437,8 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
         animChain?.cancel()
         val layoutParams: ViewGroup.LayoutParams = subCard.layoutParams
-        layoutParams.height = 24.dp
+        layoutParams.height = 60.dp
         subCard.layoutParams = layoutParams
-        subCard.alpha = 1f
         subCard.show()
         ivBrowse.invisible()
         animMonitor.setOpen()
@@ -344,7 +452,6 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         val layoutParams: ViewGroup.LayoutParams = subCard.layoutParams
         layoutParams.height = 0.dp
         subCard.layoutParams = layoutParams
-        subCard.alpha = 0f
         subCard.hide()
         ivBrowse.show()
         animMonitor.setClose()

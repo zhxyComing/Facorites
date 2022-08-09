@@ -2,6 +2,7 @@ package com.app.dixon.facorites.core.data.service
 
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
+import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.bean.ImageEntryBean
 import com.app.dixon.facorites.core.data.bean.io.toEntry
@@ -37,6 +38,9 @@ import java.util.*
  * --- id_000000000   分类 一个File 里边每行记录一条Json，即一行对应一个条目
  * --- id_000000001
  * --- id_000000002
+ *
+ * 对于真实的SD卡存储，其实没有层级结构
+ * 层级结构是代码里定义的
  */
 object DataService : IService {
 
@@ -45,8 +49,8 @@ object DataService : IService {
 
     // 单线程写入 外部只读 不需要加锁
     // ？一个线程读，一个线程写（删除），读的线程越界异常？
-    private val categoryList = ArrayList<CategoryInfoBean>()
-    private val entryMap = HashMap<Long, MutableList<BaseEntryBean>>()
+    private val categoryList = ArrayList<CategoryInfoBean>()  // 所有分类的列表
+    private val entryMap = HashMap<Long, MutableList<BaseEntryBean>>() // 所有分类对应的收藏
 
     // 回调 由UI线程进行注册、回调、删除等
     private val categoryCallbacks = ArrayList<WeakReference<ICategoryChanged>>()
@@ -148,6 +152,31 @@ object DataService : IService {
         Ln.i("DataService") { "创建分类后的分类信息：${FileUtils.readString("$ROOT_PATH/$CATEGORY_INFO_PATH")}" }
     }
 
+    // 创建子文件用 没有回调全局
+    private fun doCreateChildCategory(categoryInfoBean: CategoryInfoBean, callback: ((Long) -> Unit)? = null) {
+        // 创建文件夹
+        if (!FileUtils.createNewFile("$ROOT_PATH/${categoryInfoBean.id}")) {
+            callback?.backUi { invoke(-1L) }
+            return
+        }
+        // 使用临时数据更新文件
+        val saveList = categoryList.toMutableList() // 创建副本
+        saveList.add(categoryInfoBean)
+        val isSuccess =
+            FileUtils.saveString(
+                "$ROOT_PATH/$CATEGORY_INFO_PATH",
+                Gson().toJson(saveList)
+            )
+        if (isSuccess) {
+            // 文件写入成功后，才能更新内存数据
+            addCategoryData(categoryInfoBean)
+            callback?.backUi { invoke(categoryInfoBean.id) }
+        } else {
+            callback?.backUi { invoke(-1L) }
+        }
+        Ln.i("DataService") { "创建分类后的分类信息：${FileUtils.readString("$ROOT_PATH/$CATEGORY_INFO_PATH")}" }
+    }
+
     /**
      * 删除分类
      */
@@ -176,16 +205,20 @@ object DataService : IService {
                 // 2.删除内存的分类信息、分类文件
                 categoryList.removeByCondition { it.id == categoryId }
                 val deleteEntries = entryMap.remove(categoryId)
+                // 删除子文件夹
+                deleteEntries?.forEach {
+                    (it as? CategoryEntryBean)?.let { categoryEntryBean ->
+                        doDeleteChildCategory(categoryEntryBean.categoryInfoBean.id)
+                    }
+                }
                 // 3.回调
                 backUi {
                     callback?.invoke(categoryId)
                     callbackRegister(categoryCallbacks) {
                         it.onDataDeleted(deleteCategoryInfo)
                     }
-                    deleteEntries?.forEach { bean ->
-                        callbackRegister(globalEntryCallbacks) {
-                            it.onDataDeleted(bean)
-                        }
+                    callbackRegister(globalEntryCallbacks) {
+                        it.onDataRefresh()
                     }
                 }
                 // 删除图片 包括分类自身的 和条目的
@@ -197,6 +230,56 @@ object DataService : IService {
                         BitmapIOService.deleteBitmap(it.path)
                     }
                 }
+            } else {
+                Ln.e("DeleteCategory", "分类文件删除失败")
+                // 未找到该分类
+                callback?.backUi { invoke(-1L) }
+            }
+        } else {
+            Ln.e("DeleteCategory", "未找到分类")
+            // 未找到该分类
+            callback?.backUi { invoke(-1L) }
+        }
+
+    }
+
+    private fun doDeleteChildCategory(categoryId: Long, callback: ((Long) -> Unit)? = null) {
+        // 1.删除本地的分类信息、分类文件
+        val deleteCategoryInfo = categoryList.findByCondition { it.id == categoryId } ?: let {
+            Ln.e("DeleteCategory", "未找到分类")
+            callback?.backUi { invoke(-1L) }
+            return
+        }
+        val saveList = categoryList.toMutableList() // 创建副本
+        val hasRemove = saveList.removeByCondition {
+            it.id == categoryId
+        }
+        if (hasRemove) {
+            if (FileUtils.saveString("$ROOT_PATH/$CATEGORY_INFO_PATH", Gson().toJson(saveList))
+                && FileUtils.deleteFile("$ROOT_PATH/$categoryId")
+            ) {
+                // 文件删除成功
+                // 2.删除内存的分类信息、分类文件
+                categoryList.removeByCondition { it.id == categoryId }
+                val deleteEntries = entryMap.remove(categoryId)
+                // 循环删除子文件夹
+                deleteEntries?.forEach {
+                    // 子文件夹下的所有文件/文件夹已经全部删除
+                    (it as? CategoryEntryBean)?.let { categoryEntryBean ->
+                        doDeleteChildCategory(categoryEntryBean.categoryInfoBean.id)
+                    }
+                }
+                // 删除图片 包括分类自身的 和条目的
+                deleteCategoryInfo.bgPath?.let {
+                    BitmapIOService.deleteBitmap(it)
+                }
+                deleteEntries?.forEach {
+                    (it as? ImageEntryBean)?.let { _ ->
+                        BitmapIOService.deleteBitmap(it.path)
+                    }
+                }
+                // 3.回调
+                callback?.invoke(categoryId)
             } else {
                 Ln.e("DeleteCategory", "分类文件删除失败")
                 // 未找到该分类
@@ -253,21 +336,43 @@ object DataService : IService {
         }
     }
 
-    /**
-     * 创建新条目
-     */
-    fun createEntry(bean: BaseEntryBean, callback: Callback<BaseEntryBean>? = null) {
-        ioService.postEvent {
-            doCreateEntry(bean, callback)
+    private fun doUpdateChildCategory(originBean: CategoryInfoBean, newBean: CategoryInfoBean, callback: ((Long) -> Unit)?) {
+        // 更新category_info存储的数据即可
+        // 1.内存里找不到该分类，return
+        val deleteBean = categoryList.findByCondition { it.id == originBean.id } ?: let {
+            Ln.e("UpdateCategory", "未找到分类")
+            callback?.backUi { invoke(-1L) }
+            return
+        }
+        // 2.正确做法是先创建副本，修改值，保存到本地成功后，才能更新内存数据
+        // 这里取巧：先修改内存，再保存本地，如果本地保存失败了，再把内存数据改回去
+        val index = categoryList.indexOf(deleteBean)
+        if (index != -1) {
+            categoryList[index] = newBean
+        }
+        if (FileUtils.saveString("$ROOT_PATH/$CATEGORY_INFO_PATH", Gson().toJson(categoryList))) {
+            // 3.文件更新成功 回调
+            backUi {
+                callback?.invoke(originBean.id)
+            }
+        } else {
+            categoryList[index] = originBean
+            Ln.e("UpdateCategory", "分类文件更新失败")
+            callback?.backUi { invoke(-1L) }
+            callback?.backUi { invoke(-1L) }
+        }
+        // 删除旧的封面图
+        if (originBean.bgPath != null && originBean.bgPath != newBean.bgPath) {
+            BitmapIOService.deleteBitmap(originBean.bgPath)
         }
     }
 
     /**
      * 创建新条目
      */
-    fun createEntry(beanList: List<BaseEntryBean>, callback: Callback<List<BaseEntryBean>>? = null) {
+    fun createEntry(bean: BaseEntryBean, callback: Callback<BaseEntryBean>? = null) {
         ioService.postEvent {
-            doCreateEntry(beanList, callback)
+            doCreateEntry(bean, callback)
         }
     }
 
@@ -314,6 +419,21 @@ object DataService : IService {
                     if (success) {
                         // 更新内存数据
                         entryMap[categoryId]?.set(index, updater)
+                        // 分类只能修改至同一文件夹下
+                        if (origin is CategoryEntryBean && updater is CategoryEntryBean) {
+                            doUpdateChildCategory(origin.categoryInfoBean, updater.categoryInfoBean) {
+                                callback?.onSuccess(updater)
+                                callbackRegister(entryCallbacks) {
+                                    if (it.id == categoryId) {
+                                        it.onDataUpdated(updater)
+                                    }
+                                }
+                                callbackRegister(globalEntryCallbacks) {
+                                    it.onDataUpdated(updater)
+                                }
+                            }
+                            return
+                        }
                         // 回调注册
                         backUi {
                             callback?.onSuccess(updater)
@@ -405,6 +525,24 @@ object DataService : IService {
             if (isSuccess) {
                 // 文件写入成功后，才能更新内存数据
                 it.add(bean)
+                // 创建子文件夹
+                if (bean is CategoryEntryBean) {
+                    doCreateChildCategory(bean.categoryInfoBean) {
+                        // 已经在主线程
+                        callback?.onSuccess(bean)
+                        // 回调对应ID的EntryCreate事件
+                        callbackRegister(entryCallbacks) { register ->
+                            if (register.id == categoryId) {
+                                register.onDataCreated(bean)
+                            }
+                        }
+                        // 回调全局EntryCreate事件
+                        callbackRegister(globalEntryCallbacks) { register ->
+                            register.onDataCreated(bean)
+                        }
+                    }
+                    return@let
+                }
                 callback?.backUi { onSuccess(bean) }
                 backUi {
                     // 回调对应ID的EntryCreate事件
@@ -426,11 +564,10 @@ object DataService : IService {
         Ln.i("DataService") { "创建条目后的条目数据：${FileUtils.readString("$ROOT_PATH/$categoryId")}" }
     }
 
-    private fun doCreateEntry(
+    // 特殊 给导入使用
+    fun createEntryForIE(
         beanList: List<BaseEntryBean>,
-        callback: Callback<List<BaseEntryBean>>? = null
-    ) {
-        val successList = mutableListOf<BaseEntryBean>()
+    ): Boolean {
         beanList.forEach { bean ->
             val categoryId = bean.belongTo
             val list = entryMap[categoryId]
@@ -442,7 +579,10 @@ object DataService : IService {
                 if (isSuccess) {
                     // 文件写入成功后，才能更新内存数据
                     it.add(bean)
-                    successList.add(bean)
+                    // 创建子文件夹
+                    if (bean is CategoryEntryBean) {
+                        doCreateChildCategory(bean.categoryInfoBean)
+                    }
                     // 回调对应ID的EntryCreate事件
                     callbackRegister(entryCallbacks) { register ->
                         if (register.id == categoryId) {
@@ -453,11 +593,11 @@ object DataService : IService {
             }
             Ln.i("DataService") { "创建条目后的条目数据：${FileUtils.readString("$ROOT_PATH/$categoryId")}" }
         }
-        callback?.backUi { onSuccess(successList) }
         // 回调全局EntryCreate事件
         callbackRegister(globalEntryCallbacks) { register ->
             register.backUi { onDataRefresh() }
         }
+        return true
     }
 
     private fun doDeleteEntry(bean: BaseEntryBean, callback: Callback<BaseEntryBean>?) {
@@ -487,6 +627,23 @@ object DataService : IService {
             if (success) {
                 // 移除内存数据
                 entryMap[categoryId]?.remove(bean)
+                if (bean is CategoryEntryBean) {
+                    // 删除子文件夹
+                    doDeleteChildCategory(bean.categoryInfoBean.id)
+                    // 回调注册
+                    backUi {
+                        callback?.onSuccess(bean)
+                        callbackRegister(entryCallbacks) {
+                            if (it.id == categoryId) {
+                                it.onDataDeleted(bean)
+                            }
+                        }
+                        callbackRegister(globalEntryCallbacks) {
+                            it.onDataRefresh()
+                        }
+                    }
+                    return
+                }
                 // 回调注册
                 backUi {
                     callback?.onSuccess(bean)

@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.Callback
-import com.app.dixon.facorites.core.common.CommonCallback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
@@ -16,20 +15,18 @@ import com.app.dixon.facorites.core.util.ImageSelectHelper
 import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.app.dixon.facorites.page.home.CATEGORY_BG_IMAGE_REQUEST
-import com.dixon.dlibrary.util.Ln
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
-import kotlinx.android.synthetic.main.app_dialog_create_category_content.*
+import kotlinx.android.synthetic.main.app_dialog_update_category_content.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import java.util.*
-
+import java.io.File
 
 /**
- * 创建分类（收藏夹）的弹窗
+ * 更新子文件夹的弹窗
  */
-class CreateCategoryDialog(context: Context, val belongTo: Long? = null, private val callback: Callback<BaseEntryBean> = CommonCallback("创建成功！")) :
+class UpdateChildCategoryDialog(context: Context, val categoryEntryBean: CategoryEntryBean) :
     BaseDialog(context) {
 
     private var bgUri: Uri? = null
@@ -42,40 +39,51 @@ class CreateCategoryDialog(context: Context, val belongTo: Long? = null, private
 
     override fun isCancelOnOutSide(): Boolean = true
 
-    override fun contentLayout(): Int = R.layout.app_dialog_create_category_content
+    override fun contentLayout(): Int = R.layout.app_dialog_update_category_content
 
     override fun windowAnimStyle(): Int = R.style.DialogAnimStyle
 
     override fun initDialog() {
         EventBus.getDefault().register(this)
         flContainer.normalFont()
-        tvCreate.setOnClickListener {
-            val text = etInput.text.toString()
-            if (text.isNotEmpty()) {
-                belongTo?.let {
-                    val id = Date().time
-                    val tempCategoryInfoBean = CategoryInfoBean(id, text, bgUri?.path, belongTo = it)
-                    DataService.createEntry(CategoryEntryBean(tempCategoryInfoBean, id, belongTo), object : Callback<BaseEntryBean> {
-                        override fun onSuccess(data: BaseEntryBean) {
-                            ToastUtil.toast("创建收藏夹成功")
-                        }
-
-                        override fun onFail(msg: String) {
-                            ToastUtil.toast("创建收藏夹失败")
-                        }
-                    })
-                } ?: let {
-                    DataService.createCategory(text, bgUri?.path) {
-                        if (it != -1L) {
-                            ToastUtil.toast("创建收藏夹成功")
-                        }
-                    }
-                }
-                hasSave = true
-                dismiss()
-            } else {
+        etInput.setText(categoryEntryBean.categoryInfoBean.name)
+        tvUpdate.setOnClickListener {
+            val newTitle = etInput.text.toString()
+            val newBgUri = bgUri
+            if (newTitle.isEmpty()) {
                 etInput.shakeTip()
+                return@setOnClickListener
             }
+            val newCategoryInfoBean = CategoryInfoBean(
+                categoryEntryBean.categoryInfoBean.id,
+                newTitle,
+                newBgUri?.path,
+                categoryEntryBean.categoryInfoBean.topTimeMs,
+                categoryEntryBean.categoryInfoBean.belongTo
+            )
+            val newCategoryEntryBean = CategoryEntryBean(
+                newCategoryInfoBean,
+                categoryEntryBean.date,
+                categoryEntryBean.belongTo,
+                categoryEntryBean.star
+            )
+            DataService.updateEntry(categoryEntryBean, newCategoryEntryBean, object : Callback<BaseEntryBean> {
+                override fun onSuccess(data: BaseEntryBean) {
+                    ToastUtil.toast("更新收藏夹成功")
+                    hasSave = true
+                    dismiss()
+                }
+
+                override fun onFail(msg: String) {
+                    ToastUtil.toast("更新收藏夹失败")
+                    hasSave = true
+                    dismiss()
+                }
+            })
+        }
+        categoryEntryBean.categoryInfoBean.bgPath?.let {
+            bgUri = Uri.fromFile(File(it))
+            bgView.setImageByUri(bgUri)
         }
         selectImage.setOnClickListener {
             // 打开图片选择
@@ -93,7 +101,6 @@ class CreateCategoryDialog(context: Context, val belongTo: Long? = null, private
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onImageSelectComplete(event: CategoryImageCompleteEvent) {
-        Ln.i("onImageSelect", "Complete ${event.uri}")
         deleteExpiredImportImage()
         bgUri = event.uri
         bgView.setImageByUri(bgUri)
@@ -102,7 +109,16 @@ class CreateCategoryDialog(context: Context, val belongTo: Long? = null, private
     // 删除过期的导入图片
     private fun deleteExpiredImportImage() {
         bgUri?.path?.let {
-            BitmapIOService.deleteBitmap(it)
+            var deleteExpiredImage = true
+            categoryEntryBean.categoryInfoBean.bgPath?.let { bg ->
+                // 带入更新的图片在确认修改之前不删除
+                if (bg == it) {
+                    deleteExpiredImage = false
+                }
+            }
+            if (deleteExpiredImage) {
+                BitmapIOService.deleteBitmap(it)
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.app.dixon.facorites.page.home
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -11,26 +10,17 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.BaseActivity
-import com.app.dixon.facorites.core.bean.CropInfo
 import com.app.dixon.facorites.core.common.AGREEMENT_CONFIRM
 import com.app.dixon.facorites.core.common.VERSION_UPDATE_TIP
-import com.app.dixon.facorites.core.data.service.BitmapIOService
-import com.app.dixon.facorites.core.ex.dp
 import com.app.dixon.facorites.core.function.fromshare.FromShareHelper
-import com.app.dixon.facorites.core.util.ImageSelectHelper
-import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.core.view.AgreementDialog
 import com.app.dixon.facorites.core.view.CreateEntryDialog
-import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
 import com.app.dixon.facorites.core.view.TipDialog
 import com.app.dixon.facorites.page.category.CategoryFragment
-import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.app.dixon.facorites.page.mine.MineFragment
 import com.app.dixon.facorites.page.note.NoteFragment
 import com.dixon.dlibrary.util.SharedUtil
-import com.yalantis.ucrop.UCrop
-import org.greenrobot.eventbus.EventBus
 
 
 const val CATEGORY_BG_IMAGE_REQUEST = 100
@@ -167,45 +157,5 @@ class HomeActivity : BaseActivity() {
         setIntent(intent)
         super.onNewIntent(intent)
         autoParse()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        data?.let {
-            if (requestCode == CATEGORY_BG_IMAGE_REQUEST) {
-                // 1.分类背景图选择完成
-                it.data?.let { uri ->
-                    openCategoryBgCrop(uri)
-                }
-            } else if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
-                // 2.1 裁剪成功
-                UCrop.getOutput(it)?.let { resultUri ->
-                    Ln.i("CropResult", "success $resultUri")
-                    EventBus.getDefault().post(CategoryImageCompleteEvent(resultUri))
-                }
-            } else if (resultCode == UCrop.RESULT_ERROR) {
-                // 2.2 裁剪失败
-                val cropError = UCrop.getError(it)
-                Ln.i("CropResult", "fail ${cropError.toString()}")
-            } else if (requestCode == ENTRY_IMAGE_REQUEST) {
-                // 图片收藏选图成功
-                it.data?.let { uri ->
-                    Ln.i("ImageResult", "$uri")
-                    EventBus.getDefault().post(CategoryImageCompleteEvent(uri))
-                }
-            } else {
-                // do nothing
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    // 跳转分类背景图裁剪
-    private fun openCategoryBgCrop(uri: Uri) {
-        Ln.i("openCategoryBgCrop", "${400.dp} ${100.dp}")
-        ImageSelectHelper.openImageCropPage(
-            this, uri,
-            BitmapIOService.createBitmapSavePath(),
-            CropInfo(aspectX = 3f, aspectY = 1f, outputX = 390.dp, outputY = 130.dp)
-        )
     }
 }

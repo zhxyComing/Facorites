@@ -4,6 +4,7 @@ import android.util.Patterns
 import android.webkit.URLUtil
 import com.app.dixon.facorites.core.common.AUTO_PARSE_LINK
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
+import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
 import com.app.dixon.facorites.core.data.bean.ImageEntryBean
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.dixon.dlibrary.util.SharedUtil
@@ -149,13 +150,10 @@ fun String.tryExtractHttpByMatcher(): String {
 /**
  * 根据BaseEntryBean的实际类型进行特殊处理
  */
-fun BaseEntryBean.process(linkAction: (linkEntry: LinkEntryBean) -> Unit, imageAction: (imageEntry: ImageEntryBean) -> Unit) {
-    (this as? LinkEntryBean)?.let {
-        linkAction.invoke(it)
-    }
-    (this as? ImageEntryBean)?.let {
-        imageAction.invoke(it)
-    }
+fun BaseEntryBean.process(linkAction: (linkEntry: LinkEntryBean) -> Unit, imageAction: (imageEntry: ImageEntryBean) -> Unit, categoryAction: (categoryEntry: CategoryEntryBean) -> Unit) {
+    (this as? LinkEntryBean)?.let(linkAction)
+    (this as? ImageEntryBean)?.let(imageAction)
+    (this as? CategoryEntryBean)?.let(categoryAction)
 }
 
 /**

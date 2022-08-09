@@ -178,7 +178,7 @@ class MineFragment : VisibleExtensionFragment() {
                         progressDialog.dismiss()
                         OptionDialog(
                             context, title = "书签导入成功！",
-                            desc = "请查看收藏集～",
+                            desc = "请查看收藏夹～",
                             rightString = "确认",
                             leftString = "关闭"
                         ).show()
@@ -204,7 +204,7 @@ class MineFragment : VisibleExtensionFragment() {
                         progressDialog.dismiss()
                         OptionDialog(
                             context, title = "书签导入成功！",
-                            desc = "请查看收藏集～",
+                            desc = "请查看收藏夹～",
                             rightString = "确认",
                             leftString = "关闭"
                         ).show()

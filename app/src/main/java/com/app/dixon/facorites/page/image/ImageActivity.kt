@@ -14,6 +14,7 @@ import com.app.dixon.facorites.core.data.service.base.FileUtils
 import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.core.ex.hide
 import com.app.dixon.facorites.core.ex.show
+import com.app.dixon.facorites.core.util.ThreadExecutor
 import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.app.dixon.facorites.core.view.CreateImageEntryDialog
@@ -113,11 +114,10 @@ class ImageActivity : BaseActivity() {
         }
     }
 
-    // TODO IO线程类
     private fun runShare() {
         val tipDialog = TipDialog(this, "转码中，请耐心等待...", "提醒", false)
         tipDialog.show()
-        Thread {
+        ThreadExecutor.execute {
             val fileName = path.substring(path.lastIndexOf("/"), path.length)
             val file = FileUtils.createExTempFile(fileName)
             val bitmap = FileUtils.readBitmap(path)
@@ -141,7 +141,7 @@ class ImageActivity : BaseActivity() {
                     }
                 })
             }
-        }.start()
+        }
     }
 
     override fun statusBarColor(): Int = R.color.black

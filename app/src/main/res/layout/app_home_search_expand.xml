@@ -3,31 +3,107 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="2dp"
-    app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="8dp"
+    app:cardBackgroundColor="#E0E0E0"
+    app:cardCornerRadius="0dp"
     app:cardElevation="0dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="1dp"
+        android:background="@color/white"
+        android:orientation="vertical">
 
-        <!-- 限制最大高度的 rv，要求根布局为 ConstraintLayout -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvExpand"
-            android:layout_width="300dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:clipToPadding="false"
-            android:paddingBottom="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHeight_default="wrap"
-            app:layout_constraintHeight_max="320dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- 限制最大高度的 rv，要求根布局为 ConstraintLayout -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvExpand"
+                android:layout_width="300dp"
+                android:layout_height="230dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:clipToPadding="false"
+                android:paddingBottom="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHeight_default="wrap"
+                app:layout_constraintHeight_max="230dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#E0E0E0" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/netSearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:alpha="0.6"
+                    android:padding="2dp"
+                    android:src="@drawable/app_icon_search_net" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="20dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:singleLine="true"
+                    android:text="网络搜索"
+                    android:textColor="#909090"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/windowClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:alpha="0.6"
+                    android:padding="1dp"
+                    android:src="@drawable/app_icon_search_close" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="20dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:singleLine="true"
+                    android:text="关闭窗口"
+                    android:textColor="#909090"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </androidx.cardview.widget.CardView>

@@ -95,6 +95,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
                         android:layout_marginEnd="20dp"
+                        android:layout_marginBottom="20dp"
                         android:text="以知乎为例："
                         android:textColor="#404040"
                         android:textSize="13sp"
@@ -108,16 +109,12 @@
                         <ImageView
                             android:layout_width="0dp"
                             android:layout_height="300dp"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="20dp"
                             android:layout_weight="1"
                             android:src="@drawable/app_course_img_1" />
 
                         <ImageView
                             android:layout_width="0dp"
                             android:layout_height="300dp"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="20dp"
                             android:layout_weight="1"
                             android:src="@drawable/app_course_img_2" />
 

@@ -21,6 +21,7 @@ import com.app.dixon.facorites.core.ex.show
 import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.util.mediumFont
 import com.app.dixon.facorites.core.util.normalFont
+import com.app.dixon.facorites.core.view.CreateCategoryDialog
 import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
@@ -91,6 +92,11 @@ class EntryActivity : BaseActivity() {
         addEntry.setOnClickListener {
             // 创建Entry
             CreateEntryDialog(this, defaultCategory = categoryInfo.id).show()
+        }
+
+        // 创建收藏夹（分类）
+        ivCreateCategory.setOnClickListener {
+            CreateCategoryDialog(this, categoryInfo.id).show()
         }
     }
 

@@ -10,6 +10,7 @@ import com.app.dixon.facorites.base.BaseActivity
 import com.app.dixon.facorites.core.common.SORT_TYPE_TIME
 import com.app.dixon.facorites.core.common.SORT_TYPE_TIME_ORDER
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
+import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.hide
 import com.app.dixon.facorites.core.ex.show
@@ -18,7 +19,6 @@ import com.app.dixon.facorites.core.util.mediumFont
 import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
-import com.dixon.dlibrary.util.FontUtil
 import kotlinx.android.synthetic.main.activity_entry.*
 import org.greenrobot.eventbus.EventBus
 
@@ -47,7 +47,7 @@ class AllEntryActivity : BaseActivity() {
         val allEntry = mutableListOf<BaseEntryBean>()
         DataService.getCategoryList().forEach { category ->
             DataService.getEntryList(category.id)?.let { entryList ->
-                allEntry.addAll(entryList)
+                allEntry.addAll(entryList.filter { entry -> entry !is CategoryEntryBean })
             }
         }
         allEntry.forEach {
@@ -112,7 +112,7 @@ class AllEntryActivity : BaseActivity() {
             val allEntry = mutableListOf<BaseEntryBean>()
             DataService.getCategoryList().forEach { category ->
                 DataService.getEntryList(category.id)?.let { entryList ->
-                    allEntry.addAll(entryList)
+                    allEntry.addAll(entryList.filter { entry -> entry !is CategoryEntryBean })
                 }
             }
             allEntry.forEach {
@@ -129,6 +129,7 @@ class AllEntryActivity : BaseActivity() {
         }
 
         override fun onDataCreated(bean: BaseEntryBean) {
+            if (bean is CategoryEntryBean) return
             if (sortType == SORT_TYPE_TIME) {
                 data.add(0, Openable(data = bean))
             } else if (sortType == SORT_TYPE_TIME_ORDER) {
@@ -140,6 +141,7 @@ class AllEntryActivity : BaseActivity() {
         }
 
         override fun onDataDeleted(bean: BaseEntryBean) {
+            if (bean is CategoryEntryBean) return
             // 移除数据
             Ln.i("AllEntryActivity", "onDataDeleted $bean")
             find(bean)?.let { index ->
@@ -151,6 +153,7 @@ class AllEntryActivity : BaseActivity() {
         }
 
         override fun onDataUpdated(bean: BaseEntryBean) {
+            if (bean is CategoryEntryBean) return
             // 找到ID一样的数据 然后替换
             find(bean)?.let { index ->
                 val originOpenStatus = data[index].isOpen

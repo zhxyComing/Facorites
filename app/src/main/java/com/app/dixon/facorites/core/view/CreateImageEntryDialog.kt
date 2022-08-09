@@ -11,6 +11,7 @@ import com.app.dixon.facorites.core.data.bean.ImageEntryBean
 import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.findIndexByCondition
+import com.app.dixon.facorites.core.ex.setImageByPath
 import com.app.dixon.facorites.core.ex.shakeTip
 import com.app.dixon.facorites.core.ex.shakeTipIfEmpty
 import com.app.dixon.facorites.core.util.ImageSelectHelper
@@ -72,7 +73,7 @@ class CreateImageEntryDialog(
             override fun onSuccess(data: String) {
                 imageImporting = false
                 imagePath = data
-                bgView.setImageBitmap(bitmap)
+                bgView.setImageByPath(absolutePath) // setImageBitmap 圆角会失效
                 tvTip.text = ""
                 selectImage.isEnabled = true
             }

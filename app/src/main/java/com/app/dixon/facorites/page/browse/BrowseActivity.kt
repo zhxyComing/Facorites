@@ -29,7 +29,6 @@ import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.core.view.ClipSaveDialog
 import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.dixon.dlibrary.util.AnimationUtil
-import com.dixon.dlibrary.util.FontUtil
 import com.dixon.dlibrary.util.ToastUtil
 import kotlinx.android.synthetic.main.activity_browse.*
 import kotlinx.android.synthetic.main.app_content_web_pop.view.*

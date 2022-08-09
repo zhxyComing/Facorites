@@ -20,6 +20,7 @@
             android:drawableStart="@drawable/app_search_icon"
             android:drawablePadding="6dp"
             android:hint="搜索"
+            android:imeOptions="actionSearch"
             android:paddingStart="12dp"
             android:paddingTop="8dp"
             android:paddingEnd="32dp"
@@ -42,13 +43,13 @@
 
     <TextView
         android:id="@+id/tvGuide"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:text="收藏"
+        android:text="收藏夹子"
         android:textColor="#404040"
-        android:textSize="32sp" />
+        android:textSize="24sp" />
 
     <com.app.dixon.facorites.core.util.NestedScrollableHost
         android:layout_width="match_parent"

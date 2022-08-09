@@ -70,7 +70,7 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
 
     private fun initView() {
         context?.let {
-            dataList.addAll(DataService.getCategoryList())
+            dataList.addAll(DataService.getCategoryList().filter { categoryInfoBean -> categoryInfoBean.belongTo == null })
             sortByLastTime() // 新创建的收藏夹排前边
             val adapter = CategoryAdapter(it, dataList)
             val controller: LayoutAnimationController = AnimationUtils.loadLayoutAnimation(it, R.anim.app_rv_in_anim)
@@ -115,7 +115,7 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
         dataList.addAll(normalList)
     }
 
-    private fun sortByName(){
+    private fun sortByName() {
         val topList = dataList.filter { it.topTimeMs != 0L }.sortedBy { it.name }
         val normalList = dataList.filter { it.topTimeMs == 0L }.sortedBy { it.name }
         dataList.clear()

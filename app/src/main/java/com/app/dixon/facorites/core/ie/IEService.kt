@@ -1,9 +1,10 @@
 package com.app.dixon.facorites.core.ie
 
 import androidx.documentfile.provider.DocumentFile
-import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.EXPORT_ROOT_CATEGORY
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
+import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
+import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.bean.LinkEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.data.service.base.DocumentFileUtils
@@ -12,10 +13,13 @@ import com.app.dixon.facorites.core.data.service.base.IService
 import com.app.dixon.facorites.core.data.service.base.WorkService
 import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.core.ex.process
+import com.app.dixon.facorites.core.util.Ln
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
+
+private const val RETRACT = "    "
 
 /**
  * 全路径：com.app.dixon.facorites.core.ie
@@ -56,9 +60,16 @@ object IEService : IService {
         realExportBookmark(onProgress, onFail, onSuccess)
     }
 
+    /**
+     * 每一级菜单都这样：
+     * <DT><H3 ADD_DATE="1645856537" LAST_MODIFIED="1645859199">收藏夹子</H3>
+     * <DL><p>
+     *     xxx
+     * </DL><p>
+     */
     private fun realExportBookmark(onProgress: ((progress: Int) -> Unit)? = null, onFail: ((msg: String) -> Unit)? = null, onSuccess: (path: String) -> Unit) {
         // 创建空文件
-        val fileName =  SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒", Locale.CHINA).format(Date())
+        val fileName = SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒", Locale.CHINA).format(Date())
         val filePath = "$ROOT_PATH/收藏夹子书签_$fileName.html"
         if (!FileUtils.createNewFileAbs(filePath)) {
             backUi { onFail?.invoke("备份文件创建失败") }
@@ -69,26 +80,42 @@ object IEService : IService {
         val prefix = FileUtils.readAssets("exportprefix.html") ?: return
         FileUtils.appendStringAbs(filePath, prefix)
         // 开始写入分类及书签 图片类型忽略
-        DataService.getCategoryList().forEachIndexed { index, categoryInfo ->
-            val categoryContent = "            <DT><H3 ADD_DATE=\"${categoryInfo.id}\" LAST_MODIFIED=\"${categoryInfo.id}\">" +
-                    "${categoryInfo.name}</H3>\n" +
-                    "              <DL><p>\n"
-            FileUtils.appendStringAbs(filePath, categoryContent)
-            DataService.getEntryList(categoryInfo.id)?.forEach {
-                it.process({ linkEntry ->
-                    val linkContent = "                 <DT><A HREF=\"${linkEntry.link}\" ADD_DATE=\"${linkEntry.date}\" " +
-                            "ICON=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA1ElEQVQ4jeWTIQ7CQBBF/9+0JMUgm2B7AzQcAYFAVvQUoCqqQHKCijqOQXqNSppUFsGGlGQQBELZNixYvvyz7+/sZJbLvQyqQidChBAZw0ZkSUHmB17sVIVOBLKCWKF3iYwFWFWFhhIi/AJt5xCh09d2NHWR5g0O6+HTq7VgvtOtTlQfHE1dwx95NDwj4AFfrgJlnjfkvBtp3iDNGygCi4lR/hzw+mYbdc7g3wNOun+n644aZ5vz0foTGTRLRUH2EwyAgkz5gRcT3IIsv7mZ4NYPvPgGL+xIUqFKOAoAAAAASUVORK5CYII=\"" +
-                            ">${linkEntry.title}</A>\n"
-                    FileUtils.appendStringAbs(filePath, linkContent)
-                }, {})
+        DataService.getCategoryList()
+            .filter { categoryInfoBean -> categoryInfoBean.belongTo == null } // 根目录
+            .forEachIndexed { index, categoryInfo ->
+                // 分类标题
+                appendCategory(filePath, categoryInfo, 2)
+                val progress = (((index.toFloat() + 1f) / DataService.getCategoryList().size.toFloat()) * 100).toInt()
+                backUi { onProgress?.invoke(progress) }
             }
-            FileUtils.appendStringAbs(filePath, "              </DL><p>\n")
-            val progress = (((index.toFloat() + 1f) / DataService.getCategoryList().size.toFloat()) * 100).toInt()
-            backUi { onProgress?.invoke(progress) }
-        }
-        FileUtils.appendStringAbs(filePath, "        </DL><p>\n</DL><p>")
+        FileUtils.appendStringAbs(filePath, "$RETRACT</DL><p>\n</DL><p>")
         backUi { onProgress?.invoke(100) }
         backUi { onSuccess.invoke(filePath) }
+    }
+
+    // 写入分类
+    private fun appendCategory(filePath: String, categoryInfo: CategoryInfoBean, categoryRetract: Int) {
+        // 分类标题
+        val fatherRetract = RETRACT.repeat(categoryRetract)
+        val childRetract = RETRACT.repeat(categoryRetract + 1)
+        val categoryContent = "$fatherRetract<DT><H3 ADD_DATE=\"${categoryInfo.id}\" LAST_MODIFIED=\"${categoryInfo.id}\">" +
+                "${categoryInfo.name}</H3>\n" +
+                "$fatherRetract<DL><p>\n"
+        FileUtils.appendStringAbs(filePath, categoryContent)
+        // 分类下的数据
+        DataService.getEntryList(categoryInfo.id)?.forEach {
+            it.process({ linkEntry ->
+                // 分类下的链接类型收藏
+                val linkContent = "$childRetract<DT><A HREF=\"${linkEntry.link}\" ADD_DATE=\"${linkEntry.date}\" " +
+                        "ICON=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA1ElEQVQ4jeWTIQ7CQBBF/9+0JMUgm2B7AzQcAYFAVvQUoCqqQHKCijqOQXqNSppUFsGGlGQQBELZNixYvvyz7+/sZJbLvQyqQidChBAZw0ZkSUHmB17sVIVOBLKCWKF3iYwFWFWFhhIi/AJt5xCh09d2NHWR5g0O6+HTq7VgvtOtTlQfHE1dwx95NDwj4AFfrgJlnjfkvBtp3iDNGygCi4lR/hzw+mYbdc7g3wNOun+n644aZ5vz0foTGTRLRUH2EwyAgkz5gRcT3IIsv7mZ4NYPvPgGL+xIUqFKOAoAAAAASUVORK5CYII=\"" +
+                        ">${linkEntry.title}</A>\n"
+                FileUtils.appendStringAbs(filePath, linkContent)
+            }, {}, { categoryEntry ->
+                // 分类下的子文件夹
+                appendCategory(filePath, categoryEntry.categoryInfoBean, categoryRetract + 1)
+            })
+        }
+        FileUtils.appendStringAbs(filePath, "$fatherRetract</DL><p>\n")
     }
 
     // 导入书签
@@ -100,47 +127,100 @@ object IEService : IService {
         val size = parseLinkNumber(FileUtils.readStringAbs(file.absolutePath))
         if (size == 0) {
             backUi { onFail?.invoke("未找到有效链接") }
+            file.delete()
             return
         }
         val lineList = FileUtils.readStringByLineAbs(file.absolutePath)
         val currentTimeFormat = SimpleDateFormat("yyyy_MM_dd", Locale.CHINA).format(Date())
-        DataService.createCategory("导入的书签_$currentTimeFormat") { id ->
+        var filterRoot = false // 过滤根分类
+        DataService.createCategory("书签_$currentTimeFormat") { id ->
+            // 这里回到了主线程
             execute {
-                var index = 0
+                var offset = 0
                 val baseID = System.currentTimeMillis()
-                val importList = mutableListOf<BaseEntryBean>()
+                // 根节点其实没有BelongTo的概念，且也不是BaseEntryBean的子类
+                // 这里为了方便存储，将根节点作为CategoryEntryBean
+                val rootCategory = CategoryEntryBean(
+                    CategoryInfoBean(id, "导入书签_$currentTimeFormat"),
+                    date = id,
+                    belongTo = id
+                )
+                val rootChildList: MutableList<ImportNode> = mutableListOf()
+                var executeNode = ImportNode(
+                    data = rootCategory,
+                    childList = rootChildList,
+                    father = null
+                )
+                Ln.i("ImportDataExchange", "开始 Root_$executeNode")
+                // 将文件转为Node结构，方便导入
                 lineList.forEach {
+                    Ln.i("ImportDataExchange", "遍历 Line_$it")
                     // 说明是收藏条目
                     val trimString = it.trimStart()
-                    if (trimString.contains("<DT><A HREF")) {
-                        val title = parseTextFromLinkCode(trimString)
-                        val link = parseLinkFromLinkCode(trimString)
-                        importList.add(
-                            LinkEntryBean(
-                                link = link,
-                                title = title,
-                                remark = "",
-                                date = baseID + index,
-                                belongTo = id
+                    if (executeNode.data is CategoryEntryBean && executeNode.childList != null) {
+                        // 普通条目 直接添加
+                        if (trimString.contains("<DT><A HREF")) { // 条目
+                            val title = parseTextFromLinkCode(trimString)
+                            val link = parseLinkFromLinkCode(trimString)
+                            Ln.i("ImportDataExchange", "添加条目 Title_$title")
+                            offset += 1
+                            executeNode.childList?.add(
+                                ImportNode(
+                                    data = LinkEntryBean(
+                                        link = link,
+                                        title = title,
+                                        remark = "",
+                                        date = baseID + offset,
+                                        belongTo = executeNode.data.date
+                                    ),
+                                    childList = null,
+                                    father = executeNode
+                                )
                             )
-                        )
-                        index++
-                        backUi { onProgress?.invoke(50) }
+                        }
+                        // 分类开始
+                        if (trimString.startsWith("<DT>") && !trimString.startsWith("<DT><A HREF")) {
+                            if (!filterRoot) {
+                                Ln.i("ImportDataExchange", "过滤根文件夹")
+                                filterRoot = true
+                                return@forEach
+                            }
+                            val title = parseTextFromLinkCode(trimString)
+                            val moreLowerChildList = mutableListOf<ImportNode>()
+                            offset += 1
+                            executeNode.childList?.let { list ->
+                                val node = ImportNode(
+                                    CategoryEntryBean(
+                                        CategoryInfoBean(baseID + offset, title, belongTo = executeNode.data.date),
+                                        date = baseID + offset,
+                                        belongTo = executeNode.data.date
+                                    ),
+                                    childList = moreLowerChildList,
+                                    father = executeNode
+                                )
+                                list.add(node)
+                                // 开始下一层文件夹条目的添加
+                                executeNode = node
+                                Ln.i("ImportDataExchange", "赋值子文件夹_$executeNode")
+                            }
+                        }
+                        // 分类结束
+                        if (trimString.startsWith("</DL><p>")) {
+                            if (!filterRoot) return@forEach
+                            // 返回上一级
+                            executeNode.father?.let { node ->
+                                executeNode = node
+                                Ln.i("ImportDataExchange", "赋值父文件夹 $executeNode")
+                            }
+                        }
                     }
+                    backUi { onProgress?.invoke(50) }
                 }
-                DataService.createEntry(
-                    importList,
-                    callback = object : Callback<List<BaseEntryBean>> {
-                        override fun onSuccess(data: List<BaseEntryBean>) {
-                            backUi { onProgress?.invoke(100) }
-                            backUi { onSuccess.invoke() }
-                        }
-
-                        override fun onFail(msg: String) {
-                            backUi { onFail?.invoke("收藏创建失败") }
-                        }
-                    }
-                )
+                Ln.i("ImportDataExchange", "结束 $executeNode")
+                if (doImport(executeNode)) {
+                    backUi { onProgress?.invoke(100) }
+                    backUi { onSuccess.invoke() }
+                }
             }
         }
     }
@@ -172,51 +252,137 @@ object IEService : IService {
             }
             val lineList = FileUtils.readStringByLineAbs(file.absolutePath)
             val currentTimeFormat = SimpleDateFormat("yyyy_MM_dd", Locale.CHINA).format(Date())
-            DataService.createCategory("导入的书签_$currentTimeFormat") { id ->
+            var filterRoot = false // 过滤根分类
+            DataService.createCategory("书签_$currentTimeFormat") { id ->
                 // 这里回到了主线程
                 execute {
-                    var index = 0
+                    var offset = 0
                     val baseID = System.currentTimeMillis()
-                    val importList = mutableListOf<BaseEntryBean>()
+                    // 根节点其实没有BelongTo的概念，且也不是BaseEntryBean的子类
+                    // 这里为了方便存储，将根节点作为CategoryEntryBean
+                    val rootCategory = CategoryEntryBean(
+                        CategoryInfoBean(id, "导入书签_$currentTimeFormat"),
+                        date = id,
+                        belongTo = id
+                    )
+                    val rootChildList: MutableList<ImportNode> = mutableListOf()
+                    var executeNode = ImportNode(
+                        data = rootCategory,
+                        childList = rootChildList,
+                        father = null
+                    )
+                    Ln.i("ImportDataExchange", "开始 Root_$executeNode")
+                    // 将文件转为Node结构，方便导入
                     lineList.forEach {
+                        Ln.i("ImportDataExchange", "遍历 Line_$it")
                         // 说明是收藏条目
                         val trimString = it.trimStart()
-                        if (trimString.contains("<DT><A HREF")) {
-                            val title = parseTextFromLinkCode(trimString)
-                            val link = parseLinkFromLinkCode(trimString)
-                            importList.add(
-                                LinkEntryBean(
-                                    link = link,
-                                    title = title,
-                                    remark = "",
-                                    date = baseID + index,
-                                    belongTo = id
+                        if (executeNode.data is CategoryEntryBean && executeNode.childList != null) {
+                            // 普通条目 直接添加
+                            if (trimString.contains("<DT><A HREF")) { // 条目
+                                val title = parseTextFromLinkCode(trimString)
+                                val link = parseLinkFromLinkCode(trimString)
+                                Ln.i("ImportDataExchange", "添加条目 Title_$title")
+                                offset += 1
+                                executeNode.childList?.add(
+                                    ImportNode(
+                                        data = LinkEntryBean(
+                                            link = link,
+                                            title = title,
+                                            remark = "",
+                                            date = baseID + offset,
+                                            belongTo = executeNode.data.date
+                                        ),
+                                        childList = null,
+                                        father = executeNode
+                                    )
                                 )
-                            )
-                            index++
-                            backUi { onProgress?.invoke(50) }
+                            }
+                            // 分类开始
+                            if (trimString.startsWith("<DT>") && !trimString.startsWith("<DT><A HREF")) {
+                                if (!filterRoot) {
+                                    Ln.i("ImportDataExchange", "过滤根文件夹")
+                                    filterRoot = true
+                                    return@forEach
+                                }
+                                val title = parseTextFromLinkCode(trimString)
+                                val moreLowerChildList = mutableListOf<ImportNode>()
+                                offset += 1
+                                executeNode.childList?.let { list ->
+                                    val node = ImportNode(
+                                        CategoryEntryBean(
+                                            CategoryInfoBean(baseID + offset, title, belongTo = executeNode.data.date),
+                                            date = baseID + offset,
+                                            belongTo = executeNode.data.date
+                                        ),
+                                        childList = moreLowerChildList,
+                                        father = executeNode
+                                    )
+                                    list.add(node)
+                                    // 开始下一层文件夹条目的添加
+                                    executeNode = node
+                                    Ln.i("ImportDataExchange", "赋值子文件夹_$executeNode")
+                                }
+                            }
+                            // 分类结束
+                            if (trimString.startsWith("</DL><p>")) {
+                                if (!filterRoot) return@forEach
+                                // 返回上一级
+                                executeNode.father?.let { node ->
+                                    executeNode = node
+                                    Ln.i("ImportDataExchange", "赋值父文件夹 $executeNode")
+                                }
+                            }
                         }
+                        backUi { onProgress?.invoke(50) }
                     }
-                    DataService.createEntry(
-                        importList,
-                        callback = object : Callback<List<BaseEntryBean>> {
-                            override fun onSuccess(data: List<BaseEntryBean>) {
-                                backUi { onProgress?.invoke(100) }
-                                backUi { onSuccess.invoke() }
-                                // 删除临时文件
-                                file.delete()
-                            }
-
-                            override fun onFail(msg: String) {
-                                backUi { onFail?.invoke("收藏创建失败") }
-                                // 删除临时文件
-                                file.delete()
-                            }
-                        }
-                    )
+                    Ln.i("ImportDataExchange", "结束 $executeNode")
+                    file.delete()
+                    if (doImport(executeNode)) {
+                        backUi { onProgress?.invoke(100) }
+                        backUi { onSuccess.invoke() }
+                    }
                 }
             }
         } ?: backUi { onFail?.invoke("文件转存失败") }
+    }
+
+    private fun doImport(importNode: ImportNode): Boolean {
+        val childEntry = importNode.childList?.map {
+            it.data
+        }
+        val childCategory = importNode.childList?.filter {
+            it.data is CategoryEntryBean
+        }
+        // 其实目前即使数据丢失，也会返回true，但这是后续DataService创建优化的点，和这里逻辑无关
+        var success = true
+        childEntry?.let {
+            if (DataService.createEntryForIE(it)) {
+                if (!childCategory.isNullOrEmpty()) {
+                    childCategory.forEach { node ->
+                        if (!doImport(node)) {
+                            // 创建下级目录的条目失败
+                            success = false
+                        }
+                    }
+                }
+            } else {
+                // 创建本级目录的条目失败
+                success = false
+            }
+        }
+        return success
+    }
+
+    private class ImportNode(val data: BaseEntryBean, val childList: MutableList<ImportNode>? = null, val father: ImportNode? = null) {
+
+        // 避免循环输出
+        override fun toString(): String {
+            if (data is LinkEntryBean) {
+                return "entry_${data.title}"
+            }
+            return "category_${(data as? CategoryEntryBean)?.categoryInfoBean?.name} child_$childList"
+        }
     }
 
     // 从类似下面的代码中解析出内容

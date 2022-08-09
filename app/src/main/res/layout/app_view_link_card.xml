@@ -13,7 +13,9 @@
         android:layout_marginStart="80dp"
         android:alpha="0.6"
         android:visibility="gone"
+        app:roundBottomLeft="false"
         app:roundBottomRight="true"
+        app:roundTopLeft="false"
         app:roundTopRight="true"
         app:roundedCornerRadius="45dp" />
 
@@ -23,6 +25,13 @@
         android:layout_height="match_parent"
         android:layout_marginStart="80dp"
         android:background="@drawable/app_shape_mask_image_entry"
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/categoryTag"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/app_shape_category_tag"
         android:visibility="gone" />
 
     <LinearLayout
@@ -100,99 +109,209 @@
 
         <LinearLayout
             android:id="@+id/subCard"
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:background="@drawable/app_shape_entry_function"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
+            android:paddingStart="0dp"
+            android:paddingEnd="10dp"
             android:visibility="gone">
 
-            <TextView
-                android:id="@+id/tvSchemeJump"
-                android:layout_width="wrap_content"
+            <HorizontalScrollView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="6dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="4dp"
-                android:text="唤起应用"
-                android:textColor="@color/app_theme_grey"
-                android:textSize="10sp"
-                android:visibility="gone"
-                tools:ignore="SmallSp" />
+                android:clipToPadding="false"
+                android:scrollbars="none">
 
-            <TextView
-                android:id="@+id/tvJump"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="4dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="6dp"
-                android:paddingBottom="4dp"
-                android:text="浏览器打开"
-                android:textColor="@color/app_theme_grey"
-                android:textSize="10sp"
-                tools:ignore="SmallSp" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/tvCopy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="6dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="6dp"
-                android:paddingBottom="4dp"
-                android:text="复制"
-                android:textColor="@color/app_theme_grey"
-                android:textSize="10sp"
-                tools:ignore="SmallSp" />
+                    <LinearLayout
+                        android:id="@+id/tvSchemeJump"
+                        android:layout_width="50dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:visibility="gone">
 
-            <TextView
-                android:id="@+id/tvUpdate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="6dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="4dp"
-                android:text="修改"
-                android:textColor="@color/app_theme_grey"
-                android:textSize="10sp"
-                tools:ignore="SmallSp" />
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:padding="1dp"
+                            android:src="@drawable/app_icon_app" />
 
-            <TextView
-                android:id="@+id/tvDelete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="6dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="4dp"
-                android:text="删除"
-                android:textColor="@color/app_theme_grey"
-                android:textSize="10sp"
-                tools:ignore="SmallSp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="6dp"
+                            android:text="唤起应用"
+                            android:textColor="@color/white"
+                            android:textSize="8sp"
+                            android:visibility="visible"
+                            tools:ignore="SmallSp" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+                    </LinearLayout>
 
-            <TextView
-                android:id="@+id/tvCreateTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginEnd="20dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="4dp"
-                android:textColor="@color/md_blue_100"
-                android:textSize="10sp"
-                tools:ignore="SmallSp" />
+                    <LinearLayout
+                        android:id="@+id/tvJump"
+                        android:layout_width="50dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:padding="2dp"
+                            android:src="@drawable/app_icon_browse" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="6dp"
+                            android:text="外部打开"
+                            android:textColor="@color/white"
+                            android:textSize="8sp"
+                            tools:ignore="SmallSp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tvCopy"
+                        android:layout_width="50dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:padding="2.4dp"
+                            android:src="@drawable/app_icon_copy" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="6dp"
+                            android:text="复制链接"
+                            android:textColor="@color/white"
+                            android:textSize="8sp"
+                            tools:ignore="SmallSp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tvUpdate"
+                        android:layout_width="50dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:padding="2dp"
+                            android:src="@drawable/app_icon_update" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="6dp"
+                            android:text="修改收藏"
+                            android:textColor="@color/white"
+                            android:textSize="8sp"
+                            tools:ignore="SmallSp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tvHideBg"
+                        android:layout_width="50dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:padding="1.8dp"
+                            android:src="@drawable/app_icon_hide" />
+
+                        <TextView
+                            android:id="@+id/tvHideBgText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="6dp"
+                            android:text="隐藏背景"
+                            android:textColor="@color/white"
+                            android:textSize="8sp"
+                            tools:ignore="SmallSp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tvDelete"
+                        android:layout_width="50dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:padding="1.8dp"
+                            android:src="@drawable/app_icon_delete" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="6dp"
+                            android:text="删除收藏"
+                            android:textColor="@color/white"
+                            android:textSize="8sp"
+                            tools:ignore="SmallSp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="bottom"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvCreateTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:textColor="#E0E0E0"
+                            android:textSize="8sp"
+                            tools:ignore="SmallSp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
 
         </LinearLayout>
 

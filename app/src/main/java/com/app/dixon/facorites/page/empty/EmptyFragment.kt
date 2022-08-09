@@ -1,23 +1,11 @@
 package com.app.dixon.facorites.page.empty
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.VisibleExtensionFragment
-import com.app.dixon.facorites.core.common.PageJumper
-import com.app.dixon.facorites.core.data.bean.BaseEntryBean
-import com.app.dixon.facorites.core.data.bean.LinkEntryBean
-import com.app.dixon.facorites.core.data.service.DataService
-import com.app.dixon.facorites.core.ex.hide
-import com.app.dixon.facorites.core.ex.process
-import com.app.dixon.facorites.core.ex.show
-import com.app.dixon.facorites.core.util.CollectionUtil
-import com.app.dixon.facorites.core.view.EntryView
-import com.facebook.drawee.view.SimpleDraweeView
-import kotlinx.android.synthetic.main.app_fragment_home_content.*
 
 /**
  * 全路径：com.app.dixon.facorites.page.home

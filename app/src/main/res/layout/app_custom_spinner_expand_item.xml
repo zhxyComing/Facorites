@@ -12,17 +12,14 @@
         android:layout_height="match_parent"
         android:layout_marginStart="80dp"
         android:alpha="0.6"
-        android:visibility="gone"
-        app:roundBottomRight="true"
-        app:roundTopRight="true"
-        app:roundedCornerRadius="45dp" />
+        android:visibility="gone" />
 
     <FrameLayout
         android:id="@+id/maskView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="80dp"
-        android:background="@drawable/app_shape_mask_image_entry"
+        android:background="@drawable/app_shape_mask_category_entry"
         android:visibility="gone" />
 
     <LinearLayout

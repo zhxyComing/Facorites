@@ -21,6 +21,7 @@ import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.core.ex.hide
 import com.app.dixon.facorites.core.ex.show
 import com.app.dixon.facorites.core.util.Ln
+import com.app.dixon.facorites.core.util.ThreadExecutor
 import com.app.dixon.facorites.core.util.mediumFont
 import com.app.dixon.facorites.core.util.normalFont
 import com.dixon.dlibrary.util.ToastUtil
@@ -231,8 +232,7 @@ class FileExploreView @JvmOverloads constructor(
     private fun addCoreDir() {
         if (coreList.isEmpty()) {
             tvTip.show()
-            // TODO IO线程类
-            Thread {
+            ThreadExecutor.execute {
                 val tempList = mutableListOf<FileWrapper>()
                 tempList.add(FileWrapper(File("${FileUtils.getSDPath()}/$EXPORT_ROOT_CATEGORY"), null, true, "收藏夹子"))
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
@@ -259,7 +259,7 @@ class FileExploreView @JvmOverloads constructor(
                         rvList.adapter?.notifyDataSetChanged()
                     }
                 }
-            }.start()
+            }
         }
         dataList.addAll(0, coreList)
     }

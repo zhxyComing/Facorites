@@ -24,7 +24,6 @@ import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.dixon.dlibrary.util.Ln
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
-import com.umeng.analytics.pro.bm
 import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -145,6 +144,8 @@ class CreateEntryDialog(
             etImageTitle.setText(imageEntry.title)
             bgView.setImageByPath(imageEntry.path)
             imagePath = imageEntry.path
+        }, {
+            // 暂不支持添加分类类型的收藏
         })
         tapeEntry?.let { layoutChange.hide() }
     }

@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.core.view.forEachIndexed
@@ -16,25 +16,27 @@ import androidx.core.widget.PopupWindowCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.dixon.facorites.R
+import com.app.dixon.facorites.base.ContextAssistant
 import com.app.dixon.facorites.base.VisibleExtensionFragment
 import com.app.dixon.facorites.core.bean.BannerInfo
-import com.app.dixon.facorites.core.common.LAST_ENTRY_NUM
-import com.app.dixon.facorites.core.common.PageJumper
-import com.app.dixon.facorites.core.common.SEARCH_ENGINE
-import com.app.dixon.facorites.core.common.SEARCH_ENGINE_SOUGOU
+import com.app.dixon.facorites.core.common.*
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
+import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
-import com.app.dixon.facorites.core.ex.*
+import com.app.dixon.facorites.core.ex.findByCondition
+import com.app.dixon.facorites.core.ex.hide
+import com.app.dixon.facorites.core.ex.process
+import com.app.dixon.facorites.core.ex.show
 import com.app.dixon.facorites.core.util.*
 import com.app.dixon.facorites.core.view.EntryView
-import com.app.dixon.facorites.core.view.SearchDialog
 import com.app.dixon.facorites.page.edit.event.LastEntryNumUpdateEvent
 import com.app.dixon.facorites.page.entry.EntryAdapter
 import com.app.dixon.facorites.page.entry.Openable
 import com.dixon.dlibrary.util.SharedUtil
 import com.facebook.drawee.view.SimpleDraweeView
-import kotlinx.android.synthetic.main.app_custom_spinner_expand.view.*
+import kotlinx.android.synthetic.main.app_custom_spinner_expand.view.rvExpand
 import kotlinx.android.synthetic.main.app_fragment_home_content.*
+import kotlinx.android.synthetic.main.app_home_search_expand.view.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -71,6 +73,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         maxEntryNum = SharedUtil.getInt(LAST_ENTRY_NUM, 5)
         normalFont()
         findViewById<View>(R.id.tvLastCollection).mediumFont()
+        findViewById<View>(R.id.tvGuide).mediumFont()
     }
 
     // 添加条目卡片View
@@ -123,29 +126,60 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
             }
             // 搜索下拉框
             initSearchExpand()
-            // 搜索监听
+            // 搜索监听 输入字符自动搜索
             etSearch.addTextChangedListener({ _, _, _, _ -> },
                 { charSequence, _, _, _ ->
                     val searchString = charSequence.toString()
                     if (searchString.isEmpty()) {
-                        searchExpandList.dismiss()
+                        if (searchExpandList.isShowing) {
+                            searchExpandList.dismiss()
+                        }
                     } else {
                         Ln.i("Filter", "过滤 $searchString")
                         searchEntryAdapter?.filter?.filter(charSequence.toString())
-
-                        if (!searchExpandShow) {
-                            searchExpandShow = !searchExpandShow
-                            val offsetX = abs(searchExpandList.contentView.measuredWidth - etSearch.width) / 2
-                            val offsetY = 0
-                            PopupWindowCompat.showAsDropDown(searchExpandList, etSearch, offsetX, offsetY, Gravity.START)
+                        etSearch.post {
+                            Ln.i("Filter", "过滤结果 ${searchEntryAdapter?.filterData?.size}")
+                            if (!searchExpandShow) {
+//                            if (!searchExpandShow && searchEntryAdapter?.filterData?.size != 0) {
+                                searchExpandShow = !searchExpandShow
+                                val offsetX = abs(searchExpandList.contentView.measuredWidth - etSearch.width) / 2
+                                val offsetY = 0
+                                PopupWindowCompat.showAsDropDown(searchExpandList, etSearch, offsetX, offsetY, Gravity.START)
+                            }
                         }
                     }
                 }, {})
 
-            // 搜索结果为空 隐藏搜索结果列表
-            searchEntryAdapter?.onFilterEmptyListener = {
-                searchExpandList.dismiss()
+            // 点击enter搜索
+            etSearch.setOnEditorActionListener { v, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    val searchString = etSearch.text.toString()
+                    if (searchString.isEmpty()) {
+                        if (searchExpandList.isShowing) {
+                            searchExpandList.dismiss()
+                        }
+                    } else {
+                        Ln.i("Filter", "过滤 $searchString")
+                        searchEntryAdapter?.filter?.filter(etSearch.text.toString())
+                        etSearch.post {
+                            Ln.i("Filter", "过滤结果 ${searchEntryAdapter?.filterData?.size}")
+                            if (!searchExpandShow) {
+//                            if (!searchExpandShow && searchEntryAdapter?.filterData?.size != 0) {
+                                searchExpandShow = !searchExpandShow
+                                val offsetX = abs(searchExpandList.contentView.measuredWidth - etSearch.width) / 2
+                                val offsetY = 0
+                                PopupWindowCompat.showAsDropDown(searchExpandList, etSearch, offsetX, offsetY, Gravity.START)
+                            }
+                        }
+                    }
+                }
+                false
             }
+
+            // 搜索结果为空 隐藏搜索结果列表
+//            searchEntryAdapter?.onFilterEmptyListener = {
+//                searchExpandList.dismiss()
+//            }
 
             ivSearchClear.setOnClickListener {
                 etSearch.setText("")
@@ -171,6 +205,14 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
 
     private fun initSearchExpand() {
         val contentView: View = LayoutInflater.from(context).inflate(R.layout.app_home_search_expand, null)
+        contentView.netSearch.mediumFont()
+        contentView.windowClose.mediumFont()
+        contentView.netSearch.setOnClickListener {
+            toNetSearch()
+        }
+        contentView.windowClose.setOnClickListener {
+            searchExpandList.dismiss()
+        }
         with(contentView.rvExpand) {
             this.layoutManager = LinearLayoutManager(context)
             searchEntryAdapter = EntryAdapter(context, allEntries)
@@ -188,17 +230,33 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         val initStartTime = System.currentTimeMillis()
         // 警告：耗时方法，列表越长越耗时
         // 在展示之前先执行一次测量 避免后续获取宽高为0
-        // TODO IO线程类
-        Thread {
+        ThreadExecutor.execute {
             searchExpandList.contentView.measure(
                 makeDropDownMeasureSpec(searchExpandList.width),
                 makeDropDownMeasureSpec(searchExpandList.height)
             )
-        }.start()
+        }
         Ln.i("HomeFragmentInit", "${System.currentTimeMillis() - initStartTime}")
 
         searchExpandList.setOnDismissListener {
             searchExpandShow = false
+        }
+    }
+
+    private fun toNetSearch() {
+        val searchContent = etSearch.text.toString()
+        ContextAssistant.asContext {
+            if (searchContent.startsWith("http://") || searchContent.startsWith("https://")) {
+                PageJumper.openBrowsePage(it, link = searchContent)
+                return@asContext
+            }
+            when (val searchHost = SharedUtil.getString(SEARCH_ENGINE, SEARCH_ENGINE_BAIDU)) {
+                SEARCH_ENGINE_GOOGLE -> PageJumper.openBrowsePage(it, link = "${searchHost}search?q=$searchContent", title = searchContent)
+                SEARCH_ENGINE_BAIDU -> PageJumper.openBrowsePage(it, link = "${searchHost}s?wd=$searchContent", title = searchContent)
+                SEARCH_ENGINE_SOUGOU -> PageJumper.openBrowsePage(it, link = "${searchHost}?query=$searchContent", title = searchContent)
+                SEARCH_ENGINE_BING -> PageJumper.openBrowsePage(it, link = "${searchHost}search?q=$searchContent", title = searchContent)
+                SEARCH_ENGINE_YANDEX -> PageJumper.openBrowsePage(it, link = "${searchHost}search/?text=$searchContent", title = searchContent)
+            }
         }
     }
 
@@ -225,12 +283,13 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
             context?.let {
                 PageJumper.openCoursePage(it)
             }
-        }, BannerInfo(R.drawable.app_guide_cover_2) {
-            // 跳转浏览器
-            context?.let {
-                SearchDialog(it).show()
-            }
         })
+//        }, BannerInfo(R.drawable.app_guide_cover_2) {
+//            // 跳转浏览器
+//            context?.let {
+//                SearchDialog(it).show()
+//            }
+//        })
         banner.setParams(banners, { inflate, container, bean ->
             val item = inflate.inflate(R.layout.app_item_banner_home, container, false)
             val imageView = item.findViewById<SimpleDraweeView>(R.id.ivImage)
@@ -257,6 +316,9 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
                 }, { imageEntry ->
                     // image 类型
                     cardView.setImageEntry(imageEntry)
+                }, { categoryEntry ->
+                    // 虽然支持显示分类，但是首页不会展示分类
+                    cardView.setCategoryEntry(categoryEntry)
                 })
             }
         }
@@ -290,7 +352,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         val allEntry = mutableListOf<BaseEntryBean>()
         DataService.getCategoryList().forEach { category ->
             DataService.getEntryList(category.id)?.let { entryList ->
-                allEntry.addAll(entryList)
+                allEntry.addAll(entryList.filter { entry -> entry !is CategoryEntryBean })
             }
         }
         allEntry.sortByDescending { it.date }
@@ -315,9 +377,11 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
     }
 
     override fun onDataCreated(bean: BaseEntryBean) {
-        // 更新数据
-        CollectionUtil.insertDataToHead(entries, bean, maxEntryNum)
-        initEntryView()
+        if (bean !is CategoryEntryBean) {
+            // 更新数据
+            CollectionUtil.insertDataToHead(entries, bean, maxEntryNum)
+            initEntryView()
+        }
         // 更新所有数据 这里直接加到首位
         allEntries.add(0, Openable(false, bean))
         searchEntryAdapter?.filterData?.add(0, Openable(false, bean))
@@ -325,6 +389,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
     }
 
     override fun onDataDeleted(bean: BaseEntryBean) {
+        if (bean is CategoryEntryBean) return // 子文件夹的删除DataService会调用刷新，而不是单条目的删除
         if (entries.contains(bean)) {
             obtainLastEntry()
             initEntryView()
@@ -338,22 +403,26 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
     }
 
     override fun onDataUpdated(bean: BaseEntryBean) {
-        val index = entries.indexOf(bean)
-        if (index != -1) {
-            val cardView = cardLayout.getChildAt(index) as? EntryView
-            bean.process({
-                cardView?.setLinkEntry(it)
-            }, {
-                cardView?.setImageEntry(it)
-            })
-            // indexOf只是使用ID判断，并不代表内容一致，需要更新内容
-            entries[index] = bean
-        }
         // 更新搜索用的所有数据
         // 因为过滤数据和原始数据使用的同一个Openable，所以Openable的成员变量有一个发生变更即可
         allEntries.findByCondition { it.data == bean }?.let {
             it.data = bean
             searchEntryAdapter?.notifyDataSetChanged()
+        }
+        if (bean !is CategoryEntryBean) {
+            val index = entries.indexOf(bean)
+            if (index != -1) {
+                val cardView = cardLayout.getChildAt(index) as? EntryView
+                bean.process({
+                    cardView?.setLinkEntry(it)
+                }, {
+                    cardView?.setImageEntry(it)
+                }, {
+                    // 收藏夹不显示在这里
+                })
+                // indexOf只是使用ID判断，并不代表内容一致，需要更新内容
+                entries[index] = bean
+            }
         }
     }
 
