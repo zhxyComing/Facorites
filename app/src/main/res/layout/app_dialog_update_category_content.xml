@@ -68,6 +68,14 @@
                 android:textSize="12sp" />
         </FrameLayout>
 
+        <com.app.dixon.facorites.core.view.CustomSpinner
+            android:id="@+id/categoryChoose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp" />
+
         <TextView
             android:id="@+id/tvUpdate"
             android:layout_width="wrap_content"

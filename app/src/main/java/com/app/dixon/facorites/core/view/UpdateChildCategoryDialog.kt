@@ -9,6 +9,7 @@ import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.ex.findIndexByCondition
 import com.app.dixon.facorites.core.ex.setImageByUri
 import com.app.dixon.facorites.core.ex.shakeTip
 import com.app.dixon.facorites.core.util.ImageSelectHelper
@@ -17,7 +18,11 @@ import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.app.dixon.facorites.page.home.CATEGORY_BG_IMAGE_REQUEST
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
+import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import kotlinx.android.synthetic.main.app_dialog_update_category_content.*
+import kotlinx.android.synthetic.main.app_dialog_update_category_content.bgView
+import kotlinx.android.synthetic.main.app_dialog_update_category_content.categoryChoose
+import kotlinx.android.synthetic.main.app_dialog_update_category_content.selectImage
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -54,17 +59,18 @@ class UpdateChildCategoryDialog(context: Context, val categoryEntryBean: Categor
                 etInput.shakeTip()
                 return@setOnClickListener
             }
+            val newBelongTo = categoryChoose.getSelectionData<CategoryInfoBean>()?.id ?: categoryEntryBean.belongTo
             val newCategoryInfoBean = CategoryInfoBean(
                 categoryEntryBean.categoryInfoBean.id,
                 newTitle,
                 newBgUri?.path,
                 categoryEntryBean.categoryInfoBean.topTimeMs,
-                categoryEntryBean.categoryInfoBean.belongTo
+                belongTo = newBelongTo
             )
             val newCategoryEntryBean = CategoryEntryBean(
                 newCategoryInfoBean,
                 categoryEntryBean.date,
-                categoryEntryBean.belongTo,
+                belongTo = newBelongTo,
                 categoryEntryBean.star
             )
             DataService.updateEntry(categoryEntryBean, newCategoryEntryBean, object : Callback<BaseEntryBean> {
@@ -89,6 +95,7 @@ class UpdateChildCategoryDialog(context: Context, val categoryEntryBean: Categor
             // 打开图片选择
             ImageSelectHelper.openImageSelectPage(CATEGORY_BG_IMAGE_REQUEST)
         }
+        initSpinner()
     }
 
     override fun onDetachedFromWindow() {
@@ -119,6 +126,21 @@ class UpdateChildCategoryDialog(context: Context, val categoryEntryBean: Categor
             if (deleteExpiredImage) {
                 BitmapIOService.deleteBitmap(it)
             }
+        }
+    }
+
+    // 下拉选择框
+    private fun initSpinner() {
+        val expendInfoList = mutableListOf<CustomSpinner.ExpandInfo<CategoryInfoBean>>()
+        DataService.getCategoryList().forEach {
+            expendInfoList.add(CustomSpinner.ExpandInfo(it.name, it.bgPath, it))
+        }
+        categoryChoose.setData(expendInfoList)
+        categoryChoose.setShowPos(CustomSpinner.ShowPos.TOP)
+        expendInfoList.findIndexByCondition {
+            it.data.id == categoryEntryBean.date
+        }?.let { index ->
+            categoryChoose.setSelection(index)
         }
     }
 }

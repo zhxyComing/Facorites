@@ -194,6 +194,13 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                 })
             }
         }
+
+        // 点击浏览层级
+        tvMap.setOnClickListener {
+            (bean as? CategoryEntryBean)?.let {
+                PageJumper.openMapPage(context, it.categoryInfoBean)
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -230,6 +237,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         entryBg.show()
         entryBgMask.show()
         categoryTag.show()
+        tvMap.show()
     }
 
     fun setLinkEntry(bean: LinkEntryBean, categoryTagShow: Boolean = true) {
@@ -281,6 +289,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         entryBg.hide()
         entryBgMask.hide()
         categoryTag.hide()
+        tvMap.hide()
     }
 
     fun setImageEntry(bean: ImageEntryBean, categoryTagShow: Boolean = true) {
@@ -339,6 +348,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         entryBg.show()
         entryBgMask.show()
         categoryTag.hide()
+        tvMap.hide()
     }
 
     fun clear() {

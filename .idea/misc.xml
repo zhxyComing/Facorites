@@ -38,6 +38,8 @@
         <entry key="..\:/Work/Facorites/app/src/main/res/layout/app_item_entry.xml" value="0.14635416666666667" />
         <entry key="..\:/Work/Facorites/app/src/main/res/layout/app_view_link_card.xml" value="0.33" />
         <entry key="app/src/main/res/drawable/app_select_edit_top_bar_back.xml" value="0.3345" />
+        <entry key="app/src/main/res/drawable/app_select_map_category.xml" value="0.1375" />
+        <entry key="app/src/main/res/drawable/app_select_map_entry.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_shape_browse_search.xml" value="0.2575" />
         <entry key="app/src/main/res/drawable/app_shape_category_tag.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_shape_create_entry_add.xml" value="0.190625" />
@@ -52,12 +54,17 @@
         <entry key="app/src/main/res/drawable/app_shape_mask_image_entry.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_shape_progress_bg_normal.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_shape_rect_grey.xml" value="0.20625" />
+        <entry key="app/src/main/res/drawable/app_shape_round_rect_black.xml" value="0.1375" />
+        <entry key="app/src/main/res/drawable/app_shape_round_rect_black_dark.xml" value="0.1375" />
+        <entry key="app/src/main/res/drawable/app_shape_round_rect_blue.xml" value="0.1375" />
+        <entry key="app/src/main/res/drawable/app_shape_round_rect_blue_dark.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_shape_round_rect_green.xml" value="0.20625" />
         <entry key="app/src/main/res/drawable/app_shape_round_rect_grey.xml" value="0.30052083333333335" />
         <entry key="app/src/main/res/drawable/app_shape_round_rect_grey_alpha.xml" value="0.30052083333333335" />
         <entry key="app/src/main/res/drawable/app_shape_round_rect_grey_dark.xml" value="0.20625" />
         <entry key="app/src/main/res/drawable/app_shape_round_rect_grey_frame.xml" value="0.20677083333333332" />
         <entry key="app/src/main/res/drawable/app_shape_round_rect_white.xml" value="0.20625" />
+        <entry key="app/src/main/res/drawable/app_shape_round_white.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_shape_select.xml" value="0.3472222222222222" />
         <entry key="app/src/main/res/drawable/app_shape_select_normal.xml" value="0.3472222222222222" />
         <entry key="app/src/main/res/drawable/app_shape_select_press.xml" value="0.3472222222222222" />
@@ -70,7 +77,9 @@
         <entry key="app/src/main/res/layout/activity_entry.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_image.xml" value="0.171875" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_map.xml" value="0.20199275362318841" />
         <entry key="app/src/main/res/layout/app_content_file_function.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/app_content_tree_map.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_content_web_pop.xml" value="0.38697916666666665" />
         <entry key="app/src/main/res/layout/app_custom_spinner_expand.xml" value="0.38697916666666665" />
         <entry key="app/src/main/res/layout/app_custom_spinner_expand_item.xml" value="0.20260416666666667" />
@@ -94,7 +103,7 @@
         <entry key="app/src/main/res/layout/app_fragment_home_content.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_fragment_mine_content.xml" value="0.20260416666666667" />
         <entry key="app/src/main/res/layout/app_home_search_expand.xml" value="0.2717391304347826" />
-        <entry key="app/src/main/res/layout/app_item_category.xml" value="0.19166666666666668" />
+        <entry key="app/src/main/res/layout/app_item_category.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_item_entry.xml" value="0.246875" />
         <entry key="app/src/main/res/layout/app_view_link_card.xml" value="0.1" />
         <entry key="app/src/main/res/layout/item_file_explore.xml" value="0.335" />

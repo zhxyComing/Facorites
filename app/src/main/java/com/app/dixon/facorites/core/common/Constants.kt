@@ -27,11 +27,15 @@ const val SORT_TYPE_NAME = "sort_name"
 
 const val SORT_TYPE_TIME_ORDER = "sort_time_order"
 
+const val SORT_TYPE_BY_TYPE = "sort_type"
+
 const val AGREEMENT_CONFIRM = "agreement_confirm"
 
 const val VERSION_UPDATE_TIP = "version_update_tip"
 
 const val MARKDOWN_ASSETS_NAME = "markdown_assets_name"
+
+const val MAP_CATEGORY = "map_category"
 
 const val EXPORT_ROOT_CATEGORY = "收藏夹子"
 

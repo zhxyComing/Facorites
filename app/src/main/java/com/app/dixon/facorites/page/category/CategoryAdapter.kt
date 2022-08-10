@@ -19,7 +19,6 @@ import com.app.dixon.facorites.core.util.TimeUtils
 import com.app.dixon.facorites.core.util.mediumFont
 import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.core.view.EditCategoryDialog
-import com.dixon.dlibrary.util.FontUtil
 import kotlinx.android.synthetic.main.app_item_category.view.*
 
 /**
@@ -56,6 +55,9 @@ class CategoryAdapter(val context: Context, val data: List<CategoryInfoBean>) : 
             Ln.i("CategoryAdapter", it)
             holder.itemView.bgView.setImageByPath(it)
         } ?: holder.itemView.bgView.setImageByUri(Uri.parse("res://com.app.dixon.facorites/" + R.drawable.app_icon_category_bg))
+        holder.itemView.mapJump.setOnClickListener {
+            PageJumper.openMapPage(context, info)
+        }
     }
 
     override fun getItemCount(): Int = data.size

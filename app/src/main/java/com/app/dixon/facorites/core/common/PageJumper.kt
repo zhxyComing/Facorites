@@ -15,6 +15,7 @@ import com.app.dixon.facorites.page.entry.AllEntryActivity
 import com.app.dixon.facorites.page.entry.EntryActivity
 import com.app.dixon.facorites.page.home.HomeActivity
 import com.app.dixon.facorites.page.image.ImageActivity
+import com.app.dixon.facorites.page.map.MapActivity
 
 /**
  * 全路径：com.app.dixon.facorites.core.common
@@ -53,6 +54,18 @@ object PageJumper {
         resultJump(asContext) {
             val intent = Intent(it, EntryActivity::class.java).apply {
                 putExtra(CATEGORY_INFO, categoryInfo)
+            }
+            startActivity(it, intent, requestCode)
+        }
+    }
+
+    /**
+     * 打开层级结构页
+     */
+    fun openMapPage(asContext: Any, categoryInfo: CategoryInfoBean, requestCode: Int = -1) {
+        resultJump(asContext) {
+            val intent = Intent(it, MapActivity::class.java).apply {
+                putExtra(MAP_CATEGORY, categoryInfo)
             }
             startActivity(it, intent, requestCode)
         }

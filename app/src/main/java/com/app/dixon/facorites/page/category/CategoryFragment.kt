@@ -9,7 +9,9 @@ import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.dixon.facorites.R
+import com.app.dixon.facorites.base.ContextAssistant
 import com.app.dixon.facorites.base.VisibleExtensionFragment
+import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.common.SORT_TYPE_NAME
 import com.app.dixon.facorites.core.common.SORT_TYPE_TIME
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean

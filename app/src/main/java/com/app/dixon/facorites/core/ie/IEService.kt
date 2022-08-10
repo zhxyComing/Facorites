@@ -127,7 +127,6 @@ object IEService : IService {
         val size = parseLinkNumber(FileUtils.readStringAbs(file.absolutePath))
         if (size == 0) {
             backUi { onFail?.invoke("未找到有效链接") }
-            file.delete()
             return
         }
         val lineList = FileUtils.readStringByLineAbs(file.absolutePath)
