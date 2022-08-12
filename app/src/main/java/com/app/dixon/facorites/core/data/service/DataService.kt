@@ -394,6 +394,7 @@ object DataService : IService {
         }
     }
 
+    // 如果是文件夹Entry，不仅要修改Entry，还要修改文件夹信息
     private fun doUpdateEntry(origin: BaseEntryBean, updater: BaseEntryBean, callback: Callback<BaseEntryBean>?) {
         // 同一文件夹做修改
         if (origin.belongTo == updater.belongTo) {
@@ -419,7 +420,6 @@ object DataService : IService {
                     if (success) {
                         // 更新内存数据
                         entryMap[categoryId]?.set(index, updater)
-                        // 分类只能修改至同一文件夹下
                         if (origin is CategoryEntryBean && updater is CategoryEntryBean) {
                             doUpdateChildCategory(origin.categoryInfoBean, updater.categoryInfoBean) {
                                 callback?.onSuccess(updater)
@@ -486,6 +486,20 @@ object DataService : IService {
             val success = FileUtils.appendString("$ROOT_PATH/${updater.belongTo}", updater.toJson() + "\n")
             if (success) {
                 entryMap[updater.belongTo]?.add(updater)
+                if (origin is CategoryEntryBean && updater is CategoryEntryBean) {
+                    doUpdateChildCategory(origin.categoryInfoBean, updater.categoryInfoBean) {
+                        callback?.onSuccess(updater)
+                        callbackRegister(entryCallbacks) {
+                            if (it.id == origin.belongTo || it.id == updater.belongTo) {
+                                it.onDataUpdated(updater)
+                            }
+                        }
+                        callbackRegister(globalEntryCallbacks) {
+                            it.onDataUpdated(updater)
+                        }
+                    }
+                    return
+                }
                 // 回调注册
                 backUi {
                     callback?.onSuccess(updater)

@@ -5,16 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.app.dixon.facorites.R
-import com.app.dixon.facorites.core.ex.dpF
 import com.app.dixon.facorites.core.util.mediumFont
 import com.app.dixon.facorites.core.util.normalFont
-import com.gyso.treeview.adapter.DrawInfo
-import com.gyso.treeview.adapter.TreeViewAdapter
-import com.gyso.treeview.adapter.TreeViewHolder
-import com.gyso.treeview.line.AngledLine
-import com.gyso.treeview.line.BaseLine
-import com.gyso.treeview.model.NodeModel
 import kotlinx.android.synthetic.main.app_content_tree_map.view.*
+import treeview.adapter.DrawInfo
+import treeview.adapter.TreeViewAdapter
+import treeview.adapter.TreeViewHolder
+import treeview.line.AngledLine
+import treeview.line.BaseLine
+import treeview.model.NodeModel
 
 
 class MapTreeViewAdapter(val itemClick: ((BaseNodeData) -> Unit)? = null) : TreeViewAdapter<BaseNodeData>() {

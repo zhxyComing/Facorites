@@ -2,29 +2,31 @@ package com.app.dixon.facorites.page.map
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.BaseActivity
 import com.app.dixon.facorites.core.common.MAP_CATEGORY
 import com.app.dixon.facorites.core.common.PageJumper
-import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
-import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
-import com.app.dixon.facorites.core.data.bean.ImageEntryBean
-import com.app.dixon.facorites.core.data.bean.LinkEntryBean
+import com.app.dixon.facorites.core.data.bean.*
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.isValidUrl
 import com.app.dixon.facorites.core.ex.process
 import com.app.dixon.facorites.core.util.ClipUtil
+import com.app.dixon.facorites.core.util.Ln
+import com.app.dixon.facorites.core.util.mediumFont
+import com.dixon.dlibrary.util.HandlerUtil
 import com.dixon.dlibrary.util.ToastUtil
-import com.gyso.treeview.adapter.TreeViewAdapter
-import com.gyso.treeview.layout.RightTreeLayoutManager
-import com.gyso.treeview.layout.TreeLayoutManager
-import com.gyso.treeview.line.BaseLine
-import com.gyso.treeview.line.StraightLine
-import com.gyso.treeview.model.NodeModel
-import com.gyso.treeview.model.TreeModel
 import kotlinx.android.synthetic.main.activity_map.*
+import treeview.adapter.TreeViewAdapter
+import treeview.layout.RightTreeLayoutManager
+import treeview.layout.TreeLayoutManager
+import treeview.line.BaseLine
+import treeview.line.StraightLine
+import treeview.listener.TreeViewControlListener
+import treeview.model.NodeModel
+import treeview.model.TreeModel
 
-
+// TODO 优化代码
 class MapActivity : BaseActivity() {
 
     private lateinit var categoryInfoBean: CategoryInfoBean
@@ -32,6 +34,7 @@ class MapActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
+        editMode.mediumFont()
 
         intent.getParcelableExtra<CategoryInfoBean>(MAP_CATEGORY)?.let {
             categoryInfoBean = it
@@ -71,6 +74,85 @@ class MapActivity : BaseActivity() {
         addNode(treeModel, categoryInfoBean.id, rootNode)
 
         adapter.treeModel = treeModel
+
+        // editor
+        with(treeView.editor) {
+            focusMidLocation()
+            editMode.setOnCheckedChangeListener { _, isChecked ->
+                requestMoveNodeByDragging(isChecked)
+            }
+
+            treeView.setTreeViewControlListener(object : TreeViewControlListener {
+                // 缩放
+                override fun onScaling(state: Int, percent: Int) {
+
+                }
+
+                // 拖动
+                override fun onDragMoveNodesHit(draggingNode: NodeModel<*>?, hittingNode: NodeModel<*>?, draggingView: View?, hittingView: View?) {
+                    // 拖动过程中每次节点的碰撞都会触发，由于检测不到最终链接，所以无法使用
+                }
+
+                // 拖动结束
+                override fun onDragOver(draggingNode: NodeModel<*>?, newParentNode: NodeModel<*>?, pastParentNode: NodeModel<*>?) {
+                    Ln.i("拖动结束", "拖动节点_$draggingNode 新父级节点_$newParentNode 老父级节点_$pastParentNode")
+                    if (draggingNode != null && newParentNode != null && pastParentNode != null) {
+                        // 场景一 文件夹没变
+                        if (newParentNode == pastParentNode) return
+                        // 场景二 拖动文件到文件下 无效
+                        if (newParentNode.value is EntryNodeData) {
+                            ToastUtil.toast("不能将收藏归属到另一收藏下哦～")
+                            removeNode(draggingNode)
+                            addChildNodes(pastParentNode, draggingNode)
+                            adapter.treeModel = treeModel
+                            return
+                        }
+                        // 场景三 拖动文件到文件夹下
+                        if (newParentNode.value is CategoryNodeData && draggingNode.value is EntryNodeData) {
+                            val updater = (draggingNode.value as EntryNodeData).entry
+                            val newBelongTo = (newParentNode.value as CategoryNodeData).categoryInfoBean.id
+                            var newEntry: BaseEntryBean? = null
+                            updater.process({
+                                newEntry = LinkEntryBean(it.link, it.title, it.remark, it.schemeJump, it.date, newBelongTo, it.star)
+                            }, {
+                                newEntry = ImageEntryBean(it.path, it.title, it.hideBg, it.date, newBelongTo, it.star)
+                            }, {})
+                            newEntry?.let {
+                                DataService.updateEntry(updater, it)
+                            }
+                            return
+                        }
+                        // 场景四 拖动文件夹到文件夹下
+                        if (newParentNode.value is CategoryNodeData && draggingNode.value is CategoryNodeData) {
+                            val updater = (draggingNode.value as CategoryNodeData).categoryInfoBean
+                            val newBelongTo = (newParentNode.value as CategoryNodeData).categoryInfoBean.id
+                            // 找到文件夹对应的条目，根文件夹没有所属条目，所以无法走下面逻辑，也就无法移到子文件夹下
+                            DataService.getCategoryList().forEach { categoryInfo ->
+                                DataService.getEntryList(categoryInfo.id)?.forEach { entry ->
+                                    if (entry.date == updater.id && entry is CategoryEntryBean) {
+                                        val newCategoryInfoBean = CategoryInfoBean(
+                                            entry.categoryInfoBean.id,
+                                            entry.categoryInfoBean.name,
+                                            entry.categoryInfoBean.bgPath,
+                                            entry.categoryInfoBean.topTimeMs,
+                                            belongTo = newBelongTo
+                                        )
+                                        val newEntry = CategoryEntryBean(
+                                            newCategoryInfoBean,
+                                            entry.date,
+                                            belongTo = newBelongTo,
+                                            entry.star
+                                        )
+                                        DataService.updateEntry(entry, newEntry)
+                                        return
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+        }
     }
 
     private fun addNode(treeModel: TreeModel<BaseNodeData>, categoryId: Long, rootNode: NodeModel<BaseNodeData>) {

@@ -61,7 +61,7 @@ dependencies {
     implementation 'com.github.tiagohm.MarkdownView:library:0.19.0'
     // 权限申请框架
     implementation 'com.github.getActivity:XXPermissions:15.0'
-    // 思维导图框架
-    implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
-    implementation 'io.github.guaishoun:gyso-treeview:1.0.1'
+    // 思维导图框架 已拷贝进源码
+//    implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
+//    implementation 'io.github.guaishoun:gyso-treeview:1.0.1'
 }

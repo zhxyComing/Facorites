@@ -32,4 +32,13 @@
         <item name="android:windowExitAnimation">@anim/app_dialog_exit</item>
     </style>
 
+    <style name="SwitchBar" parent="Theme.AppCompat.Light">
+        <!--开启时的颜色-->
+        <item name="colorControlActivated">@color/app_theme_red</item>
+        <!--关闭时的颜色-->
+        <item name="colorSwitchThumbNormal">@color/white</item>
+        <!--关闭时的轨迹颜色-->
+        <item name="android:colorForeground">@color/app_theme_grey</item>
+    </style>
+
 </resources>

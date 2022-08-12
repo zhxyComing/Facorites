@@ -38,6 +38,7 @@
         <entry key="..\:/Work/Facorites/app/src/main/res/layout/app_item_entry.xml" value="0.14635416666666667" />
         <entry key="..\:/Work/Facorites/app/src/main/res/layout/app_view_link_card.xml" value="0.33" />
         <entry key="app/src/main/res/drawable/app_select_edit_top_bar_back.xml" value="0.3345" />
+        <entry key="app/src/main/res/drawable/app_select_edit_top_bar_save.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_select_map_category.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_select_map_entry.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_shape_browse_search.xml" value="0.2575" />
@@ -45,6 +46,8 @@
         <entry key="app/src/main/res/drawable/app_shape_create_entry_add.xml" value="0.190625" />
         <entry key="app/src/main/res/drawable/app_shape_create_entry_cancel.xml" value="0.190625" />
         <entry key="app/src/main/res/drawable/app_shape_edit_top_bar_back_normal.xml" value="0.3345" />
+        <entry key="app/src/main/res/drawable/app_shape_edit_top_bar_save_normal.xml" value="0.1375" />
+        <entry key="app/src/main/res/drawable/app_shape_edit_top_bar_save_press.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_shape_entry_category_tag.xml" value="0.148" />
         <entry key="app/src/main/res/drawable/app_shape_entry_function.xml" value="0.1735" />
         <entry key="app/src/main/res/drawable/app_shape_fragment_category_top_bar.xml" value="0.3609375" />
@@ -77,7 +80,7 @@
         <entry key="app/src/main/res/layout/activity_entry.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_image.xml" value="0.171875" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_map.xml" value="0.20199275362318841" />
+        <entry key="app/src/main/res/layout/activity_map.xml" value="0.25" />
         <entry key="app/src/main/res/layout/app_content_file_function.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_content_tree_map.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_content_web_pop.xml" value="0.38697916666666665" />
