@@ -18,7 +18,6 @@ import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.app.dixon.facorites.page.home.CATEGORY_BG_IMAGE_REQUEST
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
-import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import kotlinx.android.synthetic.main.app_dialog_update_category_content.*
 import kotlinx.android.synthetic.main.app_dialog_update_category_content.bgView
 import kotlinx.android.synthetic.main.app_dialog_update_category_content.categoryChoose
@@ -133,12 +132,13 @@ class UpdateChildCategoryDialog(context: Context, val categoryEntryBean: Categor
     private fun initSpinner() {
         val expendInfoList = mutableListOf<CustomSpinner.ExpandInfo<CategoryInfoBean>>()
         DataService.getCategoryList().forEach {
+            if (it.id == categoryEntryBean.date) return@forEach // 不能设置分类是自己
             expendInfoList.add(CustomSpinner.ExpandInfo(it.name, it.bgPath, it))
         }
         categoryChoose.setData(expendInfoList)
         categoryChoose.setShowPos(CustomSpinner.ShowPos.TOP)
         expendInfoList.findIndexByCondition {
-            it.data.id == categoryEntryBean.date
+            it.data.id == categoryEntryBean.belongTo
         }?.let { index ->
             categoryChoose.setSelection(index)
         }

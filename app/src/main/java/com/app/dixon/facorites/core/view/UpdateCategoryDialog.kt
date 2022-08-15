@@ -7,6 +7,7 @@ import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.bean.ImageEntryBean
 import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.ex.hide
 import com.app.dixon.facorites.core.ex.setImageByUri
 import com.app.dixon.facorites.core.ex.shakeTip
 import com.app.dixon.facorites.core.util.ImageSelectHelper
@@ -46,6 +47,7 @@ class UpdateCategoryDialog(context: Context, val categoryInfoBean: CategoryInfoB
     override fun initDialog() {
         EventBus.getDefault().register(this)
         flContainer.normalFont()
+        categoryChoose.hide()
         etInput.setText(categoryInfoBean.name)
         tvUpdate.setOnClickListener {
             val newTitle = etInput.text.toString()

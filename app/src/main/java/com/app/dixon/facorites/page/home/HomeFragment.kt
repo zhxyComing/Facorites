@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
 import android.widget.PopupWindow
@@ -23,15 +24,13 @@ import com.app.dixon.facorites.core.common.*
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
-import com.app.dixon.facorites.core.ex.findByCondition
-import com.app.dixon.facorites.core.ex.hide
-import com.app.dixon.facorites.core.ex.process
-import com.app.dixon.facorites.core.ex.show
+import com.app.dixon.facorites.core.ex.*
 import com.app.dixon.facorites.core.util.*
 import com.app.dixon.facorites.core.view.EntryView
 import com.app.dixon.facorites.page.edit.event.LastEntryNumUpdateEvent
 import com.app.dixon.facorites.page.entry.EntryAdapter
 import com.app.dixon.facorites.page.entry.Openable
+import com.dixon.dlibrary.util.AnimationUtil
 import com.dixon.dlibrary.util.SharedUtil
 import com.facebook.drawee.view.SimpleDraweeView
 import kotlinx.android.synthetic.main.app_custom_spinner_expand.view.rvExpand
@@ -102,18 +101,30 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         var initStartTime = System.currentTimeMillis()
         initBanner()
         Ln.i("HomeFragmentInit", "initBanner ${System.currentTimeMillis() - initStartTime}")
-        initStartTime = System.currentTimeMillis()
-        initEntryData()
-        Ln.i("HomeFragmentInit", "initEntryData ${System.currentTimeMillis() - initStartTime}")
-        initStartTime = System.currentTimeMillis()
-        initEntryView()
-        Ln.i("HomeFragmentInit", "initEntryView ${System.currentTimeMillis() - initStartTime}")
+        DataService.addInitCompleteListener {
+            // 避开Banner加载动画
+            HandlerUtil.postIdle{
+                var asyncStartTime = System.currentTimeMillis()
+                initEntryData()
+                Ln.i("HomeFragmentInit", "initEntryData ${System.currentTimeMillis() - asyncStartTime}")
+                asyncStartTime = System.currentTimeMillis()
+                initEntryView()
+                Ln.i("HomeFragmentInit", "initEntryView ${System.currentTimeMillis() - asyncStartTime}")
+                showCardLayoutInAnim()
+                asyncStartTime = System.currentTimeMillis()
+                initSearchView()
+                Ln.i("HomeFragmentInit", "initSearchView ${System.currentTimeMillis() - asyncStartTime}")
+            }
+        }
         initStartTime = System.currentTimeMillis()
         initOtherView()
         Ln.i("HomeFragmentInit", "initOtherView ${System.currentTimeMillis() - initStartTime}")
-        initStartTime = System.currentTimeMillis()
-        initSearchView()
-        Ln.i("HomeFragmentInit", "initSearchView ${System.currentTimeMillis() - initStartTime}")
+    }
+
+    private fun showCardLayoutInAnim() {
+        AnimationUtil.alpha(cardLayout, 0f, 1f).start()
+        AnimationUtil.alpha(entryTip, 0f, 1f).start()
+        loading.hide()
     }
 
     private fun initSearchView() {
@@ -356,6 +367,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
             }
         }
         allEntry.sortByDescending { it.date }
+        Ln.i("HomeAllEntry", "size: ${allEntry.size}\n data: $allEntry")
         val size = minOf(allEntry.size, maxEntryNum)
         for (index in 0 until size) {
             entries.add(allEntry[index])

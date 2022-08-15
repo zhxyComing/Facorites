@@ -30,11 +30,13 @@ class MapTreeViewAdapter(val itemClick: ((BaseNodeData) -> Unit)? = null) : Tree
         val node: NodeModel<BaseNodeData> = holder.node
         val nodeData = node.value
         if (nodeData is CategoryNodeData) {
-            itemView.tvItemTitle.setBackgroundResource(R.drawable.app_select_map_category)
+            itemView.container.setBackgroundResource(R.drawable.app_select_map_category)
             itemView.tvItemTitle.mediumFont()
+            itemView.ivImage.setImageResource(R.drawable.app_icon_copy)
         } else {
-            itemView.tvItemTitle.setBackgroundResource(R.drawable.app_select_map_entry)
+            itemView.container.setBackgroundResource(R.drawable.app_select_map_entry)
             itemView.tvItemTitle.normalFont()
+            itemView.ivImage.setImageResource(R.drawable.app_icon_update)
         }
         itemView.tvItemTitle.text = nodeData.name
         itemView.tvItemTitle.setOnClickListener {

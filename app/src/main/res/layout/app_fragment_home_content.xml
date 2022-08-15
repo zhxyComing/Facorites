@@ -125,6 +125,17 @@
                 android:layout_marginTop="20dp"
                 android:text="-- 仅展示最近五条 --"
                 android:textColor="#E0E0E0"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/loading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:text="加载中..."
+                android:textColor="#909090"
                 android:textSize="12sp" />
 
             <LinearLayout

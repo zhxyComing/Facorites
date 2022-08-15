@@ -103,8 +103,28 @@ object DataService : IService {
                 )
             }
             Ln.i("DataService", "init cost time ${System.currentTimeMillis() - initStartTime}")
+            // 初始化完成，清除回调，用不着了
+            backUi {
+                initCallback?.let {
+                    it.forEach { action ->
+                        action.invoke()
+                    }
+                    it.clear()
+                    initCallback = null
+                }
+            }
         }
     }
+
+    private var initCallback: MutableList<() -> Unit>? = mutableListOf()
+
+    /**
+     * 添加初始化回调
+     *
+     * 进入页面初始化没完成：添加回调，初始化完成后回调
+     * 进入页面初始化已结束：callback 被置空，无法添加回调，此时直接回调即可
+     */
+    fun addInitCompleteListener(initComplete: () -> Unit) = initCallback?.add(initComplete) ?: initComplete.invoke()
 
     private fun addCategoryData(categoryInfoBean: CategoryInfoBean) {
         categoryList.add(categoryInfoBean)
