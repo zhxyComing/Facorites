@@ -201,7 +201,6 @@ class MineFragment : VisibleExtensionFragment() {
                     ToastUtil.toast("书签导入失败：$msg")
                     progressDialog.dismiss()
                 }, onSuccess = {
-                    Log.e("testkkk","导入成功")
                     backUi(500) {
                         progressDialog.dismiss()
                         OptionDialog(
