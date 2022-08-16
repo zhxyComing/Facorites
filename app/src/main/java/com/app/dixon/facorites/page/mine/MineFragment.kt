@@ -15,6 +15,7 @@ import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.core.ie.IEService
 import com.app.dixon.facorites.core.util.ClipUtil
+import com.app.dixon.facorites.core.util.mediumFont
 import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.core.view.FileExploreDialog
 import com.app.dixon.facorites.core.view.OptionDialog
@@ -43,6 +44,7 @@ class MineFragment : VisibleExtensionFragment() {
         savedInstanceState: Bundle?
     ): View = inflater.inflate(R.layout.app_fragment_mine_content, container, false).apply {
         normalFont()
+        findViewById<View>(R.id.tvPageTitle).mediumFont()
     }
 
     override fun onVisibleFirst() {

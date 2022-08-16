@@ -238,6 +238,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         entryBgMask.show()
         categoryTag.show()
         tvMap.show()
+        vEntryTag.hide()
     }
 
     fun setLinkEntry(bean: LinkEntryBean, categoryTagShow: Boolean = true) {
@@ -290,6 +291,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         entryBgMask.hide()
         categoryTag.hide()
         tvMap.hide()
+        vEntryTag.setBackgroundColor(resources.getColor(R.color.md_red_400))
     }
 
     fun setImageEntry(bean: ImageEntryBean, categoryTagShow: Boolean = true) {
@@ -349,6 +351,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         entryBgMask.show()
         categoryTag.hide()
         tvMap.hide()
+        vEntryTag.setBackgroundColor(resources.getColor(R.color.md_blue_400))
     }
 
     fun clear() {

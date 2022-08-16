@@ -73,6 +73,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         normalFont()
         findViewById<View>(R.id.tvLastCollection).mediumFont()
         findViewById<View>(R.id.tvGuide).mediumFont()
+        findViewById<View>(R.id.etSearch).mediumFont()
     }
 
     // 添加条目卡片View

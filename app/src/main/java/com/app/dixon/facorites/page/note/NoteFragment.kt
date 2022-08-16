@@ -13,6 +13,7 @@ import com.app.dixon.facorites.core.data.bean.NoteBean
 import com.app.dixon.facorites.core.data.service.NoteService
 import com.app.dixon.facorites.core.ex.hide
 import com.app.dixon.facorites.core.ex.show
+import com.app.dixon.facorites.core.util.mediumFont
 import com.app.dixon.facorites.core.util.normalFont
 import kotlinx.android.synthetic.main.app_fragment_note_content.*
 
@@ -32,6 +33,7 @@ class NoteFragment : VisibleExtensionFragment(), NoteService.INoteChanged {
         savedInstanceState: Bundle?
     ): View = inflater.inflate(R.layout.app_fragment_note_content, container, false).apply {
         normalFont()
+        findViewById<View>(R.id.tvPageTitle).mediumFont()
     }
 
     override fun onVisibleFirst() {

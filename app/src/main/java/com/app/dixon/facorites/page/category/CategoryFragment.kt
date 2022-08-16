@@ -61,6 +61,8 @@ class CategoryFragment : VisibleExtensionFragment(), DataService.ICategoryChange
     ): View = inflater.inflate(R.layout.app_fragment_category_content, container, false).apply {
         normalFont()
         findViewById<View>(R.id.sort).mediumFont()
+        findViewById<View>(R.id.tvPageTitle).mediumFont()
+        findViewById<View>(R.id.ivCreateCategory).mediumFont()
     }
 
     override fun onVisibleFirst() {

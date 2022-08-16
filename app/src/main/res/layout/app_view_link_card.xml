@@ -66,7 +66,7 @@
             <View
                 android:id="@+id/tagLine"
                 android:layout_width="7dp"
-                android:layout_height="1px"
+                android:layout_height="1dp"
                 android:layout_gravity="center"
                 android:layout_marginStart="3dp"
                 android:background="@color/md_grey_500" />
@@ -300,7 +300,7 @@
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:padding="2dp"
-                            android:src="@drawable/app_icon_map" />
+                            android:src="@drawable/app_icon_map_for_item" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -342,5 +342,11 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <View
+        android:id="@+id/vEntryTag"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="@color/app_theme_red" />
 
 </FrameLayout>

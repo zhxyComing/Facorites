@@ -169,7 +169,7 @@ object DataService : IService {
         } else {
             callback?.backUi { invoke(-1L) }
         }
-        Ln.i("DataService") { "创建分类后的分类信息：${FileUtils.readString("$ROOT_PATH/$CATEGORY_INFO_PATH")}" }
+        Ln.safeI("DataService") { "创建分类后的分类信息：${FileUtils.readString("$ROOT_PATH/$CATEGORY_INFO_PATH")}" }
     }
 
     // 创建子文件用 没有回调全局
@@ -194,7 +194,7 @@ object DataService : IService {
         } else {
             callback?.backUi { invoke(-1L) }
         }
-        Ln.i("DataService") { "创建分类后的分类信息：${FileUtils.readString("$ROOT_PATH/$CATEGORY_INFO_PATH")}" }
+        Ln.safeI("DataService") { "创建分类后的分类信息：${FileUtils.readString("$ROOT_PATH/$CATEGORY_INFO_PATH")}" }
     }
 
     /**
@@ -595,7 +595,7 @@ object DataService : IService {
             }
         } ?: callback?.backUi { onFail("查找分类失败") }
 
-        Ln.i("DataService") { "创建条目后的条目数据：${FileUtils.readString("$ROOT_PATH/$categoryId")}" }
+        Ln.safeI("DataService") { "创建条目后的条目数据：${FileUtils.readString("$ROOT_PATH/$categoryId")}" }
     }
 
     // 特殊 给导入使用
@@ -625,7 +625,7 @@ object DataService : IService {
                     }
                 }
             }
-            Ln.i("DataService") { "创建条目后的条目数据：${FileUtils.readString("$ROOT_PATH/$categoryId")}" }
+            Ln.safeI("DataService") { "创建条目后的条目数据：${FileUtils.readString("$ROOT_PATH/$categoryId")}" }
         }
         // 回调全局EntryCreate事件
         callbackRegister(globalEntryCallbacks) { register ->

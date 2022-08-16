@@ -92,6 +92,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/tvPageTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="设置中心"
@@ -139,19 +140,20 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginBottom="10dp"
+                    android:background="#404040"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="14dp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="10dp"
                     android:text="导入与导出"
-                    android:textColor="#909090"
+                    android:textColor="@color/white"
                     android:textSize="14sp" />
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:background="@color/white" />
+                    android:layout_height="2dp"
+                    android:background="@color/app_theme_red" />
 
                 <LinearLayout
                     android:id="@+id/appExportBookmark"
@@ -291,19 +293,20 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginBottom="10dp"
+                    android:background="#404040"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="14dp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="10dp"
                     android:text="通用"
-                    android:textColor="#909090"
+                    android:textColor="@color/white"
                     android:textSize="14sp" />
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:background="@color/white" />
+                    android:layout_height="2dp"
+                    android:background="@color/app_theme_red" />
 
                 <LinearLayout
                     android:id="@+id/appEdit"

@@ -17,7 +17,7 @@
             android:layout_marginTop="50dp"
             android:layout_marginEnd="20dp"
             android:background="@drawable/app_shape_search"
-            android:drawableStart="@drawable/app_search_icon"
+            android:drawableStart="@drawable/app_search_icon_v2"
             android:drawablePadding="6dp"
             android:hint="搜索"
             android:imeOptions="actionSearch"
@@ -26,7 +26,7 @@
             android:paddingEnd="32dp"
             android:paddingBottom="8dp"
             android:singleLine="true"
-            android:textColor="#909090"
+            android:textColor="#404040"
             android:textSize="14sp" />
 
         <ImageView
@@ -128,13 +128,13 @@
                 android:textSize="12sp"
                 android:visibility="gone" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/loading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
-                android:text="加载中..."
+                android:src="@drawable/app_icon_loading"
                 android:textColor="#909090"
                 android:textSize="12sp" />
 

@@ -35,6 +35,7 @@ class AllEntryActivity : BaseActivity() {
         setContentView(R.layout.activity_all_entry)
         normalFont()
         findViewById<View>(R.id.sort).mediumFont()
+        findViewById<View>(R.id.tvCategoryName).mediumFont()
 
         // 注意：Callback不能使用局部变量，否则有页面还在、Callback被回收的风险
         callback = DataChangedCallback()

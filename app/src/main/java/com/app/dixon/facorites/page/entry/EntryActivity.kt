@@ -45,6 +45,8 @@ class EntryActivity : BaseActivity() {
         setContentView(R.layout.activity_entry)
         normalFont()
         findViewById<View>(R.id.sort).mediumFont()
+        findViewById<View>(R.id.tvCategoryName).mediumFont()
+        findViewById<View>(R.id.ivCreateCategory).mediumFont()
 
         intent.getParcelableExtra<CategoryInfoBean>(CATEGORY_INFO)?.let {
             categoryInfo = it

@@ -23,6 +23,7 @@ import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.dixon.dlibrary.util.Ln
 import com.dixon.dlibrary.util.ScreenUtil
+import com.dixon.dlibrary.util.SharedUtil
 import com.dixon.dlibrary.util.ToastUtil
 import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import org.greenrobot.eventbus.EventBus
