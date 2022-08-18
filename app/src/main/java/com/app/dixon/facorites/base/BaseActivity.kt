@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -17,10 +18,13 @@ import com.app.dixon.facorites.core.data.service.base.DocumentFileUtils
 import com.app.dixon.facorites.core.ex.dp
 import com.app.dixon.facorites.core.util.ImageSelectHelper
 import com.app.dixon.facorites.core.util.Ln
+import com.app.dixon.facorites.core.view.ENTRY_GALLERY_REQUEST
 import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
+import com.app.dixon.facorites.page.gallery.event.GalleryCompleteEvent
 import com.app.dixon.facorites.page.home.CATEGORY_BG_IMAGE_REQUEST
 import com.dixon.dlibrary.util.StatusBarUtil
+import com.dixon.dlibrary.util.ToastUtil
 import com.yalantis.ucrop.UCrop
 import org.greenrobot.eventbus.EventBus
 
@@ -101,6 +105,19 @@ open class BaseActivity : FragmentActivity() {
                 it.data?.let { uri ->
                     Ln.i("ImageResult", "$uri")
                     EventBus.getDefault().post(CategoryImageCompleteEvent(uri))
+                }
+            } else if (requestCode == ENTRY_GALLERY_REQUEST) {
+                it.data?.let { uri ->
+                    Ln.i("ImageResult", "$uri")
+                    EventBus.getDefault().post(GalleryCompleteEvent(mutableListOf(uri)))
+                }
+                it.clipData?.let { clip ->
+                    Ln.i("GalleryResult", "$clip")
+                    val res = mutableListOf<Uri>()
+                    for (index in 0 until clip.itemCount) {
+                        res.add(clip.getItemAt(index).uri)
+                    }
+                    EventBus.getDefault().post(GalleryCompleteEvent(res))
                 }
             } else {
                 // do nothing

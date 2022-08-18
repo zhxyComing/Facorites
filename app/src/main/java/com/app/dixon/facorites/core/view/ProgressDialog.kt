@@ -34,6 +34,7 @@ class ProgressDialog(context: Context, val title: String) : BaseDialog(context) 
 
     fun setProgress(progress: Int) {
         progressBar.progress = progress
+        tvProgress.text = "$progress%"
     }
 
     override fun onBackPressed() {

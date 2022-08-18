@@ -13,10 +13,7 @@ import android.view.animation.DecelerateInterpolator
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.common.SuccessCallback
-import com.app.dixon.facorites.core.data.bean.BaseEntryBean
-import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
-import com.app.dixon.facorites.core.data.bean.ImageEntryBean
-import com.app.dixon.facorites.core.data.bean.LinkEntryBean
+import com.app.dixon.facorites.core.data.bean.*
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.ex.*
 import com.app.dixon.facorites.core.util.*
@@ -35,6 +32,8 @@ import kotlinx.android.synthetic.main.app_view_link_card.view.*
  * 类描述：链接类型的卡片
  * 创建人：xuzheng
  * 创建时间：3/31/22 10:21 AM
+ *
+ * TODO 代码优化&拆解
  */
 
 private const val CLICK_DELAY_TIME = 500L
@@ -108,11 +107,18 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
 
         tvCopy.setOnClickListener {
-            // 只有链接才能复制
-            (bean as? LinkEntryBean)?.let { linkBean ->
-                ClipUtil.copyToClip(context, linkBean.link)
-                ToastUtil.toast("已复制到剪贴板")
-            }
+            bean?.process({ linkEntry ->
+                ClipUtil.copyToClip(context, linkEntry.link)
+            }, {
+                // 图片不能复制
+            }, {
+                // 文件夹不能复制
+            }, { wordEntry ->
+                ClipUtil.copyToClip(context, wordEntry.content)
+            }, {
+                // 图片集不能复制
+            })
+            ToastUtil.toast("已复制到剪贴板")
         }
 
         ivBrowse.setOnClickListener {
@@ -127,6 +133,10 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                 PageJumper.openImagePage(context, imageEntry.path)
             }, { categoryEntry ->
                 PageJumper.openEntryPage(context, categoryEntry.categoryInfoBean)
+            }, { wordEntry ->
+                PageJumper.openWordPage(context, wordEntry.content)
+            }, { galleryEntry ->
+                PageJumper.openGalleryPage(context, galleryEntry.path, galleryEntry.title)
             })
         }
 
@@ -168,6 +178,27 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                             star = star
                         )
                     )
+                }, { wordEntry ->
+                    DataService.updateEntry(
+                        it,
+                        WordEntryBean(
+                            content = wordEntry.content,
+                            date = wordEntry.date,
+                            belongTo = wordEntry.belongTo,
+                            star = star
+                        )
+                    )
+                }, { galleryEntry ->
+                    DataService.updateEntry(
+                        it,
+                        GalleryEntryBean(
+                            path = galleryEntry.path,
+                            title = galleryEntry.title,
+                            date = galleryEntry.date,
+                            belongTo = galleryEntry.belongTo,
+                            star = star
+                        )
+                    )
                 })
             }
         }
@@ -191,12 +222,17 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                     )
                 }, {
                     // 暂不支持文件夹隐藏背景
+                }, {
+                    // 语录目前没有背景
+                }, {
+                    // 相册集没有背景
                 })
             }
         }
 
         // 点击浏览层级
         tvMap.setOnClickListener {
+            // 只有文件夹能浏览层级
             (bean as? CategoryEntryBean)?.let {
                 PageJumper.openMapPage(context, it.categoryInfoBean)
             }
@@ -352,6 +388,64 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         categoryTag.hide()
         tvMap.hide()
         vEntryTag.setBackgroundColor(resources.getColor(R.color.md_blue_400))
+    }
+
+    fun setWordEntry(bean: WordEntryBean, categoryTagShow: Boolean = true) {
+        initWordUi()
+        this.bean = bean
+        title.text = bean.content
+        if (categoryTagShow) {
+            setCategoryTag(bean.belongTo)
+        } else {
+            hideCategoryTag()
+        }
+        tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
+        updateStarIcon()
+        icon.setActualImageResource(R.drawable.app_icon_word_entry_view_tag)
+    }
+
+    private fun initWordUi() {
+        tvSchemeJump.hide()
+        tvJump.hide()
+        tvHideBg.hide()
+        tvUpdate.show()
+        tvCopy.show()
+        ivBrowse.show()
+        tvDelete.show()
+        entryBg.hide()
+        entryBgMask.hide()
+        categoryTag.hide()
+        tvMap.hide()
+        vEntryTag.setBackgroundColor(resources.getColor(R.color.md_green_400))
+    }
+
+    fun setGalleryEntry(bean: GalleryEntryBean, categoryTagShow: Boolean = true) {
+        initGalleryUi()
+        this.bean = bean
+        title.text = bean.title
+        if (categoryTagShow) {
+            setCategoryTag(bean.belongTo)
+        } else {
+            hideCategoryTag()
+        }
+        tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
+        updateStarIcon()
+        icon.setActualImageResource(R.drawable.app_icon_gallery_entry_view_tag)
+    }
+
+    private fun initGalleryUi() {
+        tvSchemeJump.hide()
+        tvJump.hide()
+        tvHideBg.hide()
+        tvUpdate.show()
+        tvCopy.hide()
+        ivBrowse.show()
+        tvDelete.show()
+        entryBg.hide()
+        entryBgMask.hide()
+        categoryTag.hide()
+        tvMap.hide()
+        vEntryTag.setBackgroundColor(resources.getColor(R.color.md_orange_400))
     }
 
     fun clear() {

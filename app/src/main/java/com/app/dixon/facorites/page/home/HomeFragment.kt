@@ -104,7 +104,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         Ln.i("HomeFragmentInit", "initBanner ${System.currentTimeMillis() - initStartTime}")
         DataService.addInitCompleteListener {
             // 避开Banner加载动画
-            HandlerUtil.postIdle{
+            HandlerUtil.postIdle {
                 var asyncStartTime = System.currentTimeMillis()
                 initEntryData()
                 Ln.i("HomeFragmentInit", "initEntryData ${System.currentTimeMillis() - asyncStartTime}")
@@ -331,6 +331,10 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
                 }, { categoryEntry ->
                     // 虽然支持显示分类，但是首页不会展示分类
                     cardView.setCategoryEntry(categoryEntry)
+                }, { wordEntry ->
+                    cardView.setWordEntry(wordEntry)
+                }, { galleryEntry ->
+                    cardView.setGalleryEntry(galleryEntry)
                 })
             }
         }
@@ -432,6 +436,10 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
                     cardView?.setImageEntry(it)
                 }, {
                     // 收藏夹不显示在这里
+                }, {
+                    cardView?.setWordEntry(it)
+                }, {
+                    cardView?.setGalleryEntry(it)
                 })
                 // indexOf只是使用ID判断，并不代表内容一致，需要更新内容
                 entries[index] = bean

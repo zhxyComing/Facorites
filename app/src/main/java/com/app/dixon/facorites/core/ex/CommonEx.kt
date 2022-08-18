@@ -3,10 +3,7 @@ package com.app.dixon.facorites.core.ex
 import android.util.Patterns
 import android.webkit.URLUtil
 import com.app.dixon.facorites.core.common.AUTO_PARSE_LINK
-import com.app.dixon.facorites.core.data.bean.BaseEntryBean
-import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
-import com.app.dixon.facorites.core.data.bean.ImageEntryBean
-import com.app.dixon.facorites.core.data.bean.LinkEntryBean
+import com.app.dixon.facorites.core.data.bean.*
 import com.dixon.dlibrary.util.SharedUtil
 import java.lang.ref.WeakReference
 import java.net.URL
@@ -150,10 +147,18 @@ fun String.tryExtractHttpByMatcher(): String {
 /**
  * 根据BaseEntryBean的实际类型进行特殊处理
  */
-fun BaseEntryBean.process(linkAction: (linkEntry: LinkEntryBean) -> Unit, imageAction: (imageEntry: ImageEntryBean) -> Unit, categoryAction: (categoryEntry: CategoryEntryBean) -> Unit) {
+fun BaseEntryBean.process(
+    linkAction: (linkEntry: LinkEntryBean) -> Unit,
+    imageAction: (imageEntry: ImageEntryBean) -> Unit,
+    categoryAction: (categoryEntry: CategoryEntryBean) -> Unit,
+    wordAction: (wordEntry: WordEntryBean) -> Unit,
+    galleryAction: (GalleryEntryBean)->Unit
+) {
     (this as? LinkEntryBean)?.let(linkAction)
     (this as? ImageEntryBean)?.let(imageAction)
     (this as? CategoryEntryBean)?.let(categoryAction)
+    (this as? WordEntryBean)?.let(wordAction)
+    (this as? GalleryEntryBean)?.let(galleryAction)
 }
 
 /**

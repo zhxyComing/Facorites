@@ -41,6 +41,7 @@
         <entry key="app/src/main/res/drawable-anydpi/app_icon_note_next.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_select_edit_top_bar_back.xml" value="0.3345" />
         <entry key="app/src/main/res/drawable/app_select_edit_top_bar_save.xml" value="0.1375" />
+        <entry key="app/src/main/res/drawable/app_select_gallery_add.xml" value="0.265" />
         <entry key="app/src/main/res/drawable/app_select_main_tab_category.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_select_main_tab_display.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_select_main_tab_home.xml" value="0.1375" />
@@ -49,8 +50,12 @@
         <entry key="app/src/main/res/drawable/app_select_map_entry.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_shape_browse_search.xml" value="0.2575" />
         <entry key="app/src/main/res/drawable/app_shape_category_tag.xml" value="0.1375" />
+        <entry key="app/src/main/res/drawable/app_shape_clip_save_edit.xml" value="0.265" />
         <entry key="app/src/main/res/drawable/app_shape_create_entry_add.xml" value="0.190625" />
         <entry key="app/src/main/res/drawable/app_shape_create_entry_cancel.xml" value="0.190625" />
+        <entry key="app/src/main/res/drawable/app_shape_create_entry_input.xml" value="0.265" />
+        <entry key="app/src/main/res/drawable/app_shape_create_entry_input_v2.xml" value="0.265" />
+        <entry key="app/src/main/res/drawable/app_shape_create_word.xml" value="0.265" />
         <entry key="app/src/main/res/drawable/app_shape_edit_top_bar_back_normal.xml" value="0.3345" />
         <entry key="app/src/main/res/drawable/app_shape_edit_top_bar_save_normal.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_shape_edit_top_bar_save_press.xml" value="0.1375" />
@@ -61,6 +66,7 @@
         <entry key="app/src/main/res/drawable/app_shape_home_search_bg.xml" value="0.2265" />
         <entry key="app/src/main/res/drawable/app_shape_mask_category_entry.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_shape_mask_image_entry.xml" value="0.1375" />
+        <entry key="app/src/main/res/drawable/app_shape_progress.xml" value="0.265" />
         <entry key="app/src/main/res/drawable/app_shape_progress_bg_normal.xml" value="0.1375" />
         <entry key="app/src/main/res/drawable/app_shape_rect_grey.xml" value="0.20625" />
         <entry key="app/src/main/res/drawable/app_shape_round_rect_black.xml" value="0.1375" />
@@ -79,16 +85,18 @@
         <entry key="app/src/main/res/drawable/app_shape_select_normal.xml" value="0.3472222222222222" />
         <entry key="app/src/main/res/drawable/app_shape_select_press.xml" value="0.3472222222222222" />
         <entry key="app/src/main/res/drawable/app_shape_top_tag.xml" value="0.223" />
-        <entry key="app/src/main/res/layout/activity_about.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_about.xml" value="0.1937984496124031" />
         <entry key="app/src/main/res/layout/activity_all_entry.xml" value="0.20199275362318841" />
         <entry key="app/src/main/res/layout/activity_browse.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_course.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_course.xml" value="0.125" />
         <entry key="app/src/main/res/layout/activity_crop.xml" value="0.17604166666666668" />
         <entry key="app/src/main/res/layout/activity_edit.xml" value="0.38697916666666665" />
         <entry key="app/src/main/res/layout/activity_entry.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_gallery.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_image.xml" value="0.171875" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_map.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_word.xml" value="0.1072961373390558" />
         <entry key="app/src/main/res/layout/app_content_file_function.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_content_tree_map.xml" value="0.335" />
         <entry key="app/src/main/res/layout/app_content_web_pop.xml" value="0.38697916666666665" />
@@ -100,10 +108,12 @@
         <entry key="app/src/main/res/layout/app_dialog_category_edit_content.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_dialog_clip_save_content.xml" value="0.33229166666666665" />
         <entry key="app/src/main/res/layout/app_dialog_create_category_content.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/app_dialog_create_entry_content.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/app_dialog_create_entry_content.xml" value="0.1488095238095238" />
+        <entry key="app/src/main/res/layout/app_dialog_create_gallery_entry_content.xml" value="0.12376237623762376" />
         <entry key="app/src/main/res/layout/app_dialog_create_image_entry_content.xml" value="0.335" />
         <entry key="app/src/main/res/layout/app_dialog_file_explore_content.xml" value="0.33229166666666665" />
         <entry key="app/src/main/res/layout/app_dialog_option.xml" value="0.33229166666666665" />
+        <entry key="app/src/main/res/layout/app_dialog_progress.xml" value="0.30416666666666664" />
         <entry key="app/src/main/res/layout/app_dialog_scheme_jump_content.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_dialog_search.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_dialog_tip.xml" value="0.33229166666666665" />
@@ -119,6 +129,9 @@
         <entry key="app/src/main/res/layout/app_item_banner_home.xml" value="0.20199275362318841" />
         <entry key="app/src/main/res/layout/app_item_category.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_item_entry.xml" value="0.246875" />
+        <entry key="app/src/main/res/layout/app_item_gallery_import.xml" value="0.303125" />
+        <entry key="app/src/main/res/layout/app_item_gallery_import_footer.xml" value="0.30416666666666664" />
+        <entry key="app/src/main/res/layout/app_item_gallery_list.xml" value="0.30416666666666664" />
         <entry key="app/src/main/res/layout/app_item_note.xml" value="0.25" />
         <entry key="app/src/main/res/layout/app_view_link_card.xml" value="0.1" />
         <entry key="app/src/main/res/layout/item_file_explore.xml" value="0.335" />

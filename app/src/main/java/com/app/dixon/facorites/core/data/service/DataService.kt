@@ -1,10 +1,7 @@
 package com.app.dixon.facorites.core.data.service
 
 import com.app.dixon.facorites.core.common.Callback
-import com.app.dixon.facorites.core.data.bean.BaseEntryBean
-import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
-import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
-import com.app.dixon.facorites.core.data.bean.ImageEntryBean
+import com.app.dixon.facorites.core.data.bean.*
 import com.app.dixon.facorites.core.data.bean.io.toEntry
 import com.app.dixon.facorites.core.data.bean.io.toJson
 import com.app.dixon.facorites.core.data.service.base.FileUtils
@@ -249,6 +246,9 @@ object DataService : IService {
                     (it as? ImageEntryBean)?.let { _ ->
                         BitmapIOService.deleteBitmap(it.path)
                     }
+                    (it as? GalleryEntryBean)?.path?.forEach { path ->
+                        BitmapIOService.deleteBitmap(path)
+                    }
                 }
             } else {
                 Ln.e("DeleteCategory", "分类文件删除失败")
@@ -296,6 +296,9 @@ object DataService : IService {
                 deleteEntries?.forEach {
                     (it as? ImageEntryBean)?.let { _ ->
                         BitmapIOService.deleteBitmap(it.path)
+                    }
+                    (it as? GalleryEntryBean)?.path?.forEach { path ->
+                        BitmapIOService.deleteBitmap(path)
                     }
                 }
                 // 3.回调
@@ -543,6 +546,16 @@ object DataService : IService {
                 }
             }
         }
+        // 筛选被移除掉的图片 然后删掉
+        (origin as? GalleryEntryBean)?.let { originGalleryBean ->
+            (updater as? GalleryEntryBean)?.let { updaterGalleryBean ->
+                originGalleryBean.path.forEach { originPath ->
+                    if (!updaterGalleryBean.path.contains(originPath)) {
+                        BitmapIOService.deleteBitmap(originPath)
+                    }
+                }
+            }
+        }
     }
 
     private fun doCreateEntry(
@@ -693,6 +706,9 @@ object DataService : IService {
                 // 如果是图片Entry，删除本地转存的图片
                 (bean as? ImageEntryBean)?.let {
                     BitmapIOService.deleteBitmap(it.path)
+                }
+                (bean as? GalleryEntryBean)?.path?.forEach { path ->
+                    BitmapIOService.deleteBitmap(path)
                 }
             } else {
                 callback?.backUi { onFail("文件写入失败") }

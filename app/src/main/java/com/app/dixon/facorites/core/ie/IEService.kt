@@ -110,9 +110,15 @@ object IEService : IService {
                         "ICON=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA1ElEQVQ4jeWTIQ7CQBBF/9+0JMUgm2B7AzQcAYFAVvQUoCqqQHKCijqOQXqNSppUFsGGlGQQBELZNixYvvyz7+/sZJbLvQyqQidChBAZw0ZkSUHmB17sVIVOBLKCWKF3iYwFWFWFhhIi/AJt5xCh09d2NHWR5g0O6+HTq7VgvtOtTlQfHE1dwx95NDwj4AFfrgJlnjfkvBtp3iDNGygCi4lR/hzw+mYbdc7g3wNOun+n644aZ5vz0foTGTRLRUH2EwyAgkz5gRcT3IIsv7mZ4NYPvPgGL+xIUqFKOAoAAAAASUVORK5CYII=\"" +
                         ">${linkEntry.title}</A>\n"
                 FileUtils.appendStringAbs(filePath, linkContent)
-            }, {}, { categoryEntry ->
+            }, {
+               // 图片不参与书签导出
+            }, { categoryEntry ->
                 // 分类下的子文件夹
                 appendCategory(filePath, categoryEntry.categoryInfoBean, categoryRetract + 1)
+            }, {
+                // 一句话不参与书签导出
+            }, {
+                // 相册集不参与书签导出
             })
         }
         FileUtils.appendStringAbs(filePath, "$fatherRetract</DL><p>\n")

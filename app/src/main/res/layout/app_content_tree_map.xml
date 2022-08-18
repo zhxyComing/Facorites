@@ -11,8 +11,7 @@
         android:layout_height="24dp"
         android:layout_gravity="center"
         android:layout_marginStart="20dp"
-        android:layout_marginEnd="14dp"
-        android:src="@drawable/app_icon_copy" />
+        android:layout_marginEnd="14dp" />
 
     <TextView
         android:id="@+id/tvItemTitle"

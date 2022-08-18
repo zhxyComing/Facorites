@@ -6,24 +6,24 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.os.Build
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.CommonCallback
-import com.app.dixon.facorites.core.data.bean.BaseEntryBean
-import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
-import com.app.dixon.facorites.core.data.bean.ImageEntryBean
-import com.app.dixon.facorites.core.data.bean.LinkEntryBean
+import com.app.dixon.facorites.core.data.bean.*
 import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.data.service.JSoupService
 import com.app.dixon.facorites.core.enum.EntryType
 import com.app.dixon.facorites.core.ex.*
 import com.app.dixon.facorites.core.util.ImageSelectHelper
+import com.app.dixon.facorites.core.util.mediumFont
 import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
+import com.app.dixon.facorites.page.gallery.adapter.GalleryImportAdapter
+import com.app.dixon.facorites.page.gallery.event.GalleryCompleteEvent
 import com.dixon.dlibrary.util.Ln
 import com.dixon.dlibrary.util.ScreenUtil
-import com.dixon.dlibrary.util.SharedUtil
 import com.dixon.dlibrary.util.ToastUtil
 import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import org.greenrobot.eventbus.EventBus
@@ -33,6 +33,7 @@ import java.util.*
 
 
 const val ENTRY_IMAGE_REQUEST = 101
+const val ENTRY_GALLERY_REQUEST = 102
 
 // 创建用构造函数
 class CreateEntryDialog(
@@ -67,6 +68,10 @@ class CreateEntryDialog(
     // 是否点击了确认
     private var hasSave = false
 
+    // 图片集类型
+    private var galleryPath = mutableListOf<String>()
+    private var tempGalleryPath = mutableListOf<String>() // 新导入的临时图片 如果后续选择取消 则要删除掉这些新导入的图
+
     // 更新用构造函数
     constructor(
         context: Context, entry: BaseEntryBean,
@@ -93,6 +98,7 @@ class CreateEntryDialog(
         initCommonLogic()
         initLinkLogic()
         initImageLayout()
+        initGalleryLayout()
     }
 
     // 通用逻辑的初始化
@@ -103,10 +109,11 @@ class CreateEntryDialog(
         EventBus.getDefault().register(this)
         llContainer.normalFont()
         tvCreate.setOnClickListener {
-            if (dataType == EntryType.LINK) {
-                saveOrUpdateLink()
-            } else {
-                saveOrUpdateImage()
+            when (dataType) {
+                EntryType.LINK -> saveOrUpdateLink()
+                EntryType.IMAGE -> saveOrUpdateImage()
+                EntryType.WORD -> saveOrUpdateWord()
+                EntryType.GALLERY -> saveOrUpdateGallery()
             }
         }
         // 分类的下拉列表
@@ -124,12 +131,23 @@ class CreateEntryDialog(
         // 切换数据类型
         layoutChange.setOnClickListener {
             changeType()
-            if (dataType == EntryType.LINK) {
-                showLinkUi()
-                layoutChange.setImageResource(R.drawable.app_image_red)
-            } else {
-                showImageUi()
-                layoutChange.setImageResource(R.drawable.app_link_red)
+            when (dataType) {
+                EntryType.LINK -> {
+                    showLinkUi()
+                    layoutChange.setImageResource(R.drawable.app_image_red)
+                }
+                EntryType.IMAGE -> {
+                    showImageUi()
+                    layoutChange.setImageResource(R.drawable.app_icon_word_create_entry)
+                }
+                EntryType.WORD -> {
+                    showWordUi()
+                    layoutChange.setImageResource(R.drawable.app_icon_gallery_create_entry)
+                }
+                EntryType.GALLERY -> {
+                    showGalleryUi()
+                    layoutChange.setImageResource(R.drawable.app_link_red)
+                }
             }
         }
         // 更新 其它类型不显示 并往UI填充已有数据
@@ -146,9 +164,25 @@ class CreateEntryDialog(
             bgView.setImageByPath(imageEntry.path)
             imagePath = imageEntry.path
         }, {
-            // 暂不支持添加分类类型的收藏
+            // 文件夹以另外的方式创建
+        }, { wordEntry ->
+            dataType = EntryType.WORD
+            showWordUi()
+            etWordContent.setText(wordEntry.content)
+        }, { galleryEntry ->
+            dataType = EntryType.GALLERY
+            galleryPath.addAll(galleryEntry.path)
+            etGalleryTitle.setText(galleryEntry.title)
+            showGalleryUi()
         })
         tapeEntry?.let { layoutChange.hide() }
+
+        // 部分粗体
+        etWordContent.mediumFont()
+        tvLinkLayoutTitle.mediumFont()
+        tvImageLayoutTitle.mediumFont()
+        tvWordLayoutTitle.mediumFont()
+        tvGalleryLayoutTitle.mediumFont()
     }
 
     // 链接数据初始化逻辑
@@ -168,6 +202,7 @@ class CreateEntryDialog(
         // 带入弹窗的链接进行解析 比如外部分享跳转
         linkFromShare?.let {
             etEntryInput.setText(it)
+            etWordContent.setText(it)
             parseTitle(it)
         }
     }
@@ -175,11 +210,29 @@ class CreateEntryDialog(
     private fun showLinkUi() {
         linkLayout.show()
         imageLayout.hide()
+        wordLayout.hide()
+        galleryLayout.hide()
     }
 
     private fun showImageUi() {
         linkLayout.hide()
         imageLayout.show()
+        wordLayout.hide()
+        galleryLayout.hide()
+    }
+
+    private fun showWordUi() {
+        linkLayout.hide()
+        imageLayout.hide()
+        wordLayout.show()
+        galleryLayout.hide()
+    }
+
+    private fun showGalleryUi() {
+        linkLayout.hide()
+        imageLayout.hide()
+        wordLayout.hide()
+        galleryLayout.show()
     }
 
     // 保存链接
@@ -268,19 +321,138 @@ class CreateEntryDialog(
         }
     }
 
+    // 保存语录
+    private fun saveOrUpdateWord() {
+        val content = etWordContent.text.toString()
+        val categoryId = categoryChoose.getSelectionData<CategoryInfoBean>()?.id
+        if (content.isNotEmpty() && categoryId != null) {
+            if (editType == EDIT_TYPE_CREATE) {
+                DataService.createEntry(
+                    WordEntryBean(
+                        content = content,
+                        date = Date().time,
+                        belongTo = categoryId,
+                    ),
+                    callback
+                )
+            } else if (editType == EDIT_TYPE_UPDATE) {
+                (tapeEntry as? WordEntryBean)?.let {
+                    DataService.updateEntry(
+                        it,
+                        WordEntryBean(
+                            content = content,
+                            date = it.date,
+                            belongTo = categoryId,
+                            star = it.star
+                        ),
+                        callback
+                    )
+                }
+            }
+            hasSave = true
+            dismiss()
+        } else {
+            // 未填数据提示
+            etWordContent.shakeTipIfEmpty()
+        }
+    }
+
+    // 保存相册集
+    private fun saveOrUpdateGallery() {
+        val title = etGalleryTitle.text.toString()
+        val categoryId = categoryChoose.getSelectionData<CategoryInfoBean>()?.id
+        if (title.isNotEmpty() && categoryId != null && galleryPath.isNotEmpty()) {
+            if (editType == EDIT_TYPE_CREATE) {
+                DataService.createEntry(
+                    GalleryEntryBean(
+                        path = galleryPath,
+                        title = title,
+                        date = Date().time,
+                        belongTo = categoryId,
+                    ),
+                    callback
+                )
+            } else if (editType == EDIT_TYPE_UPDATE) {
+                (tapeEntry as? GalleryEntryBean)?.let {
+                    DataService.updateEntry(
+                        it,
+                        GalleryEntryBean(
+                            path = galleryPath,
+                            title = title,
+                            date = it.date,
+                            belongTo = categoryId,
+                            star = it.star
+                        ),
+                        callback
+                    )
+                }
+            }
+            hasSave = true
+            dismiss()
+        } else {
+            // 未填数据提示
+            etGalleryTitle.shakeTipIfEmpty()
+            // 没选图或者导入过程中均不允许创建或更新
+            if (galleryPath.isEmpty()) {
+                rvGalleryList.shakeTip()
+            }
+        }
+    }
+
     // 图片类型
     private fun initImageLayout() {
         selectImage.setOnClickListener {
             // 打开图片选择
             ImageSelectHelper.openImageSelectPage(ENTRY_IMAGE_REQUEST)
         }
+        tvImageLayoutTip.setOnClickListener {
+            TipDialog(
+                context,
+                content = "导入收藏夹子的图片有以下特性：\n\n1.应用外（如相册）不可见；\n" +
+                        "\n2.删除手机（相册）的原图不会影响到收藏图。",
+                title = "图片收藏提示"
+            ).show()
+        }
+    }
+
+    // 图片集类型
+    private fun initGalleryLayout() {
+        tvGalleryLayoutTip.setOnClickListener {
+            TipDialog(
+                context,
+                content = "导入收藏夹子的图片有以下特性：\n\n1.应用外（如相册）不可见；\n" +
+                        "\n2.删除手机（相册）的原图不会影响到收藏图。",
+                title = "图片集收藏提示"
+            ).show()
+        }
+        rvGalleryList.layoutManager = LinearLayoutManager(context).apply { orientation = LinearLayoutManager.HORIZONTAL }
+        rvGalleryList.adapter = GalleryImportAdapter(context,
+            galleryPath,
+            addClickAction = {
+                // 打开图片选择
+                ImageSelectHelper.openGallerySelectPage(ENTRY_GALLERY_REQUEST)
+            },
+            removeClickAction = {
+                // 移除Item
+                val removePath = galleryPath.removeAt(it) // 删除galleryPath的数据，Adapter.data也会同步变化
+                rvGalleryList.adapter?.notifyItemRemoved(it)
+                // 临时导入的文件才删除
+                // 如果是更新，则会带入图片，这些图片只有在确认更新时由DataService负责删除
+                // 原则是：已保存的图片由数据管理器（DataService）负责删除，临时图片是业务产生的，由业务方（CreateEntryDialog）删除
+                if (tempGalleryPath.contains(removePath)) {
+                    BitmapIOService.deleteBitmap(removePath)
+                    tempGalleryPath.remove(removePath)
+                }
+            })
     }
 
     private fun changeType() {
-        dataType = if (dataType == EntryType.LINK) {
-            EntryType.IMAGE
-        } else {
-            EntryType.LINK
+        dataType = when (dataType) {
+            EntryType.LINK -> EntryType.IMAGE
+            EntryType.IMAGE -> EntryType.WORD
+            EntryType.WORD -> EntryType.GALLERY
+            EntryType.GALLERY -> EntryType.LINK
+            else -> EntryType.LINK
         }
     }
 
@@ -316,6 +488,15 @@ class CreateEntryDialog(
     override fun onDetachedFromWindow() {
         if (!hasSave) {
             deleteExpiredImportImage()
+            deleteExpiredGalleryImage()
+        } else {
+            // 保存了，但是保存的不是对应类型
+            if (dataType != EntryType.IMAGE) {
+                deleteExpiredImportImage()
+            }
+            if (dataType != EntryType.GALLERY) {
+                deleteExpiredGalleryImage()
+            }
         }
         super.onDetachedFromWindow()
         EventBus.getDefault().unregister(this)
@@ -334,6 +515,13 @@ class CreateEntryDialog(
             if (deleteExpiredImage) {
                 BitmapIOService.deleteBitmap(it)
             }
+        }
+    }
+
+    // 删除过期的导入图片集
+    private fun deleteExpiredGalleryImage() {
+        tempGalleryPath.forEach {
+            BitmapIOService.deleteBitmap(it)
         }
     }
 
@@ -384,5 +572,63 @@ class CreateEntryDialog(
                 selectImage.isEnabled = true
             }
         })
+    }
+
+    // 导入多张图片
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onGallerySelectComplete(event: GalleryCompleteEvent) {
+        val dialog = ProgressDialog(context, "图片导入中..").apply { show() }
+        val max = event.list.size
+        var progress = 0f
+        event.list.forEach { uri ->
+            // 图片信息
+            var rotate = false
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                context.contentResolver.openInputStream(uri)?.let {
+                    val imageRotation = ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+                    if (imageRotation == ExifInterface.ORIENTATION_ROTATE_90 || imageRotation == ExifInterface.ORIENTATION_ROTATE_270) {
+                        rotate = true
+                    }
+                }
+            }
+            // 转存图片到本地
+            var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
+            // iOS 拍出的图片带旋转角，要在导入时转为旋转后的图片
+            if (rotate) {
+                val m = Matrix()
+                m.setRotate(90f, bitmap.width.toFloat() / 2, bitmap.height.toFloat() / 2)
+                try {
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
+                } catch (ex: OutOfMemoryError) {
+                    Ln.e("OutOfMemoryError", "转存图片OOM")
+                }
+            }
+            val absolutePath = BitmapIOService.createBitmapSavePath()
+            BitmapIOService.saveBitmap(absolutePath, bitmap, object : Callback<String> {
+                override fun onSuccess(data: String) {
+                    galleryPath.add(data)
+                    tempGalleryPath.add(data)
+                    progress++
+                    dialog.setProgress((progress / max * 100).toInt())
+                    if (progress.toInt() == max) {
+                        dialog.dismiss()
+                        ToastUtil.toast("图片导入完成")
+                        rvGalleryList.adapter?.notifyDataSetChanged()
+                    }
+                }
+
+                override fun onFail(msg: String) {
+                    // 导入失败，删除存图的文件
+                    BitmapIOService.deleteBitmap(absolutePath)
+                    progress++
+                    dialog.setProgress((progress / max * 100).toInt())
+                    if (progress.toInt() == max) {
+                        dialog.dismiss()
+                        ToastUtil.toast("图片导入完成")
+                        rvGalleryList.adapter?.notifyDataSetChanged()
+                    }
+                }
+            })
+        }
     }
 }

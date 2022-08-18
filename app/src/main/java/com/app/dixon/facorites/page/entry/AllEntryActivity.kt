@@ -174,20 +174,4 @@ class AllEntryActivity : BaseActivity() {
             return null
         }
     }
-
-    // 修改图片Entry选图回调
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        data?.let {
-            if (requestCode == ENTRY_IMAGE_REQUEST) {
-                // 图片收藏选图成功
-                it.data?.let { uri ->
-                    Ln.i("ImageResult", "$uri")
-                    EventBus.getDefault().post(CategoryImageCompleteEvent(uri))
-                }
-            } else {
-                // do nothing
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
 }

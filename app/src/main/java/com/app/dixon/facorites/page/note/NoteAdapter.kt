@@ -52,6 +52,12 @@ class NoteAdapter(val context: Context, val data: List<NoteBean>) : RecyclerView
                     PageJumper.openImagePage(context, imageEntry.path)
                 }, {
                     // 文件夹不会有笔记
+                }, { wordEntry ->
+                    // 暂时不会走到
+                    PageJumper.openWordPage(context, wordEntry.content)
+                }, { galleryEntry ->
+                    // 暂时不会走到
+                    PageJumper.openGalleryPage(context, galleryEntry.path, galleryEntry.title)
                 })
             } ?: let {
                 // 未找到 说明条目已删除

@@ -6,14 +6,11 @@ import android.net.Uri
 import android.os.Parcelable
 import com.app.dixon.facorites.base.BaseApplication
 import com.app.dixon.facorites.base.ContextAssistant
-import com.app.dixon.facorites.core.common.Callback
-import com.app.dixon.facorites.core.common.CommonCallback
-import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.core.ex.tryExtractHttp
-import com.app.dixon.facorites.core.util.HandlerUtil
 import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.view.CreateEntryDialog
+import com.app.dixon.facorites.core.view.CreateGalleryEntryDialog
 import com.app.dixon.facorites.core.view.CreateImageEntryDialog
 import com.dixon.dlibrary.util.ToastUtil
 
@@ -79,7 +76,13 @@ class FromShareHelper {
         intent.getParcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)?.let {
             // Update UI to reflect multiple images being shared
             Ln.i("FromShare", it.toString())
-            ToastUtil.toast("暂不支持一次收藏多张图片哦～")
+            val import = mutableListOf<Uri>()
+            it.forEach { uri ->
+                if (uri is Uri) import.add(uri)
+            }
+            ContextAssistant.asContext { context ->
+                CreateGalleryEntryDialog(context, import).show()
+            }
         }
     }
 }

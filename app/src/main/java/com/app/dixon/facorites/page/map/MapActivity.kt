@@ -57,7 +57,13 @@ class MapActivity : BaseActivity() {
                     }
                 }, {
                     PageJumper.openImagePage(this, it.path)
-                }, {})
+                }, {
+
+                }, {
+                    PageJumper.openWordPage(this, it.content)
+                }, {
+                    PageJumper.openGalleryPage(this, it.path, it.title)
+                })
             }
         }
         val line: BaseLine = StraightLine(Color.parseColor("#4DB6AC"), 2) // ? 有什么用
@@ -116,7 +122,13 @@ class MapActivity : BaseActivity() {
                                 newEntry = LinkEntryBean(it.link, it.title, it.remark, it.schemeJump, it.date, newBelongTo, it.star)
                             }, {
                                 newEntry = ImageEntryBean(it.path, it.title, it.hideBg, it.date, newBelongTo, it.star)
-                            }, {})
+                            }, {
+                                //
+                            }, {
+                                newEntry = WordEntryBean(it.content, it.date, newBelongTo, it.star)
+                            }, {
+                                newEntry = GalleryEntryBean(it.path, it.title, it.date, newBelongTo, it.star)
+                            })
                             newEntry?.let {
                                 DataService.updateEntry(updater, it)
                             }
@@ -163,11 +175,15 @@ class MapActivity : BaseActivity() {
                 addNode(treeModel, it.categoryInfoBean.id, nodeTemp)
             } else {
                 var name = ""
-                if (it is LinkEntryBean) {
-                    name = it.title
-                } else if (it is ImageEntryBean) {
-                    name = it.title
-                }
+                it.process({ link ->
+                    name = link.title
+                }, { image ->
+                    name = image.title
+                }, {}, { word ->
+                    name = word.content
+                }, { gallery ->
+                    name = gallery.title
+                })
                 val nodeTemp: NodeModel<BaseNodeData> = NodeModel<BaseNodeData>(EntryNodeData(it, name))
                 treeModel.addNode(rootNode, nodeTemp)
             }

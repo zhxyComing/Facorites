@@ -13,9 +13,11 @@ import com.app.dixon.facorites.page.edit.MarkdownActivity
 import com.app.dixon.facorites.page.edit.EditActivity
 import com.app.dixon.facorites.page.entry.AllEntryActivity
 import com.app.dixon.facorites.page.entry.EntryActivity
+import com.app.dixon.facorites.page.gallery.GalleryActivity
 import com.app.dixon.facorites.page.home.HomeActivity
 import com.app.dixon.facorites.page.image.ImageActivity
 import com.app.dixon.facorites.page.map.MapActivity
+import com.app.dixon.facorites.page.word.WordActivity
 
 /**
  * 全路径：com.app.dixon.facorites.core.common
@@ -147,6 +149,34 @@ object PageJumper {
     fun openCoursePage(asContext: Any, requestCode: Int = -1) {
         resultJump(asContext) {
             val intent = Intent(it, CourseActivity::class.java)
+            startActivity(it, intent, requestCode)
+        }
+    }
+
+    /**
+     * 打开语录页
+     */
+    fun openWordPage(asContext: Any, word: String, requestCode: Int = -1) {
+        resultJump(asContext) {
+            val intent = Intent(it, WordActivity::class.java).apply {
+                putExtra(WORD_CONTENT, word)
+            }
+            startActivity(it, intent, requestCode)
+        }
+    }
+
+    /**
+     * 打开相册集页
+     */
+    fun openGalleryPage(asContext: Any, path: List<String>, name: String? = null, requestCode: Int = -1) {
+        resultJump(asContext) {
+            val arrayList = ArrayList<String>().apply {
+                addAll(path)
+            }
+            val intent = Intent(it, GalleryActivity::class.java).apply {
+                putStringArrayListExtra(GALLERY_LIST, arrayList)
+                putExtra(GALLERY_NAME, name)
+            }
             startActivity(it, intent, requestCode)
         }
     }

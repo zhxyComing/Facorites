@@ -67,6 +67,12 @@ open class BaseApplication : Application() {
             // 设置设备信息
             CrashReport.setDeviceModel(applicationContext, DeviceUtil.getDeviceKeyInfo())
             CrashReport.setDeviceId(applicationContext, DeviceUtil.getDeviceID())
+            // 测试环境关闭一切上报
+            if (BuildConfig.DEBUG) {
+                CrashReport.closeBugly()
+                CrashReport.closeCrashReport()
+                CrashReport.closeNativeReport()
+            }
         }
     }
 

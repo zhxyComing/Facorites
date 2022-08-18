@@ -5,7 +5,7 @@ import kotlinx.android.parcel.Parcelize
 
 /**
  * 全路径：com.app.dixon.facorites.core.data.bean.dir
- * 类描述：分类信息
+ * 类描述：文件夹类型
  * 创建人：xuzheng
  * 创建时间：3/18/22 3:07 PM
  */

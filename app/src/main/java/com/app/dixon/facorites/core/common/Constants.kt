@@ -19,6 +19,12 @@ const val BROWSE_TITLE = "browse_title"
 
 const val IMAGE_PATH = "image_path"
 
+const val WORD_CONTENT = "word_content"
+
+const val GALLERY_LIST = "gallery_list"
+
+const val GALLERY_NAME = "gallery_name"
+
 const val TRANSIT_LINK = "transit_link"
 
 const val SORT_TYPE_TIME = "sort_time"
