@@ -204,6 +204,12 @@ class CreateEntryDialog(
             etEntryInput.setText(it)
             etWordContent.setText(it)
             parseTitle(it)
+            if (!linkFromShare.contains("http")) {
+                // 切换至语录面板
+                dataType = EntryType.WORD
+                showWordUi()
+                layoutChange.setImageResource(R.drawable.app_icon_gallery_create_entry)
+            }
         }
     }
 
