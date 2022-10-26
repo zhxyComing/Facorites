@@ -46,7 +46,7 @@ object ImageSelectHelper {
     }
 
     //  打开图片裁剪页
-    fun openImageCropPage(context: Activity, data: Uri, outputPath: String, cropInfo: CropInfo) {
+    fun openImageCropPage(context: Activity, data: Uri, outputPath: String, cropInfo: CropInfo, requestCode: Int = REQUEST_CROP) {
         val intent = UCrop.of(data, Uri.fromFile(File(outputPath)))
             .withAspectRatio(cropInfo.aspectX, cropInfo.aspectY)
             .withMaxResultSize(cropInfo.outputX, cropInfo.outputY)
@@ -59,6 +59,6 @@ object ImageSelectHelper {
             .getIntent(context)
         // 替换为启动自己的裁剪页 方便定制UI
         intent.setClass(context, CropActivity::class.java)
-        context.startActivityForResult(intent, REQUEST_CROP)
+        context.startActivityForResult(intent, requestCode)
     }
 }

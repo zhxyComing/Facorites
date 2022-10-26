@@ -7,6 +7,7 @@ import com.app.dixon.facorites.core.data.bean.*
 import com.dixon.dlibrary.util.SharedUtil
 import java.lang.ref.WeakReference
 import java.net.URL
+import java.text.DecimalFormat
 import java.util.regex.Pattern
 
 /**
@@ -152,7 +153,7 @@ fun BaseEntryBean.process(
     imageAction: (imageEntry: ImageEntryBean) -> Unit,
     categoryAction: (categoryEntry: CategoryEntryBean) -> Unit,
     wordAction: (wordEntry: WordEntryBean) -> Unit,
-    galleryAction: (GalleryEntryBean)->Unit
+    galleryAction: (GalleryEntryBean) -> Unit
 ) {
     (this as? LinkEntryBean)?.let(linkAction)
     (this as? ImageEntryBean)?.let(imageAction)
@@ -173,4 +174,26 @@ fun <T> callbackRegister(list: ArrayList<WeakReference<T>>, action: (T) -> Unit)
             action.invoke(it)
         } ?: iterator.remove()
     }
+}
+
+// 格式化输出byte
+fun byteToString(size: Long): String {
+    val gb = (1024 * 1024 * 1024).toLong() //定义GB的计算常量
+    val mb = (1024 * 1024).toLong() //定义MB的计算常量
+    val kb: Long = 1024 //定义KB的计算常量
+    val df = DecimalFormat("0.00") //格式化小数
+    var resultSize = ""
+    resultSize = if (size / gb >= 1) {
+        // 如果当前Byte的值大于等于1GB
+        df.format(size / gb.toFloat()) + " GB   "
+    } else if (size / mb >= 1) {
+        // 如果当前Byte的值大于等于1MB
+        df.format(size / mb.toFloat()) + " MB   "
+    } else if (size / kb >= 1) {
+        // 如果当前Byte的值大于等于1KB
+        df.format(size / kb.toFloat()) + " KB   "
+    } else {
+        "$size B   "
+    }
+    return resultSize
 }

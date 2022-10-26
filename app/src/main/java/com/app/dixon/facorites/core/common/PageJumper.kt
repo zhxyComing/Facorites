@@ -14,6 +14,7 @@ import com.app.dixon.facorites.page.edit.EditActivity
 import com.app.dixon.facorites.page.entry.AllEntryActivity
 import com.app.dixon.facorites.page.entry.EntryActivity
 import com.app.dixon.facorites.page.gallery.GalleryActivity
+import com.app.dixon.facorites.page.gallery.GalleryBrowserActivity
 import com.app.dixon.facorites.page.home.HomeActivity
 import com.app.dixon.facorites.page.image.ImageActivity
 import com.app.dixon.facorites.page.map.MapActivity
@@ -176,6 +177,22 @@ object PageJumper {
             val intent = Intent(it, GalleryActivity::class.java).apply {
                 putStringArrayListExtra(GALLERY_LIST, arrayList)
                 putExtra(GALLERY_NAME, name)
+            }
+            startActivity(it, intent, requestCode)
+        }
+    }
+
+    /**
+     * 打开相册集浏览页
+     */
+    fun openGalleryBrowserPage(asContext: Any, path: List<String>, index: Int = 0, requestCode: Int = -1) {
+        resultJump(asContext) {
+            val arrayList = ArrayList<String>().apply {
+                addAll(path)
+            }
+            val intent = Intent(it, GalleryBrowserActivity::class.java).apply {
+                putStringArrayListExtra(GALLERY_LIST, arrayList)
+                putExtra(GALLERY_INDEX, index)
             }
             startActivity(it, intent, requestCode)
         }

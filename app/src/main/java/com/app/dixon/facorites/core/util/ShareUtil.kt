@@ -6,8 +6,18 @@ import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import android.text.TextUtils
+import com.app.dixon.facorites.R
+import com.app.dixon.facorites.base.ContextAssistant
+import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.data.service.base.FileUtils
+import com.app.dixon.facorites.core.ex.backUi
+import com.app.dixon.facorites.core.util.ThreadExecutor
+import com.app.dixon.facorites.core.view.OptionDialog
+import com.app.dixon.facorites.core.view.TipDialog
 import com.dixon.dlibrary.util.ToastUtil
+import com.hjq.permissions.OnPermissionCallback
+import com.hjq.permissions.Permission
+import com.hjq.permissions.XXPermissions
 import java.io.File
 import java.util.*
 

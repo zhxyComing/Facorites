@@ -1,11 +1,12 @@
 package com.app.dixon.facorites.base
 
+import android.app.WallpaperManager
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -23,11 +24,13 @@ import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.app.dixon.facorites.page.gallery.event.GalleryCompleteEvent
 import com.app.dixon.facorites.page.home.CATEGORY_BG_IMAGE_REQUEST
+import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.StatusBarUtil
 import com.dixon.dlibrary.util.ToastUtil
 import com.yalantis.ucrop.UCrop
 import org.greenrobot.eventbus.EventBus
 
+private const val REQUEST_CODE_WRAPPER_SET = 20001
 
 /**
  * 全路径：com.app.dixon.facorites.base
@@ -65,6 +68,26 @@ open class BaseActivity : FragmentActivity() {
         window.decorView.apply {
             systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Ln.i("BaseActivity", "onStart $this")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Ln.i("BaseActivity", "onResume $this")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Ln.i("BaseActivity", "onPause $this")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Ln.i("BaseActivity", "onStop $this")
     }
 
     override fun onDestroy() {
@@ -119,6 +142,14 @@ open class BaseActivity : FragmentActivity() {
                     }
                     EventBus.getDefault().post(GalleryCompleteEvent(res))
                 }
+            } else if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_WRAPPER_SET) {
+                // 设置壁纸
+                UCrop.getOutput(it)?.let { resultUri ->
+                    val wrapperManager = WallpaperManager.getInstance(ContextAssistant.application())
+                    val bitmap = BitmapFactory.decodeFile(resultUri.path)
+                    wrapperManager.setBitmap(bitmap)
+                    ToastUtil.toast("设置壁纸成功")
+                }
             } else {
                 // do nothing
             }
@@ -133,6 +164,26 @@ open class BaseActivity : FragmentActivity() {
             this, uri,
             BitmapIOService.createBitmapSavePath(),
             CropInfo(aspectX = 3f, aspectY = 1f, outputX = 390.dp, outputY = 130.dp)
+        )
+    }
+
+    protected fun setSystemWrapper(uri: Uri) {
+        // 求最大公约数
+        fun gcd(a: Int, b: Int): Int {
+            if (b == 0) return a
+            return gcd(b, a % b)
+        }
+
+        val width = ScreenUtil.getDisplayWidth(this)
+        val height = ScreenUtil.getDisplayHeight(this)
+        val gcd = gcd(width, height)
+        val aspectX = width / gcd
+        val aspectY = height / gcd
+        ImageSelectHelper.openImageCropPage(
+            this, uri,
+            BitmapIOService.createBitmapSavePath(),
+            CropInfo(aspectX = aspectX.toFloat(), aspectY = aspectY.toFloat(), outputX = width, outputY = height),
+            REQUEST_CODE_WRAPPER_SET
         )
     }
 }

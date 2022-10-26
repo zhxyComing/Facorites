@@ -6,6 +6,7 @@ import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.BaseActivity
 import com.app.dixon.facorites.core.common.GALLERY_LIST
 import com.app.dixon.facorites.core.common.GALLERY_NAME
+import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.util.mediumFont
 import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.page.gallery.adapter.GalleryListAdapter
@@ -35,7 +36,12 @@ class GalleryActivity : BaseActivity() {
 
     private fun initView() {
         rvGalleryList.layoutManager = GridLayoutManager(this, 3)
-        rvGalleryList.adapter = GalleryListAdapter(this, path)
+        rvGalleryList.adapter = GalleryListAdapter(
+            context = this,
+            data = path,
+            onClickAction = { index, _ ->
+                PageJumper.openGalleryBrowserPage(this, path, index)
+            })
         name?.let {
             tvPageTitle.text = name
         }

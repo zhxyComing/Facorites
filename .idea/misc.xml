@@ -132,7 +132,7 @@
         <entry key="app/src/main/res/layout/app_item_entry.xml" value="0.246875" />
         <entry key="app/src/main/res/layout/app_item_gallery_import.xml" value="0.303125" />
         <entry key="app/src/main/res/layout/app_item_gallery_import_footer.xml" value="0.30416666666666664" />
-        <entry key="app/src/main/res/layout/app_item_gallery_list.xml" value="0.30416666666666664" />
+        <entry key="app/src/main/res/layout/app_item_gallery_list.xml" value="0.1" />
         <entry key="app/src/main/res/layout/app_item_note.xml" value="0.25" />
         <entry key="app/src/main/res/layout/app_view_link_card.xml" value="0.1" />
         <entry key="app/src/main/res/layout/item_file_explore.xml" value="0.335" />

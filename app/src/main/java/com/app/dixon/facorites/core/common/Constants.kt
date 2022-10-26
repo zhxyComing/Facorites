@@ -25,6 +25,8 @@ const val GALLERY_LIST = "gallery_list"
 
 const val GALLERY_NAME = "gallery_name"
 
+const val GALLERY_INDEX = "gallery_index"
+
 const val TRANSIT_LINK = "transit_link"
 
 const val SORT_TYPE_TIME = "sort_time"

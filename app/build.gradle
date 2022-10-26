@@ -64,4 +64,6 @@ dependencies {
     // 思维导图框架 已拷贝进源码
 //    implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
 //    implementation 'io.github.guaishoun:gyso-treeview:1.0.1'
+    // 图片双指缩放放大
+//    implementation 'io.github.imablanco:zoomy:1.0.0'
 }

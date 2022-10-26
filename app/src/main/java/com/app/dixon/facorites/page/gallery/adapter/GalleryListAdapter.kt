@@ -10,13 +10,12 @@ import com.app.dixon.facorites.core.common.PageJumper
 import com.app.dixon.facorites.core.ex.setImageByPath
 import kotlinx.android.synthetic.main.app_item_gallery_import.view.*
 
-class GalleryListAdapter(val context: Context, val data: List<String>) : RecyclerView.Adapter<GalleryListAdapter.GalleryViewHolder>() {
+class GalleryListAdapter(val context: Context, val data: List<String>, private val onClickAction: (index: Int, path: String) -> Unit) : RecyclerView.Adapter<GalleryListAdapter.GalleryViewHolder>() {
 
     class GalleryViewHolder(item: View) : RecyclerView.ViewHolder(item)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryViewHolder {
         val item = LayoutInflater.from(context).inflate(R.layout.app_item_gallery_list, parent, false)
-
         return GalleryViewHolder(item)
     }
 
@@ -24,7 +23,8 @@ class GalleryListAdapter(val context: Context, val data: List<String>) : Recycle
         val path: String = data[position]
         holder.itemView.ivPic.setImageByPath(path, 100, 100)
         holder.itemView.ivPic.setOnClickListener {
-            PageJumper.openImagePage(context, path)
+//            PageJumper.openImagePage(context, path)
+            onClickAction.invoke(position, path)
         }
     }
 
