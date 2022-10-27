@@ -7,7 +7,6 @@ import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.data.service.base.FileUtils
 import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.core.view.OptionDialog
-import com.app.dixon.facorites.core.view.TipDialog
 import com.dixon.dlibrary.util.ToastUtil
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
@@ -43,11 +42,11 @@ fun String.shareAsImage(context: Context) {
             leftString = "关闭",
             rightClick = {
                 requestStoragePermission {
-                    runShare(context, this)
+                    runShare(this)
                 }
             }).show()
     } else {
-        runShare(context, this)
+        runShare(this)
     }
 }
 
@@ -76,18 +75,14 @@ private fun requestStoragePermission(block: () -> Unit) {
 }
 
 // 执行分享
-private fun runShare(context: Context, path: String) {
-    val tipDialog = TipDialog(context, "正在准备分享资源，请稍后...", "提醒", false)
-    tipDialog.show()
+private fun runShare(path: String) {
     ThreadExecutor.execute {
         val fileName = path.substring(path.lastIndexOf("/"), path.length)
         val file = FileUtils.createExTempFile(fileName)
-        val bitmap = FileUtils.readBitmap(path)
-        if (file != null && bitmap != null) {
-            FileUtils.saveBitmap(file, bitmap, object : Callback<String> {
+        file?.let {
+            FileUtils.saveFile(path, file, object : Callback<String> {
                 override fun onSuccess(data: String) {
                     backUi {
-                        tipDialog.dismiss()
                         ContextAssistant.activity()?.let { aty ->
                             ShareUtil.shareImage(aty, data)
                         }
@@ -96,7 +91,6 @@ private fun runShare(context: Context, path: String) {
 
                 override fun onFail(msg: String) {
                     backUi {
-                        tipDialog.dismiss()
                         ToastUtil.toast("分享失败：资源错误")
                     }
                     File(file).delete()
