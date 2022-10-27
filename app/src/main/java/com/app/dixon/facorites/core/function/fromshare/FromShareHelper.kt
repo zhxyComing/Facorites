@@ -12,6 +12,7 @@ import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.view.CreateEntryDialog
 import com.app.dixon.facorites.core.view.CreateGalleryEntryDialog
 import com.app.dixon.facorites.core.view.CreateImageEntryDialog
+import com.app.dixon.facorites.core.view.CreateVideoEntryDialog
 import com.dixon.dlibrary.util.ToastUtil
 
 /**
@@ -29,6 +30,8 @@ class FromShareHelper {
                     handleSendText(intent) // Handle text being sent
                 } else if (intent.type?.startsWith("image/") == true) {
                     handleSendImage(intent) // Handle single image being sent
+                } else if (intent.type?.startsWith("video/") == true) {
+                    handleSendVideo(intent)
                 }
             }
             intent.action == Intent.ACTION_SEND_MULTIPLE
@@ -82,6 +85,20 @@ class FromShareHelper {
             ContextAssistant.asContext { context ->
                 CreateGalleryEntryDialog(context, import).show()
             }
+        }
+    }
+
+    private fun handleSendVideo(intent: Intent) {
+        (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
+            // 获取到链接 走创建流程
+            // 延迟0.5s，防止在部分手机上因Activity在没有Running的情况下弹出Dialog而崩溃
+            backUi(500) {
+                Ln.i("FromShare", uri.toString())
+                ContextAssistant.asContext {
+                    CreateVideoEntryDialog(it, uri).show()
+                }
+            }
+            intent.removeExtra(Intent.EXTRA_STREAM)
         }
     }
 }
