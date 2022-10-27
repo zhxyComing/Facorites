@@ -7,7 +7,7 @@ import com.app.dixon.facorites.R
 import com.app.dixon.facorites.base.BaseActivity
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.IMAGE_PATH
-import com.app.dixon.facorites.core.data.service.BitmapIOService
+import com.app.dixon.facorites.core.data.service.FileIOService
 import com.app.dixon.facorites.core.ex.hide
 import com.app.dixon.facorites.core.ex.show
 import com.app.dixon.facorites.core.util.*
@@ -44,7 +44,7 @@ class ImageActivity : BaseActivity() {
         if (path.startsWith("http")) {
             tvLoading.show()
             functionBar.hide()
-            BitmapIOService.readBitmapFromUrl(path, object : Callback<Bitmap> {
+            FileIOService.readBitmapByUrl(path, object : Callback<Bitmap> {
                 override fun onSuccess(data: Bitmap) {
                     tvLoading.hide()
                     photoView.setImageBitmap(data)
@@ -61,7 +61,9 @@ class ImageActivity : BaseActivity() {
             return
         }
         // 从本地读取图片
-        photoView.setImageURI(Uri.parse(path))
+        ImageUtil.obtainSafeBitmap(path) {
+            photoView.setImageBitmap(it)
+        }
         tvShare.setOnClickListener {
             path.shareAsImage(this)
         }
@@ -83,7 +85,7 @@ class ImageActivity : BaseActivity() {
             CreateImageEntryDialog(this, bitmap).show()
         }
         tvSave.setOnClickListener {
-            BitmapIOService.saveBitmapToAlbum(this, bitmap)
+            FileIOService.saveBitmapToAlbum(this, bitmap)
         }
     }
 

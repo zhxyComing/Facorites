@@ -4,7 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.BitmapFactory.Options
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import com.app.dixon.facorites.base.BaseApplication
 import com.app.dixon.facorites.base.ContextAssistant
@@ -240,6 +244,9 @@ object FileUtils {
      */
     fun deleteFileAbs(absolutePath: String): Boolean {
         val file = File(absolutePath)
+        if (!file.exists()) {
+            return false
+        }
         return file.delete()
     }
 
@@ -267,6 +274,7 @@ object FileUtils {
         }
     }
 
+    // 保存文件失败会删除保存临时文件
     fun saveFile(originUri: Uri, saveAbsolutePath: String, asyncCallback: ProgressCallback<String>) {
         // File.getTotalSpace()
         // 创建String对象保存文件名路径
@@ -297,11 +305,13 @@ object FileUtils {
             } ?: let {
                 asyncCallback.onFail("inputStream 获取失败")
                 Ln.i("SaveFile", "Fail 获取失败")
+                file.delete()
             }
         } catch (e: Exception) {
             e.printStackTrace()
             asyncCallback.onFail(e.toString())
             Ln.i("SaveFile", "Fail ${e.printStackTrace()}")
+            File(saveAbsolutePath).delete()
         }
     }
 
@@ -340,43 +350,51 @@ object FileUtils {
         } catch (e: IOException) {
             Ln.e("BitmapUtils", e.toString())
             asyncCallback.onFail(e.toString())
+            file.delete()
         }
     }
 
     /**
      * 读取图片
      */
-    fun readBitmap(absolutePath: String): Bitmap? {
+    fun readBitmap(absolutePath: String, options: Options? = null): Bitmap? {
         val file = File(absolutePath)
         if (!file.exists()) {
             return null
         }
-        // 最大读取30M图片
-        val buf = ByteArray(1024 * 1024 * 30)
-        val bitmap: Bitmap?
+        // 最大读取80M图片
+        val buf = ByteArray(1024 * 1024 * 80)
+        var bitmap: Bitmap?
         try {
             val fis = FileInputStream(file.absolutePath)
             val len: Int = fis.read(buf, 0, buf.size)
-            bitmap = BitmapFactory.decodeByteArray(buf, 0, len)
+            bitmap = BitmapFactory.decodeByteArray(buf, 0, len, options)
             if (bitmap == null) {
                 return null
             }
             fis.close()
+            // 返回图片时，如果有旋转角，则自动旋转正
+            // iOS 拍出的图片带旋转角，要在展示时转为旋转后的图片
+            var rotate = false
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val imageRotation = ExifInterface(absolutePath).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+                if (imageRotation == ExifInterface.ORIENTATION_ROTATE_90 || imageRotation == ExifInterface.ORIENTATION_ROTATE_270) {
+                    rotate = true
+                }
+            }
+            if (rotate) {
+                val m = Matrix()
+                m.setRotate(90f, bitmap.width.toFloat() / 2, bitmap.height.toFloat() / 2)
+                try {
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
+                } catch (ex: OutOfMemoryError) {
+                    Ln.e("OutOfMemoryError", "转存图片OOM")
+                }
+            }
         } catch (e: Exception) {
             return null
         }
         return bitmap
-    }
-
-    /**
-     * 创建一个空文件用于保存图片
-     */
-    fun createBitmapSavePath(path: String): String {
-        val file = File(ROOT_CATEGORY, path)
-        if (!file.exists()) {
-            file.createNewFile()
-        }
-        return file.absolutePath
     }
 
     /**
@@ -476,28 +494,6 @@ object FileUtils {
             }
         }
         return false
-    }
-
-    /**
-     * 创建一个空文件用于保存图片
-     */
-    fun createBitmapSavePathAbs(absolutePath: String): String {
-        val file = File(absolutePath)
-        if (!file.exists()) {
-            file.createNewFile()
-        }
-        return file.absolutePath
-    }
-
-    /**
-     * 删除图片
-     */
-    fun deleteBitmap(absolutePath: String): Boolean {
-        val file = File(absolutePath)
-        if (!file.exists()) {
-            return false
-        }
-        return file.delete()
     }
 
     /**

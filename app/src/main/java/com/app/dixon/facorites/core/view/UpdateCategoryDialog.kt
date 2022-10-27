@@ -4,9 +4,8 @@ import android.content.Context
 import android.net.Uri
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
-import com.app.dixon.facorites.core.data.bean.ImageEntryBean
-import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.data.service.FileIOService
 import com.app.dixon.facorites.core.ex.hide
 import com.app.dixon.facorites.core.ex.setImageByUri
 import com.app.dixon.facorites.core.ex.shakeTip
@@ -101,7 +100,7 @@ class UpdateCategoryDialog(context: Context, val categoryInfoBean: CategoryInfoB
                 }
             }
             if (deleteExpiredImage) {
-                BitmapIOService.deleteBitmap(it)
+                FileIOService.deleteFile(it)
             }
         }
     }

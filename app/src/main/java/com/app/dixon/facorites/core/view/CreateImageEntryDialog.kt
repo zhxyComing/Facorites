@@ -2,19 +2,20 @@ package com.app.dixon.facorites.core.view
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.CommonCallback
+import com.app.dixon.facorites.core.common.ProgressCallback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.bean.ImageEntryBean
-import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.data.service.FileIOService
 import com.app.dixon.facorites.core.ex.findIndexByCondition
 import com.app.dixon.facorites.core.ex.setImageByPath
 import com.app.dixon.facorites.core.ex.shakeTip
 import com.app.dixon.facorites.core.ex.shakeTipIfEmpty
-import com.app.dixon.facorites.core.util.ImageSelectHelper
 import com.app.dixon.facorites.core.util.normalFont
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
@@ -22,9 +23,9 @@ import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import java.util.*
 
 // 创建用构造函数
-class CreateImageEntryDialog(
+class CreateImageEntryDialog<T>(
     context: Context,
-    private val bitmap: Bitmap,
+    private val image: T? = null, // bitmap、uri 二选一
     private val callback: Callback<BaseEntryBean> = CommonCallback("创建成功！"),
     private val defaultCategory: Long? = null
 ) : BaseDialog(context) {
@@ -65,26 +66,51 @@ class CreateImageEntryDialog(
     }
 
     private fun saveBitmapToLocal() {
-        val absolutePath = BitmapIOService.createBitmapSavePath()
-        tvTip.text = "转存图片中，请耐心等待"
-        imageImporting = true
-        selectImage.isEnabled = false
-        BitmapIOService.saveBitmap(absolutePath, bitmap, object : Callback<String> {
-            override fun onSuccess(data: String) {
-                imageImporting = false
-                imagePath = data
-                bgView.setImageByPath(absolutePath) // setImageBitmap 圆角会失效
-                tvTip.text = ""
-                selectImage.isEnabled = true
-            }
+        (image as? Uri)?.let {
+            tvTip.text = "转存图片中，请耐心等待"
+            imageImporting = true
+            selectImage.isEnabled = false
+            FileIOService.saveFile(FileIOService.FileType.IMAGE, it, object : ProgressCallback<String> {
+                override fun onSuccess(data: String) {
+                    imageImporting = false
+                    imagePath = data
+                    bgView.setImageByPath(data) // setImageBitmap 圆角会失效
+                    tvTip.text = ""
+                    selectImage.isEnabled = true
+                }
 
-            override fun onFail(msg: String) {
-                ToastUtil.toast("图片转存失败，无法添加收藏")
-                imageImporting = false
-                tvTip.text = ""
-                selectImage.isEnabled = true
-            }
-        })
+                override fun onFail(msg: String) {
+                    ToastUtil.toast("图片转存失败，无法添加收藏")
+                    imageImporting = false
+                    tvTip.text = ""
+                    selectImage.isEnabled = true
+                }
+
+                override fun onProgress(progress: Int) {
+                }
+            })
+        }
+        (image as? Bitmap)?.let {
+            tvTip.text = "转存图片中，请耐心等待"
+            imageImporting = true
+            selectImage.isEnabled = false
+            FileIOService.saveBitmap(it, object : Callback<String> {
+                override fun onSuccess(data: String) {
+                    imageImporting = false
+                    imagePath = data
+                    bgView.setImageByPath(data) // setImageBitmap 圆角会失效
+                    tvTip.text = ""
+                    selectImage.isEnabled = true
+                }
+
+                override fun onFail(msg: String) {
+                    ToastUtil.toast("图片转存失败，无法添加收藏")
+                    imageImporting = false
+                    tvTip.text = ""
+                    selectImage.isEnabled = true
+                }
+            })
+        }
     }
 
     // 保存图片
@@ -140,7 +166,7 @@ class CreateImageEntryDialog(
     // 删除过期的导入图片
     private fun deleteExpiredImportImage() {
         imagePath?.let {
-            BitmapIOService.deleteBitmap(it)
+            FileIOService.deleteFile(it)
         }
     }
 }

@@ -1,28 +1,23 @@
 package com.app.dixon.facorites.core.view
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
-import android.media.ExifInterface
 import android.net.Uri
-import android.os.Build
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.CommonCallback
+import com.app.dixon.facorites.core.common.ProgressCallback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.bean.GalleryEntryBean
-import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.data.service.FileIOService
 import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.core.ex.shakeTip
 import com.app.dixon.facorites.core.ex.shakeTipIfEmpty
 import com.app.dixon.facorites.core.util.ImageSelectHelper
 import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.page.gallery.adapter.GalleryImportAdapter
-import com.dixon.dlibrary.util.Ln
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
 import kotlinx.android.synthetic.main.app_dialog_create_gallery_entry_content.*
@@ -74,29 +69,53 @@ class CreateGalleryEntryDialog(
         var progress = 0f
         import.forEach { uri ->
             // 图片信息
-            var rotate = false
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                context.contentResolver.openInputStream(uri)?.let {
-                    val imageRotation = ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
-                    if (imageRotation == ExifInterface.ORIENTATION_ROTATE_90 || imageRotation == ExifInterface.ORIENTATION_ROTATE_270) {
-                        rotate = true
-                    }
-                }
-            }
-            // 转存图片到本地
-            var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
-            // iOS 拍出的图片带旋转角，要在导入时转为旋转后的图片
-            if (rotate) {
-                val m = Matrix()
-                m.setRotate(90f, bitmap.width.toFloat() / 2, bitmap.height.toFloat() / 2)
-                try {
-                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
-                } catch (ex: OutOfMemoryError) {
-                    Ln.e("OutOfMemoryError", "转存图片OOM")
-                }
-            }
-            val absolutePath = BitmapIOService.createBitmapSavePath()
-            BitmapIOService.saveBitmap(absolutePath, bitmap, object : Callback<String> {
+//            var rotate = false
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                context.contentResolver.openInputStream(uri)?.let {
+//                    val imageRotation = ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+//                    if (imageRotation == ExifInterface.ORIENTATION_ROTATE_90 || imageRotation == ExifInterface.ORIENTATION_ROTATE_270) {
+//                        rotate = true
+//                    }
+//                }
+//            }
+//            // 转存图片到本地
+//            var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
+//            // iOS 拍出的图片带旋转角，要在导入时转为旋转后的图片
+//            if (rotate) {
+//                val m = Matrix()
+//                m.setRotate(90f, bitmap.width.toFloat() / 2, bitmap.height.toFloat() / 2)
+//                try {
+//                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
+//                } catch (ex: OutOfMemoryError) {
+//                    Ln.e("OutOfMemoryError", "转存图片OOM")
+//                }
+//            }
+//            val absolutePath = BitmapIOService.createBitmapSavePath()
+//            BitmapIOService.saveBitmap(absolutePath, bitmap, object : Callback<String> {
+//                override fun onSuccess(data: String) {
+//                    tempGalleryPath.add(data)
+//                    progress++
+//                    dialog.setProgress((progress / max * 100).toInt())
+//                    if (progress.toInt() == max) {
+//                        dialog.dismiss()
+//                        ToastUtil.toast("图片导入完成")
+//                        rvGalleryList.adapter?.notifyDataSetChanged()
+//                    }
+//                }
+//
+//                override fun onFail(msg: String) {
+//                    // 导入失败，删除存图的文件
+//                    FileIOService.deleteFile(absolutePath)
+//                    progress++
+//                    dialog.setProgress((progress / max * 100).toInt())
+//                    if (progress.toInt() == max) {
+//                        dialog.dismiss()
+//                        ToastUtil.toast("图片导入完成")
+//                        rvGalleryList.adapter?.notifyDataSetChanged()
+//                    }
+//                }
+//            })
+            FileIOService.saveFile(FileIOService.FileType.IMAGE, uri, object : ProgressCallback<String> {
                 override fun onSuccess(data: String) {
                     tempGalleryPath.add(data)
                     progress++
@@ -109,8 +128,6 @@ class CreateGalleryEntryDialog(
                 }
 
                 override fun onFail(msg: String) {
-                    // 导入失败，删除存图的文件
-                    BitmapIOService.deleteBitmap(absolutePath)
                     progress++
                     dialog.setProgress((progress / max * 100).toInt())
                     if (progress.toInt() == max) {
@@ -118,6 +135,10 @@ class CreateGalleryEntryDialog(
                         ToastUtil.toast("图片导入完成")
                         rvGalleryList.adapter?.notifyDataSetChanged()
                     }
+                }
+
+                override fun onProgress(progress: Int) {
+
                 }
             })
         }
@@ -169,7 +190,7 @@ class CreateGalleryEntryDialog(
     // 删除过期的导入图片集
     private fun deleteExpiredGalleryImage() {
         tempGalleryPath.forEach {
-            BitmapIOService.deleteBitmap(it)
+            FileIOService.deleteFile(it)
         }
     }
 
@@ -199,7 +220,7 @@ class CreateGalleryEntryDialog(
                 // 如果是更新，则会带入图片，这些图片只有在确认更新时由DataService负责删除
                 // 原则是：已保存的图片由数据管理器（DataService）负责删除，临时图片是业务产生的，由业务方（CreateEntryDialog）删除
                 if (tempGalleryPath.contains(removePath)) {
-                    BitmapIOService.deleteBitmap(removePath)
+                    FileIOService.deleteFile(removePath)
                     tempGalleryPath.remove(removePath)
                 }
             },

@@ -46,7 +46,6 @@ open class BaseApplication : Application() {
 
         DataService.runService()
         JSoupService.runService()
-        BitmapIOService.runService()
         FileIOService.runService()
         NoteService.runService()
         IEService.runService()

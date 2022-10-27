@@ -240,14 +240,14 @@ object DataService : IService {
                 }
                 // 删除图片 包括分类自身的 和条目的
                 deleteCategoryInfo.bgPath?.let {
-                    BitmapIOService.deleteBitmap(it)
+                    FileIOService.deleteFile(it)
                 }
                 deleteEntries?.forEach {
                     (it as? ImageEntryBean)?.let { _ ->
-                        BitmapIOService.deleteBitmap(it.path)
+                        FileIOService.deleteFile(it.path)
                     }
                     (it as? GalleryEntryBean)?.path?.forEach { path ->
-                        BitmapIOService.deleteBitmap(path)
+                        FileIOService.deleteFile(path)
                     }
                 }
             } else {
@@ -291,14 +291,14 @@ object DataService : IService {
                 }
                 // 删除图片 包括分类自身的 和条目的
                 deleteCategoryInfo.bgPath?.let {
-                    BitmapIOService.deleteBitmap(it)
+                    FileIOService.deleteFile(it)
                 }
                 deleteEntries?.forEach {
                     (it as? ImageEntryBean)?.let { _ ->
-                        BitmapIOService.deleteBitmap(it.path)
+                        FileIOService.deleteFile(it.path)
                     }
                     (it as? GalleryEntryBean)?.path?.forEach { path ->
-                        BitmapIOService.deleteBitmap(path)
+                        FileIOService.deleteFile(path)
                     }
                 }
                 // 3.回调
@@ -355,7 +355,7 @@ object DataService : IService {
         }
         // 删除旧的封面图
         if (originBean.bgPath != null && originBean.bgPath != newBean.bgPath) {
-            BitmapIOService.deleteBitmap(originBean.bgPath)
+            FileIOService.deleteFile(originBean.bgPath)
         }
     }
 
@@ -386,7 +386,7 @@ object DataService : IService {
         }
         // 删除旧的封面图
         if (originBean.bgPath != null && originBean.bgPath != newBean.bgPath) {
-            BitmapIOService.deleteBitmap(originBean.bgPath)
+            FileIOService.deleteFile(originBean.bgPath)
         }
     }
 
@@ -542,7 +542,7 @@ object DataService : IService {
         (origin as? ImageEntryBean)?.let { originImageBean ->
             (updater as? ImageEntryBean)?.let { updaterImageBean ->
                 if (originImageBean.path != updaterImageBean.path) {
-                    BitmapIOService.deleteBitmap(originImageBean.path)
+                    FileIOService.deleteFile(originImageBean.path)
                 }
             }
         }
@@ -551,7 +551,7 @@ object DataService : IService {
             (updater as? GalleryEntryBean)?.let { updaterGalleryBean ->
                 originGalleryBean.path.forEach { originPath ->
                     if (!updaterGalleryBean.path.contains(originPath)) {
-                        BitmapIOService.deleteBitmap(originPath)
+                        FileIOService.deleteFile(originPath)
                     }
                 }
             }
@@ -705,10 +705,10 @@ object DataService : IService {
                 }
                 // 如果是图片/视频Entry，删除本地转存的图片/视频
                 (bean as? ImageEntryBean)?.let {
-                    BitmapIOService.deleteBitmap(it.path)
+                    FileIOService.deleteFile(it.path)
                 }
                 (bean as? GalleryEntryBean)?.path?.forEach { path ->
-                    BitmapIOService.deleteBitmap(path)
+                    FileIOService.deleteFile(path)
                 }
                 (bean as? VideoEntryBean)?.let {
                     FileIOService.deleteFile((it.path))

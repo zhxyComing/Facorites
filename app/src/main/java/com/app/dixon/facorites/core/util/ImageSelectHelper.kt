@@ -37,18 +37,19 @@ object ImageSelectHelper {
 
     // 打开图片选择器 可多选
     fun openGallerySelectPage(requestCode: Int) {
-//        val intent = Intent()
-//        intent.type = "image/*"
-//        intent.putExtra(EXTRA_ALLOW_MULTIPLE, true)
-//        intent.action = Intent.ACTION_GET_CONTENT
-//        // 打开手机相册,设置请求码
-//        BaseApplication.currentActivity.get()?.startActivityForResult(Intent.createChooser(intent, "Select Picture"), requestCode)
-
-        // 打开系统相册的选择方式 更友好
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
         intent.putExtra(EXTRA_ALLOW_MULTIPLE, true)
-        BaseApplication.currentActivity.get()?.startActivityForResult(intent, requestCode)
+        intent.action = Intent.ACTION_GET_CONTENT
+        // 打开手机相册,设置请求码
+        BaseApplication.currentActivity.get()?.startActivityForResult(Intent.createChooser(intent, "Select Picture"), requestCode)
+
+        // 打开系统相册的选择方式 更友好
+//        val intent = Intent(Intent.ACTION_PICK)
+//        intent.type = "image/*"
+//        intent.putExtra(EXTRA_ALLOW_MULTIPLE, true)
+//        intent.action = Intent.ACTION_GET_CONTENT
+//        BaseApplication.currentActivity.get()?.startActivityForResult(intent, requestCode)
     }
 
     //  打开图片裁剪页

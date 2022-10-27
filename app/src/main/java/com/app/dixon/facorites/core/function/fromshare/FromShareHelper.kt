@@ -64,8 +64,7 @@ class FromShareHelper {
             backUi(500) {
                 Ln.i("FromShare", uri.toString())
                 ContextAssistant.asContext {
-                    val bitmap = BitmapFactory.decodeStream(it.contentResolver.openInputStream(uri))
-                    CreateImageEntryDialog(it, bitmap).show()
+                    CreateImageEntryDialog(it, uri).show()
                 }
             }
             intent.removeExtra(Intent.EXTRA_STREAM)

@@ -8,8 +8,8 @@ import com.app.dixon.facorites.core.common.CommonCallback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
-import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.data.service.FileIOService
 import com.app.dixon.facorites.core.ex.setImageByUri
 import com.app.dixon.facorites.core.ex.shakeTip
 import com.app.dixon.facorites.core.util.ImageSelectHelper
@@ -102,7 +102,7 @@ class CreateCategoryDialog(context: Context, val belongTo: Long? = null, private
     // 删除过期的导入图片
     private fun deleteExpiredImportImage() {
         bgUri?.path?.let {
-            BitmapIOService.deleteBitmap(it)
+            FileIOService.deleteFile(it)
         }
     }
 }

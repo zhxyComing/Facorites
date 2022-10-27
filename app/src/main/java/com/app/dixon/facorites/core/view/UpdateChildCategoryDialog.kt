@@ -7,8 +7,8 @@ import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.data.bean.BaseEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryEntryBean
 import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
-import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.data.service.FileIOService
 import com.app.dixon.facorites.core.ex.findIndexByCondition
 import com.app.dixon.facorites.core.ex.setImageByUri
 import com.app.dixon.facorites.core.ex.shakeTip
@@ -123,7 +123,7 @@ class UpdateChildCategoryDialog(context: Context, val categoryEntryBean: Categor
                 }
             }
             if (deleteExpiredImage) {
-                BitmapIOService.deleteBitmap(it)
+                FileIOService.deleteFile(it)
             }
         }
     }

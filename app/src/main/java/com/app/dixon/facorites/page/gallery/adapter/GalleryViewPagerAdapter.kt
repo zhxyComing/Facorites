@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.app.dixon.facorites.R
+import com.app.dixon.facorites.core.util.ImageUtil
 import kotlinx.android.synthetic.main.item_gallery_view_pager.view.*
 
 class GalleryViewPagerAdapter(val context: Context, val data: List<String>) : RecyclerView.Adapter<GalleryViewPagerAdapter.ViewHolder>() {
@@ -18,7 +19,9 @@ class GalleryViewPagerAdapter(val context: Context, val data: List<String>) : Re
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.itemView.photoView.setImageURI(Uri.parse(data[position]))
+        ImageUtil.obtainSafeBitmap(data[position]) {
+            holder.itemView.photoView.setImageBitmap(it)
+        }
     }
 
     override fun getItemCount(): Int = data.size

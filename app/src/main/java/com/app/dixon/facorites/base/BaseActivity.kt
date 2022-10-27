@@ -14,7 +14,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentActivity
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.bean.CropInfo
-import com.app.dixon.facorites.core.data.service.BitmapIOService
+import com.app.dixon.facorites.core.data.service.FileIOService
 import com.app.dixon.facorites.core.data.service.base.DocumentFileUtils
 import com.app.dixon.facorites.core.ex.dp
 import com.app.dixon.facorites.core.util.ImageSelectHelper
@@ -169,7 +169,7 @@ open class BaseActivity : FragmentActivity() {
         Ln.i("openCategoryBgCrop", "${400.dp} ${100.dp}")
         ImageSelectHelper.openImageCropPage(
             this, uri,
-            BitmapIOService.createBitmapSavePath(),
+            FileIOService.createFileSavePath(FileIOService.FileType.IMAGE, "png"),
             CropInfo(aspectX = 3f, aspectY = 1f, outputX = 390.dp, outputY = 130.dp)
         )
     }
@@ -188,7 +188,7 @@ open class BaseActivity : FragmentActivity() {
         val aspectY = height / gcd
         ImageSelectHelper.openImageCropPage(
             this, uri,
-            BitmapIOService.createBitmapSavePath(),
+            FileIOService.createFileSavePath(FileIOService.FileType.IMAGE, "png"),
             CropInfo(aspectX = aspectX.toFloat(), aspectY = aspectY.toFloat(), outputX = width, outputY = height),
             REQUEST_CODE_WRAPPER_SET
         )

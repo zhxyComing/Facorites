@@ -1,12 +1,7 @@
 package com.app.dixon.facorites.core.view
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
-import android.media.ExifInterface
 import android.net.Uri
-import android.os.Build
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.dixon.facorites.R
@@ -14,7 +9,6 @@ import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.CommonCallback
 import com.app.dixon.facorites.core.common.ProgressCallback
 import com.app.dixon.facorites.core.data.bean.*
-import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.data.service.FileIOService
 import com.app.dixon.facorites.core.data.service.JSoupService
@@ -532,7 +526,7 @@ class CreateEntryDialog(
                 // 如果是更新，则会带入图片，这些图片只有在确认更新时由DataService负责删除
                 // 原则是：已保存的图片由数据管理器（DataService）负责删除，临时图片是业务产生的，由业务方（CreateEntryDialog）删除
                 if (tempGalleryPath.contains(removePath)) {
-                    BitmapIOService.deleteBitmap(removePath)
+                    FileIOService.deleteFile(removePath)
                     tempGalleryPath.remove(removePath)
                 }
             })
@@ -635,7 +629,7 @@ class CreateEntryDialog(
                 }
             }
             if (deleteExpiredImage) {
-                BitmapIOService.deleteBitmap(it)
+                FileIOService.deleteFile(it)
             }
         }
     }
@@ -643,7 +637,7 @@ class CreateEntryDialog(
     // 删除过期的导入图片集
     private fun deleteExpiredGalleryImage() {
         tempGalleryPath.forEach {
-            BitmapIOService.deleteBitmap(it)
+            FileIOService.deleteFile(it)
         }
     }
 
@@ -668,33 +662,10 @@ class CreateEntryDialog(
     fun onImageSelectComplete(event: CategoryImageCompleteEvent) {
         // 转存之前先把之前导入的图片删掉
         deleteExpiredImportImage()
-        // 图片信息
-        var rotate = false
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.contentResolver.openInputStream(event.uri)?.let {
-                val imageRotation = ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
-                if (imageRotation == ExifInterface.ORIENTATION_ROTATE_90 || imageRotation == ExifInterface.ORIENTATION_ROTATE_270) {
-                    rotate = true
-                }
-            }
-        }
-        // 转存图片到本地
-        var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(event.uri))
-        // iOS 拍出的图片带旋转角，要在导入时转为旋转后的图片
-        if (rotate) {
-            val m = Matrix()
-            m.setRotate(90f, bitmap.width.toFloat() / 2, bitmap.height.toFloat() / 2)
-            try {
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
-            } catch (ex: OutOfMemoryError) {
-                Ln.e("OutOfMemoryError", "转存图片OOM")
-            }
-        }
-        val absolutePath = BitmapIOService.createBitmapSavePath()
         tvTip.text = "转存图片中，请耐心等待"
         imageImporting = true
         selectImage.isEnabled = false
-        BitmapIOService.saveBitmap(absolutePath, bitmap, object : Callback<String> {
+        FileIOService.saveFile(FileIOService.FileType.IMAGE, event.uri, object : ProgressCallback<String> {
             override fun onSuccess(data: String) {
                 ToastUtil.toast("图片转存成功")
                 imageImporting = false
@@ -710,7 +681,54 @@ class CreateEntryDialog(
                 tvTip.text = "从相册选取图片"
                 selectImage.isEnabled = true
             }
+
+            override fun onProgress(progress: Int) {
+
+            }
         })
+//        // 图片信息
+//        var rotate = false
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//            context.contentResolver.openInputStream(event.uri)?.let {
+//                val imageRotation = ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+//                if (imageRotation == ExifInterface.ORIENTATION_ROTATE_90 || imageRotation == ExifInterface.ORIENTATION_ROTATE_270) {
+//                    rotate = true
+//                }
+//            }
+//        }
+//        // 转存图片到本地
+//        var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(event.uri))
+//        // iOS 拍出的图片带旋转角，要在导入时转为旋转后的图片
+//        if (rotate) {
+//            val m = Matrix()
+//            m.setRotate(90f, bitmap.width.toFloat() / 2, bitmap.height.toFloat() / 2)
+//            try {
+//                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
+//            } catch (ex: OutOfMemoryError) {
+//                Ln.e("OutOfMemoryError", "转存图片OOM")
+//            }
+//        }
+//        val absolutePath = BitmapIOService.createBitmapSavePath()
+//        tvTip.text = "转存图片中，请耐心等待"
+//        imageImporting = true
+//        selectImage.isEnabled = false
+//        BitmapIOService.saveBitmap(absolutePath, bitmap, object : Callback<String> {
+//            override fun onSuccess(data: String) {
+//                ToastUtil.toast("图片转存成功")
+//                imageImporting = false
+//                imagePath = data
+//                bgView.setImageByUri(event.uri)
+//                tvTip.text = "从相册选取图片"
+//                selectImage.isEnabled = true
+//            }
+//
+//            override fun onFail(msg: String) {
+//                ToastUtil.toast("图片转存失败，请更换图片后重新尝试")
+//                imageImporting = false
+//                tvTip.text = "从相册选取图片"
+//                selectImage.isEnabled = true
+//            }
+//        })
     }
 
     // 导入多张图片
@@ -721,29 +739,54 @@ class CreateEntryDialog(
         var progress = 0f
         event.list.forEach { uri ->
             // 图片信息
-            var rotate = false
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                context.contentResolver.openInputStream(uri)?.let {
-                    val imageRotation = ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
-                    if (imageRotation == ExifInterface.ORIENTATION_ROTATE_90 || imageRotation == ExifInterface.ORIENTATION_ROTATE_270) {
-                        rotate = true
-                    }
-                }
-            }
-            // 转存图片到本地
-            var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
-            // iOS 拍出的图片带旋转角，要在导入时转为旋转后的图片
-            if (rotate) {
-                val m = Matrix()
-                m.setRotate(90f, bitmap.width.toFloat() / 2, bitmap.height.toFloat() / 2)
-                try {
-                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
-                } catch (ex: OutOfMemoryError) {
-                    Ln.e("OutOfMemoryError", "转存图片OOM")
-                }
-            }
-            val absolutePath = BitmapIOService.createBitmapSavePath()
-            BitmapIOService.saveBitmap(absolutePath, bitmap, object : Callback<String> {
+//            var rotate = false
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                context.contentResolver.openInputStream(uri)?.let {
+//                    val imageRotation = ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+//                    if (imageRotation == ExifInterface.ORIENTATION_ROTATE_90 || imageRotation == ExifInterface.ORIENTATION_ROTATE_270) {
+//                        rotate = true
+//                    }
+//                }
+//            }
+//            // 转存图片到本地
+//            var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
+//            // iOS 拍出的图片带旋转角，要在导入时转为旋转后的图片
+//            if (rotate) {
+//                val m = Matrix()
+//                m.setRotate(90f, bitmap.width.toFloat() / 2, bitmap.height.toFloat() / 2)
+//                try {
+//                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
+//                } catch (ex: OutOfMemoryError) {
+//                    Ln.e("OutOfMemoryError", "转存图片OOM")
+//                }
+//            }
+//            val absolutePath = BitmapIOService.createBitmapSavePath()
+//            BitmapIOService.saveBitmap(absolutePath, bitmap, object : Callback<String> {
+//                override fun onSuccess(data: String) {
+//                    galleryPath.add(data)
+//                    tempGalleryPath.add(data)
+//                    progress++
+//                    dialog.setProgress((progress / max * 100).toInt())
+//                    if (progress.toInt() == max) {
+//                        dialog.dismiss()
+//                        ToastUtil.toast("图片导入完成")
+//                        rvGalleryList.adapter?.notifyDataSetChanged()
+//                    }
+//                }
+//
+//                override fun onFail(msg: String) {
+//                    // 导入失败，删除存图的文件
+//                    FileIOService.deleteFile(absolutePath)
+//                    progress++
+//                    dialog.setProgress((progress / max * 100).toInt())
+//                    if (progress.toInt() == max) {
+//                        dialog.dismiss()
+//                        ToastUtil.toast("图片导入完成")
+//                        rvGalleryList.adapter?.notifyDataSetChanged()
+//                    }
+//                }
+//            })
+            FileIOService.saveFile(FileIOService.FileType.IMAGE, uri, object : ProgressCallback<String> {
                 override fun onSuccess(data: String) {
                     galleryPath.add(data)
                     tempGalleryPath.add(data)
@@ -757,8 +800,6 @@ class CreateEntryDialog(
                 }
 
                 override fun onFail(msg: String) {
-                    // 导入失败，删除存图的文件
-                    BitmapIOService.deleteBitmap(absolutePath)
                     progress++
                     dialog.setProgress((progress / max * 100).toInt())
                     if (progress.toInt() == max) {
@@ -766,6 +807,10 @@ class CreateEntryDialog(
                         ToastUtil.toast("图片导入完成")
                         rvGalleryList.adapter?.notifyDataSetChanged()
                     }
+                }
+
+                override fun onProgress(progress: Int) {
+
                 }
             })
         }
@@ -775,7 +820,7 @@ class CreateEntryDialog(
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onVideoSelectComplete(event: VideoSelectCompleteEvent) {
         val dialog = ProgressDialog(context, "视频导入中..").apply { show() }
-        FileIOService.saveFile(event.uri, object : ProgressCallback<String> {
+        FileIOService.saveFile(FileIOService.FileType.VIDEO, event.uri, object : ProgressCallback<String> {
             override fun onSuccess(data: String) {
                 dialog.dismiss()
                 ToastUtil.toast("导入视频成功")
