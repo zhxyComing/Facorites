@@ -18,6 +18,7 @@ import com.app.dixon.facorites.page.gallery.GalleryBrowserActivity
 import com.app.dixon.facorites.page.home.HomeActivity
 import com.app.dixon.facorites.page.image.ImageActivity
 import com.app.dixon.facorites.page.map.MapActivity
+import com.app.dixon.facorites.page.video.activity.VideoPlayActivity
 import com.app.dixon.facorites.page.word.WordActivity
 
 /**
@@ -193,6 +194,18 @@ object PageJumper {
             val intent = Intent(it, GalleryBrowserActivity::class.java).apply {
                 putStringArrayListExtra(GALLERY_LIST, arrayList)
                 putExtra(GALLERY_INDEX, index)
+            }
+            startActivity(it, intent, requestCode)
+        }
+    }
+
+    /**
+     * 打开视频播放页
+     */
+    fun openVideoPlayerPage(asContext: Any, path: String, requestCode: Int = -1) {
+        resultJump(asContext) {
+            val intent = Intent(it, VideoPlayActivity::class.java).apply {
+                putExtra(VIDEO_PATH, path)
             }
             startActivity(it, intent, requestCode)
         }

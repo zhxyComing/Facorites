@@ -342,6 +342,91 @@
 
     </LinearLayout>
 
+    <!-- 导入视频 -->
+    <LinearLayout
+        android:id="@+id/videoLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvVideoLayoutTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:text="收藏视频"
+                android:textColor="@color/app_theme_red"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/tvVideoLayoutTip"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/app_icon_edit_info" />
+
+            <EditText
+                android:id="@+id/etVideoTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/app_shape_create_entry_input"
+                android:hint="在此添加标题"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:singleLine="true"
+                android:textColor="#404040"
+                android:textColorHint="#909090"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/tvVideoSubLayout"
+            android:layout_width="match_parent"
+            android:layout_height="148.5dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/app_shape_round_rect_grey_dark"
+            android:orientation="horizontal">
+
+            <com.jarvanmo.exoplayerview.ui.ExoVideoView
+                android:id="@+id/videoView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvVideoImportTip"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="点击导入视频"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/ivVideoRemove"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="end"
+                android:src="@drawable/app_icon_gallery_remove"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
     <com.app.dixon.facorites.core.view.CustomSpinner
         android:id="@+id/categoryChoose"
         android:layout_width="match_parent"
@@ -355,16 +440,61 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:gravity="end">
+        android:layout_marginBottom="20dp">
 
-        <ImageView
+        <LinearLayout
             android:id="@+id/layoutChange"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginEnd="20dp"
-            android:padding="5dp"
-            android:src="@drawable/app_image_red" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/app_shape_home_entry_card"
+            android:orientation="horizontal"
+            android:paddingStart="10dp">
+
+            <ImageView
+                android:id="@+id/ivGoLinkLayout"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="20dp"
+                android:padding="8dp"
+                android:src="@drawable/app_link_red" />
+
+            <ImageView
+                android:id="@+id/ivGoWordLayout"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="20dp"
+                android:padding="8dp"
+                android:src="@drawable/app_icon_word_create_entry" />
+
+            <ImageView
+                android:id="@+id/ivGoImageLayout"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="20dp"
+                android:padding="8dp"
+                android:src="@drawable/app_image_red" />
+
+            <ImageView
+                android:id="@+id/ivGoGalleryLayout"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="20dp"
+                android:padding="8dp"
+                android:src="@drawable/app_icon_gallery_create_entry" />
+
+            <ImageView
+                android:id="@+id/ivGoVideoLayout"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="20dp"
+                android:padding="8dp"
+                android:src="@drawable/app_icon_work" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <TextView
             android:id="@+id/tvCreate"

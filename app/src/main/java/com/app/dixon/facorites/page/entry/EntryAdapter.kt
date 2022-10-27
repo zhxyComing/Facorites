@@ -47,6 +47,8 @@ class EntryAdapter(val context: Context, val data: List<Openable<BaseEntryBean>>
             holder.itemView.linkCard.setWordEntry(wordEntry, showCategoryTag)
         }, { galleryEntry ->
             holder.itemView.linkCard.setGalleryEntry(galleryEntry, showCategoryTag)
+        }, { videoEntry ->
+            holder.itemView.linkCard.setVideoEntry(videoEntry, showCategoryTag)
         })
         holder.itemView.linkCard.apply {
             setOnClickListener {
@@ -117,6 +119,10 @@ class EntryAdapter(val context: Context, val data: List<Openable<BaseEntryBean>>
                         }
                     }, { galleryEntry ->
                         if (galleryEntry.title.toLowerCase().contains(charString.toLowerCase())) {
+                            filterData?.add(it)
+                        }
+                    }, { videoEntry ->
+                        if (videoEntry.title.toLowerCase().contains(charString.toLowerCase())) {
                             filterData?.add(it)
                         }
                     })

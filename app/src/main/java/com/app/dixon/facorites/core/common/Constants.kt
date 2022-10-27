@@ -19,6 +19,8 @@ const val BROWSE_TITLE = "browse_title"
 
 const val IMAGE_PATH = "image_path"
 
+const val VIDEO_PATH = "video_path"
+
 const val WORD_CONTENT = "word_content"
 
 const val GALLERY_LIST = "gallery_list"

@@ -335,6 +335,8 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
                     cardView.setWordEntry(wordEntry)
                 }, { galleryEntry ->
                     cardView.setGalleryEntry(galleryEntry)
+                }, { videoEntry ->
+                    cardView.setVideoEntry(videoEntry)
                 })
             }
         }
@@ -440,6 +442,8 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
                     cardView?.setWordEntry(it)
                 }, {
                     cardView?.setGalleryEntry(it)
+                }, {
+                    cardView?.setVideoEntry(it)
                 })
                 // indexOf只是使用ID判断，并不代表内容一致，需要更新内容
                 entries[index] = bean

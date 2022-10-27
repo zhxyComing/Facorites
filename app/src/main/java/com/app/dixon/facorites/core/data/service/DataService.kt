@@ -703,12 +703,15 @@ object DataService : IService {
                         it.onDataDeleted(bean)
                     }
                 }
-                // 如果是图片Entry，删除本地转存的图片
+                // 如果是图片/视频Entry，删除本地转存的图片/视频
                 (bean as? ImageEntryBean)?.let {
                     BitmapIOService.deleteBitmap(it.path)
                 }
                 (bean as? GalleryEntryBean)?.path?.forEach { path ->
                     BitmapIOService.deleteBitmap(path)
+                }
+                (bean as? VideoEntryBean)?.let {
+                    FileIOService.deleteFile((it.path))
                 }
             } else {
                 callback?.backUi { onFail("文件写入失败") }

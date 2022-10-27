@@ -63,6 +63,8 @@ class MapActivity : BaseActivity() {
                     PageJumper.openWordPage(this, it.content)
                 }, {
                     PageJumper.openGalleryPage(this, it.path, it.title)
+                }, {
+                    PageJumper.openVideoPlayerPage(this, it.path)
                 })
             }
         }
@@ -128,6 +130,8 @@ class MapActivity : BaseActivity() {
                                 newEntry = WordEntryBean(it.content, it.date, newBelongTo, it.star)
                             }, {
                                 newEntry = GalleryEntryBean(it.path, it.title, it.date, newBelongTo, it.star)
+                            }, {
+                                newEntry = VideoEntryBean(it.path, it.title, it.date, newBelongTo, it.star)
                             })
                             newEntry?.let {
                                 DataService.updateEntry(updater, it)
@@ -183,6 +187,8 @@ class MapActivity : BaseActivity() {
                     name = word.content
                 }, { gallery ->
                     name = gallery.title
+                }, { video ->
+                    name = video.title
                 })
                 val nodeTemp: NodeModel<BaseNodeData> = NodeModel<BaseNodeData>(EntryNodeData(it, name))
                 treeModel.addNode(rootNode, nodeTemp)

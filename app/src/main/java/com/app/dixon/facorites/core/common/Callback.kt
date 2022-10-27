@@ -47,3 +47,15 @@ open class SuccessCallback<T>(private val action: (T) -> Unit) : Callback<T> {
         ToastUtil.toast(msg)
     }
 }
+
+/**
+ * 带进度的回调
+ */
+interface ProgressCallback<T> {
+
+    fun onSuccess(data: T)
+
+    fun onFail(msg: String)
+
+    fun onProgress(progress: Int)
+}

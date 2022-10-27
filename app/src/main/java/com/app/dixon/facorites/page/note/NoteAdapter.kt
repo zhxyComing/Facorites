@@ -58,6 +58,8 @@ class NoteAdapter(val context: Context, val data: List<NoteBean>) : RecyclerView
                 }, { galleryEntry ->
                     // 暂时不会走到
                     PageJumper.openGalleryPage(context, galleryEntry.path, galleryEntry.title)
+                }, {
+                    // 视频不会有笔记
                 })
             } ?: let {
                 // 未找到 说明条目已删除

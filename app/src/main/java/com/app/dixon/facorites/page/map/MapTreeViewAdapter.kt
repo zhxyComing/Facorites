@@ -48,6 +48,9 @@ class MapTreeViewAdapter(val itemClick: ((BaseNodeData) -> Unit)? = null) : Tree
                     itemView.ivImage.setImageResource(R.drawable.app_icon_map_entry_word)
                 }, {
                     itemView.ivImage.setImageResource(R.drawable.app_icon_map_entry_gallery)
+                }, {
+                    // TODO VIDEO 替换视频图标
+                    itemView.ivImage.setImageResource(R.drawable.app_icon_map_entry_gallery)
                 })
             } else {
                 itemView.ivImage.setImageResource(R.drawable.app_icon_map_entry)

@@ -117,6 +117,8 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                 ClipUtil.copyToClip(context, wordEntry.content)
             }, {
                 // 图片集不能复制
+            }, {
+                // 视频不能复制
             })
             ToastUtil.toast("已复制到剪贴板")
         }
@@ -137,6 +139,8 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                 PageJumper.openWordPage(context, wordEntry.content)
             }, { galleryEntry ->
                 PageJumper.openGalleryPage(context, galleryEntry.path, galleryEntry.title)
+            }, { videoEntry ->
+                PageJumper.openVideoPlayerPage(context, videoEntry.path)
             })
         }
 
@@ -199,6 +203,17 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                             star = star
                         )
                     )
+                }, { videoEntry ->
+                    DataService.updateEntry(
+                        it,
+                        VideoEntryBean(
+                            path = videoEntry.path,
+                            title = videoEntry.title,
+                            date = videoEntry.date,
+                            belongTo = videoEntry.belongTo,
+                            star = star
+                        )
+                    )
                 })
             }
         }
@@ -226,6 +241,8 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                     // 语录目前没有背景
                 }, {
                     // 相册集没有背景
+                }, {
+                    // 视频没有背景
                 })
             }
         }
@@ -417,6 +434,35 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         categoryTag.hide()
         tvMap.hide()
         vEntryTag.setBackgroundColor(resources.getColor(R.color.md_green_400))
+    }
+
+    fun setVideoEntry(bean: VideoEntryBean, categoryTagShow: Boolean = true) {
+        initVideoUi()
+        this.bean = bean
+        title.text = bean.title
+        if (categoryTagShow) {
+            setCategoryTag(bean.belongTo)
+        } else {
+            hideCategoryTag()
+        }
+        tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
+        updateStarIcon()
+        icon.setActualImageResource(R.drawable.app_icon_word_entry_view_tag) // TODO VIDEO 更换图标
+    }
+
+    private fun initVideoUi() {
+        tvSchemeJump.hide()
+        tvJump.hide()
+        tvHideBg.hide()
+        tvUpdate.show()
+        tvCopy.hide()
+        ivBrowse.show()
+        tvDelete.show()
+        entryBg.hide()
+        entryBgMask.hide()
+        categoryTag.hide()
+        tvMap.hide()
+        vEntryTag.setBackgroundColor(resources.getColor(R.color.md_blue_grey_400))
     }
 
     fun setGalleryEntry(bean: GalleryEntryBean, categoryTagShow: Boolean = true) {

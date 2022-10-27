@@ -1,13 +1,16 @@
 package com.app.dixon.facorites.core.data.service.base
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Environment
-import android.util.Log
 import com.app.dixon.facorites.base.BaseApplication
 import com.app.dixon.facorites.base.ContextAssistant
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.EXPORT_ROOT_CATEGORY
+import com.app.dixon.facorites.core.common.ProgressCallback
 import com.app.dixon.facorites.core.util.Ln
 import java.io.*
 import java.util.*
@@ -235,18 +238,84 @@ object FileUtils {
     /**
      * 删除文件
      */
-    fun deleteFile(path: String): Boolean {
-        val file = File(ROOT_CATEGORY, path)
-        return file.delete()
-    }
-
-    /**
-     * 删除文件
-     */
     fun deleteFileAbs(absolutePath: String): Boolean {
         val file = File(absolutePath)
         return file.delete()
     }
+
+    fun saveFile(originAbsolutePath: String, saveAbsolutePath: String, asyncCallback: Callback<String>) {
+        // File.getTotalSpace()
+        // 创建String对象保存文件名路径
+        try {
+            // 创建指定路径的文件
+            val file = File(saveAbsolutePath)
+            if (!file.exists()) {
+                file.createNewFile()
+            }
+            val inputStream: InputStream = FileInputStream(originAbsolutePath)
+            val fos = FileOutputStream(saveAbsolutePath)
+            val b = ByteArray(1024)
+            while (inputStream.read(b) != -1) {
+                fos.write(b) // 写入数据
+            }
+            inputStream.close()
+            fos.close() // 保存数据
+            asyncCallback.onSuccess(saveAbsolutePath)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            asyncCallback.onFail(e.toString())
+        }
+    }
+
+    fun saveFile(originUri: Uri, saveAbsolutePath: String, asyncCallback: ProgressCallback<String>) {
+        // File.getTotalSpace()
+        // 创建String对象保存文件名路径
+        try {
+            // 创建指定路径的文件
+            val file = File(saveAbsolutePath)
+            if (!file.exists()) {
+                file.createNewFile()
+            }
+            val inputStream: InputStream? = ContextAssistant.application().contentResolver.openInputStream(originUri)
+            inputStream?.let {
+                val uriLength: Long = it.available().toLong()
+                Ln.i("SaveFile", "uriLength: $uriLength")
+                var currentLength = 0L
+                val fos = FileOutputStream(saveAbsolutePath)
+                val b = ByteArray(1024)
+                while (it.read(b) != -1) {
+                    fos.write(b) // 写入数据
+                    currentLength += 1024
+                    val progress = (currentLength * 100L / uriLength).toInt() // 一定要用Long，否则超限
+                    asyncCallback.onProgress(progress)
+                    Ln.i("SaveFile", "progress: $progress currentLength: $currentLength uriLength: $uriLength")
+                }
+                it.close()
+                fos.close() // 保存数据
+                asyncCallback.onSuccess(saveAbsolutePath)
+                Ln.i("SaveFile", "Success")
+            } ?: let {
+                asyncCallback.onFail("inputStream 获取失败")
+                Ln.i("SaveFile", "Fail 获取失败")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            asyncCallback.onFail(e.toString())
+            Ln.i("SaveFile", "Fail ${e.printStackTrace()}")
+        }
+    }
+
+    /**
+     * 删除图片
+     */
+    fun deleteFile(absolutePath: String): Boolean {
+        val file = File(absolutePath)
+        if (!file.exists()) {
+            return false
+        }
+        return file.delete()
+    }
+
 
     /**
      * 保存图片
@@ -303,6 +372,17 @@ object FileUtils {
      * 创建一个空文件用于保存图片
      */
     fun createBitmapSavePath(path: String): String {
+        val file = File(ROOT_CATEGORY, path)
+        if (!file.exists()) {
+            file.createNewFile()
+        }
+        return file.absolutePath
+    }
+
+    /**
+     * 创建一个空文件用于保存文件
+     */
+    fun createFileSavePath(path: String): String {
         val file = File(ROOT_CATEGORY, path)
         if (!file.exists()) {
             file.createNewFile()
@@ -408,7 +488,6 @@ object FileUtils {
         }
         return file.absolutePath
     }
-
 
     /**
      * 删除图片

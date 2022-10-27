@@ -5,26 +5,34 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
+import android.net.Uri
 import android.os.Build
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.dixon.facorites.R
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.CommonCallback
+import com.app.dixon.facorites.core.common.ProgressCallback
 import com.app.dixon.facorites.core.data.bean.*
 import com.app.dixon.facorites.core.data.service.BitmapIOService
 import com.app.dixon.facorites.core.data.service.DataService
+import com.app.dixon.facorites.core.data.service.FileIOService
 import com.app.dixon.facorites.core.data.service.JSoupService
 import com.app.dixon.facorites.core.enum.EntryType
 import com.app.dixon.facorites.core.ex.*
 import com.app.dixon.facorites.core.util.ImageSelectHelper
+import com.app.dixon.facorites.core.util.VideoSelectHelper
 import com.app.dixon.facorites.core.util.mediumFont
 import com.app.dixon.facorites.core.util.normalFont
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.app.dixon.facorites.page.gallery.adapter.GalleryImportAdapter
 import com.app.dixon.facorites.page.gallery.event.GalleryCompleteEvent
+import com.app.dixon.facorites.page.video.event.VideoSelectCompleteEvent
 import com.dixon.dlibrary.util.Ln
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
+import com.google.android.exoplayer2.Player.REPEAT_MODE_ALL
+import com.jarvanmo.exoplayerview.media.SimpleMediaSource
 import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -34,6 +42,11 @@ import java.util.*
 
 const val ENTRY_IMAGE_REQUEST = 101
 const val ENTRY_GALLERY_REQUEST = 102
+const val ENTRY_VIDEO_REQUEST = 103
+
+/**
+ * TODO 重构 拆解 优化
+ */
 
 // 创建用构造函数
 class CreateEntryDialog(
@@ -72,6 +85,9 @@ class CreateEntryDialog(
     private var galleryPath = mutableListOf<String>()
     private var tempGalleryPath = mutableListOf<String>() // 新导入的临时图片 如果后续选择取消 则要删除掉这些新导入的图
 
+    // 视频
+    private var tempVideoPath: String? = null // 新导入的临时视频 如果后续选择取消 则要删除掉这些新导入的视频
+
     // 更新用构造函数
     constructor(
         context: Context, entry: BaseEntryBean,
@@ -99,6 +115,7 @@ class CreateEntryDialog(
         initLinkLogic()
         initImageLayout()
         initGalleryLayout()
+        initVideoLayout()
     }
 
     // 通用逻辑的初始化
@@ -114,6 +131,7 @@ class CreateEntryDialog(
                 EntryType.IMAGE -> saveOrUpdateImage()
                 EntryType.WORD -> saveOrUpdateWord()
                 EntryType.GALLERY -> saveOrUpdateGallery()
+                EntryType.VIDEO -> saveOrUpdateVideo()
             }
         }
         // 分类的下拉列表
@@ -128,28 +146,31 @@ class CreateEntryDialog(
             }
             spinnerIndex?.let { index -> categoryChoose.setSelection(index) }
         }
+
         // 切换数据类型
-        layoutChange.setOnClickListener {
-            changeType()
-            when (dataType) {
-                EntryType.LINK -> {
-                    showLinkUi()
-                    layoutChange.setImageResource(R.drawable.app_image_red)
-                }
-                EntryType.IMAGE -> {
-                    showImageUi()
-                    layoutChange.setImageResource(R.drawable.app_icon_word_create_entry)
-                }
-                EntryType.WORD -> {
-                    showWordUi()
-                    layoutChange.setImageResource(R.drawable.app_icon_gallery_create_entry)
-                }
-                EntryType.GALLERY -> {
-                    showGalleryUi()
-                    layoutChange.setImageResource(R.drawable.app_link_red)
-                }
-            }
+        // TODO 抽离组件
+        ivGoLinkLayout.setOnClickListener {
+            dataType = EntryType.LINK
+            showLinkUi()
+            // TODO 图标高亮 & 替换图标
         }
+        ivGoWordLayout.setOnClickListener {
+            dataType = EntryType.WORD
+            showWordUi()
+        }
+        ivGoImageLayout.setOnClickListener {
+            dataType = EntryType.IMAGE
+            showImageUi()
+        }
+        ivGoGalleryLayout.setOnClickListener {
+            dataType = EntryType.GALLERY
+            showGalleryUi()
+        }
+        ivGoVideoLayout.setOnClickListener {
+            dataType = EntryType.VIDEO
+            showVideoUi()
+        }
+
         // 更新 其它类型不显示 并往UI填充已有数据
         tapeEntry?.process({ linkEntry ->
             dataType = EntryType.LINK
@@ -174,6 +195,16 @@ class CreateEntryDialog(
             galleryPath.addAll(galleryEntry.path)
             etGalleryTitle.setText(galleryEntry.title)
             showGalleryUi()
+        }, { videoEntryBean ->
+            dataType = EntryType.VIDEO
+            tempVideoPath = videoEntryBean.path
+            etVideoTitle.setText(videoEntryBean.title)
+            showVideoUi()
+            videoView.show()
+            tvVideoImportTip.hide()
+            // 不允许修改视频：视频都改了，为什么不去创建新的？
+            ivVideoRemove.hide()
+            playVideo(videoEntryBean.path)
         })
         tapeEntry?.let { layoutChange.hide() }
 
@@ -183,6 +214,7 @@ class CreateEntryDialog(
         tvImageLayoutTitle.mediumFont()
         tvWordLayoutTitle.mediumFont()
         tvGalleryLayoutTitle.mediumFont()
+        tvVideoLayoutTitle.mediumFont()
     }
 
     // 链接数据初始化逻辑
@@ -208,7 +240,7 @@ class CreateEntryDialog(
                 // 切换至语录面板
                 dataType = EntryType.WORD
                 showWordUi()
-                layoutChange.setImageResource(R.drawable.app_icon_gallery_create_entry)
+                // TODO 图标高亮
             }
         }
     }
@@ -218,6 +250,7 @@ class CreateEntryDialog(
         imageLayout.hide()
         wordLayout.hide()
         galleryLayout.hide()
+        videoLayout.hide()
     }
 
     private fun showImageUi() {
@@ -225,6 +258,7 @@ class CreateEntryDialog(
         imageLayout.show()
         wordLayout.hide()
         galleryLayout.hide()
+        videoLayout.hide()
     }
 
     private fun showWordUi() {
@@ -232,6 +266,7 @@ class CreateEntryDialog(
         imageLayout.hide()
         wordLayout.show()
         galleryLayout.hide()
+        videoLayout.hide()
     }
 
     private fun showGalleryUi() {
@@ -239,6 +274,15 @@ class CreateEntryDialog(
         imageLayout.hide()
         wordLayout.hide()
         galleryLayout.show()
+        videoLayout.hide()
+    }
+
+    private fun showVideoUi() {
+        videoLayout.show()
+        linkLayout.hide()
+        imageLayout.hide()
+        wordLayout.hide()
+        galleryLayout.hide()
     }
 
     // 保存链接
@@ -405,6 +449,48 @@ class CreateEntryDialog(
         }
     }
 
+    // 保存视频
+    private fun saveOrUpdateVideo() {
+        val title = etVideoTitle.text.toString()
+        val categoryId = categoryChoose.getSelectionData<CategoryInfoBean>()?.id
+        if (title.isNotEmpty() && categoryId != null && !tempVideoPath.isNullOrEmpty()) {
+            if (editType == EDIT_TYPE_CREATE) {
+                DataService.createEntry(
+                    VideoEntryBean(
+                        path = tempVideoPath!!,
+                        title = title,
+                        date = Date().time,
+                        belongTo = categoryId,
+                    ),
+                    callback
+                )
+            } else if (editType == EDIT_TYPE_UPDATE) {
+                (tapeEntry as? VideoEntryBean)?.let {
+                    DataService.updateEntry(
+                        it,
+                        VideoEntryBean(
+                            path = tempVideoPath!!,
+                            title = title,
+                            date = it.date,
+                            belongTo = categoryId,
+                            star = it.star
+                        ),
+                        callback
+                    )
+                }
+            }
+            hasSave = true
+            dismiss()
+        } else {
+            // 未填数据提示
+            etVideoTitle.shakeTipIfEmpty()
+            // 没选图或者导入过程中均不允许创建或更新
+            if (tempVideoPath.isNullOrEmpty()) {
+                tvVideoSubLayout.shakeTip()
+            }
+        }
+    }
+
     // 图片类型
     private fun initImageLayout() {
         selectImage.setOnClickListener {
@@ -452,12 +538,34 @@ class CreateEntryDialog(
             })
     }
 
+    // 视频类型
+    private fun initVideoLayout() {
+        tvVideoSubLayout.setOnClickListener {
+            VideoSelectHelper.openVideoSelectPage(ENTRY_VIDEO_REQUEST)
+        }
+        ivVideoRemove.setOnClickListener {
+            tvVideoImportTip.show()
+            ivVideoRemove.hide()
+            releaseVideo()
+            videoView.hide()
+        }
+        tvVideoLayoutTip.setOnClickListener {
+            TipDialog(
+                context,
+                content = "导入收藏夹子的视频有以下特性：\n\n1.应用外（如相册）不可见；\n" +
+                        "\n2.删除手机（相册）的原视频不会影响到收藏视频。",
+                title = "视频收藏提示"
+            ).show()
+        }
+    }
+
     private fun changeType() {
         dataType = when (dataType) {
             EntryType.LINK -> EntryType.IMAGE
             EntryType.IMAGE -> EntryType.WORD
             EntryType.WORD -> EntryType.GALLERY
-            EntryType.GALLERY -> EntryType.LINK
+            EntryType.GALLERY -> EntryType.VIDEO
+            EntryType.VIDEO -> EntryType.LINK
             else -> EntryType.LINK
         }
     }
@@ -492,9 +600,14 @@ class CreateEntryDialog(
     }
 
     override fun onDetachedFromWindow() {
+        Ln.i("CreateEntryDialog", "onDetachedFromWindow")
+        // 如果视频在播放 则停止播放并释放资源
+        videoView.stop()
+        videoView.releasePlayer()
         if (!hasSave) {
             deleteExpiredImportImage()
             deleteExpiredGalleryImage()
+            deleteExpiredVideo()
         } else {
             // 保存了，但是保存的不是对应类型
             if (dataType != EntryType.IMAGE) {
@@ -502,6 +615,9 @@ class CreateEntryDialog(
             }
             if (dataType != EntryType.GALLERY) {
                 deleteExpiredGalleryImage()
+            }
+            if (dataType != EntryType.VIDEO) {
+                deleteExpiredVideo()
             }
         }
         super.onDetachedFromWindow()
@@ -528,6 +644,23 @@ class CreateEntryDialog(
     private fun deleteExpiredGalleryImage() {
         tempGalleryPath.forEach {
             BitmapIOService.deleteBitmap(it)
+        }
+    }
+
+    // 删除过期的导入视频
+    private fun deleteExpiredVideo() {
+        tempVideoPath?.let {
+            var deleteExpiredImage = true
+            (tapeEntry as? VideoEntryBean)?.let { tapeVideoBean ->
+                // 带入更新的视频在确认修改之前不删除
+                if (tapeVideoBean.path == it) {
+                    deleteExpiredImage = false
+                }
+            }
+            if (deleteExpiredImage) {
+                FileIOService.deleteFile(it)
+                tempVideoPath = null
+            }
         }
     }
 
@@ -636,5 +769,47 @@ class CreateEntryDialog(
                 }
             })
         }
+    }
+
+    // 导入视频
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onVideoSelectComplete(event: VideoSelectCompleteEvent) {
+        val dialog = ProgressDialog(context, "视频导入中..").apply { show() }
+        FileIOService.saveFile(event.uri, object : ProgressCallback<String> {
+            override fun onSuccess(data: String) {
+                dialog.dismiss()
+                ToastUtil.toast("导入视频成功")
+                tempVideoPath = data
+
+                // 打开播放器进行播放
+                videoView.show()
+                tvVideoImportTip.hide()
+                ivVideoRemove.show()
+                playVideo(data)
+            }
+
+            override fun onFail(msg: String) {
+                dialog.dismiss()
+                ToastUtil.toast("导入视频失败 $msg")
+            }
+
+            override fun onProgress(progress: Int) {
+                dialog.setProgress(progress)
+            }
+        })
+    }
+
+    private fun playVideo(path: String) {
+        val mediaSource = SimpleMediaSource(Uri.parse(path)) //uri also supported
+        videoView.play(mediaSource, 0) //play from a particular position
+        videoView.player.repeatMode = REPEAT_MODE_ALL
+        videoView.changeWidgetVisibility(R.id.exo_player_enter_fullscreen, View.GONE)
+    }
+
+    // 停止播放并移除视频
+    private fun releaseVideo() {
+        videoView.stop()
+        videoView.releasePlayer()
+        deleteExpiredVideo()
     }
 }

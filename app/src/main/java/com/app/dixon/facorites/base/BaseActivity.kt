@@ -21,9 +21,11 @@ import com.app.dixon.facorites.core.util.ImageSelectHelper
 import com.app.dixon.facorites.core.util.Ln
 import com.app.dixon.facorites.core.view.ENTRY_GALLERY_REQUEST
 import com.app.dixon.facorites.core.view.ENTRY_IMAGE_REQUEST
+import com.app.dixon.facorites.core.view.ENTRY_VIDEO_REQUEST
 import com.app.dixon.facorites.page.category.event.CategoryImageCompleteEvent
 import com.app.dixon.facorites.page.gallery.event.GalleryCompleteEvent
 import com.app.dixon.facorites.page.home.CATEGORY_BG_IMAGE_REQUEST
+import com.app.dixon.facorites.page.video.event.VideoSelectCompleteEvent
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.StatusBarUtil
 import com.dixon.dlibrary.util.ToastUtil
@@ -149,6 +151,11 @@ open class BaseActivity : FragmentActivity() {
                     val bitmap = BitmapFactory.decodeFile(resultUri.path)
                     wrapperManager.setBitmap(bitmap)
                     ToastUtil.toast("设置壁纸成功")
+                }
+            } else if (resultCode == RESULT_OK && requestCode == ENTRY_VIDEO_REQUEST) {
+                it.data?.let { uri ->
+                    Ln.i("VideoSelectResult", "$uri ${uri.path}")
+                    EventBus.getDefault().post(VideoSelectCompleteEvent(uri))
                 }
             } else {
                 // do nothing

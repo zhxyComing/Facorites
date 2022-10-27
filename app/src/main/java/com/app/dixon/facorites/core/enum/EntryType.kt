@@ -4,7 +4,7 @@ import androidx.annotation.IntDef
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
     @MustBeDocumented
-    @IntDef(EntryType.LINK, EntryType.IMAGE, EntryType.WORD, EntryType.GALLERY)
+    @IntDef(EntryType.LINK, EntryType.IMAGE, EntryType.WORD, EntryType.GALLERY, EntryType.VIDEO)
     @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
     annotation
     class EntryType {
@@ -13,5 +13,6 @@ import androidx.annotation.IntDef
             const val IMAGE = 0x1
             const val WORD = 0x2
             const val GALLERY = 0x3
+            const val VIDEO = 0x4
         }
     }

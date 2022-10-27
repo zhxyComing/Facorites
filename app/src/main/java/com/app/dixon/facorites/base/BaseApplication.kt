@@ -5,10 +5,7 @@ import android.app.Application
 import android.os.Bundle
 import com.app.dixon.facorites.BuildConfig
 import com.app.dixon.facorites.core.common.AGREEMENT_CONFIRM
-import com.app.dixon.facorites.core.data.service.BitmapIOService
-import com.app.dixon.facorites.core.data.service.DataService
-import com.app.dixon.facorites.core.data.service.JSoupService
-import com.app.dixon.facorites.core.data.service.NoteService
+import com.app.dixon.facorites.core.data.service.*
 import com.app.dixon.facorites.core.ie.IEService
 import com.app.dixon.facorites.core.util.DeviceUtil
 import com.dixon.dlibrary.util.DUtil
@@ -50,6 +47,7 @@ open class BaseApplication : Application() {
         DataService.runService()
         JSoupService.runService()
         BitmapIOService.runService()
+        FileIOService.runService()
         NoteService.runService()
         IEService.runService()
 
