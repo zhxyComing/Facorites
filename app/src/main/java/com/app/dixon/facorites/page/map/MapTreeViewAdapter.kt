@@ -19,7 +19,7 @@ import treeview.model.NodeModel
 
 class MapTreeViewAdapter(val itemClick: ((BaseNodeData) -> Unit)? = null) : TreeViewAdapter<BaseNodeData>() {
 
-    private val dashLine = AngledLine(Color.parseColor("#FF2442"), 4)
+    private val dashLine = AngledLine(Color.parseColor("#1B5E20"), 2)
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, node: NodeModel<BaseNodeData>): TreeViewHolder<BaseNodeData> {
         val contentView = LayoutInflater.from(viewGroup.context).inflate(R.layout.app_content_tree_map, viewGroup, false)
@@ -33,27 +33,26 @@ class MapTreeViewAdapter(val itemClick: ((BaseNodeData) -> Unit)? = null) : Tree
         if (nodeData is CategoryNodeData) {
             itemView.container.setBackgroundResource(R.drawable.app_select_map_category)
             itemView.tvItemTitle.mediumFont()
-            itemView.ivImage.setImageResource(R.drawable.app_icon_map_category)
+            itemView.ivImage.setImageResource(R.drawable.app_icon_entry_view_tag_dir)
         } else {
             itemView.container.setBackgroundResource(R.drawable.app_select_map_entry)
-            itemView.tvItemTitle.normalFont()
+            itemView.tvItemTitle.mediumFont()
             if (nodeData is EntryNodeData) {
                 nodeData.entry.process({
-                    itemView.ivImage.setImageResource(R.drawable.app_icon_map_entry)
+                    itemView.ivImage.setImageResource(R.drawable.app_icon_entry_view_tag_link)
                 }, {
-                    itemView.ivImage.setImageResource(R.drawable.app_icon_map_entry_image)
+                    itemView.ivImage.setImageResource(R.drawable.app_icon_entry_view_tag_image)
                 }, {
                     // 不会走到这
                 }, {
-                    itemView.ivImage.setImageResource(R.drawable.app_icon_map_entry_word)
+                    itemView.ivImage.setImageResource(R.drawable.app_icon_entry_view_tag_word)
                 }, {
-                    itemView.ivImage.setImageResource(R.drawable.app_icon_map_entry_gallery)
+                    itemView.ivImage.setImageResource(R.drawable.app_icon_entry_view_tag_gallery)
                 }, {
-                    // TODO VIDEO 替换视频图标
-                    itemView.ivImage.setImageResource(R.drawable.app_icon_map_entry_gallery)
+                    itemView.ivImage.setImageResource(R.drawable.app_icon_entry_view_tag_video)
                 })
             } else {
-                itemView.ivImage.setImageResource(R.drawable.app_icon_map_entry)
+                itemView.ivImage.setImageResource(R.drawable.app_icon_entry_view_tag_link)
             }
         }
         itemView.tvItemTitle.text = nodeData.name

@@ -68,7 +68,7 @@ class MapActivity : BaseActivity() {
                 })
             }
         }
-        val line: BaseLine = StraightLine(Color.parseColor("#4DB6AC"), 2) // ? 有什么用
+        val line: BaseLine = StraightLine(Color.parseColor("#2E7D32"), 2) // ? 有什么用
         val treeLayoutManager: TreeLayoutManager = RightTreeLayoutManager(this, 50, 20, line)
 
         // adapter & layout
@@ -195,4 +195,6 @@ class MapActivity : BaseActivity() {
             }
         }
     }
+
+    override fun statusBarColor(): Int = R.color.md_grey_300
 }

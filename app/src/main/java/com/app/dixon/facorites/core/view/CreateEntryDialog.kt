@@ -1,6 +1,7 @@
 package com.app.dixon.facorites.core.view
 
 import android.content.Context
+import android.graphics.Color
 import android.net.Uri
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -209,6 +210,8 @@ class CreateEntryDialog(
         tvWordLayoutTitle.mediumFont()
         tvGalleryLayoutTitle.mediumFont()
         tvVideoLayoutTitle.mediumFont()
+
+        changeFunctionSelectStatus()
     }
 
     // 链接数据初始化逻辑
@@ -239,12 +242,42 @@ class CreateEntryDialog(
         }
     }
 
+    private fun changeFunctionSelectStatus(){
+        val items = listOf(ivGoLinkLayout, ivGoWordLayout, ivGoImageLayout, ivGoGalleryLayout, ivGoVideoLayout)
+        fun resetSelectStatus(){
+            items.forEach { it.setBackgroundColor(Color.TRANSPARENT) }
+        }
+        when(dataType){
+            EntryType.LINK -> {
+                resetSelectStatus()
+                ivGoLinkLayout.setBackgroundResource(R.drawable.app_shape_create_entry_function_item_bg)
+            }
+            EntryType.WORD -> {
+                resetSelectStatus()
+                ivGoWordLayout.setBackgroundResource(R.drawable.app_shape_create_entry_function_item_bg)
+            }
+            EntryType.IMAGE -> {
+                resetSelectStatus()
+                ivGoImageLayout.setBackgroundResource(R.drawable.app_shape_create_entry_function_item_bg)
+            }
+            EntryType.GALLERY -> {
+                resetSelectStatus()
+                ivGoGalleryLayout.setBackgroundResource(R.drawable.app_shape_create_entry_function_item_bg)
+            }
+            EntryType.VIDEO -> {
+                resetSelectStatus()
+                ivGoVideoLayout.setBackgroundResource(R.drawable.app_shape_create_entry_function_item_bg)
+            }
+        }
+    }
+
     private fun showLinkUi() {
         linkLayout.show()
         imageLayout.hide()
         wordLayout.hide()
         galleryLayout.hide()
         videoLayout.hide()
+        changeFunctionSelectStatus()
     }
 
     private fun showImageUi() {
@@ -253,6 +286,7 @@ class CreateEntryDialog(
         wordLayout.hide()
         galleryLayout.hide()
         videoLayout.hide()
+        changeFunctionSelectStatus()
     }
 
     private fun showWordUi() {
@@ -261,6 +295,7 @@ class CreateEntryDialog(
         wordLayout.show()
         galleryLayout.hide()
         videoLayout.hide()
+        changeFunctionSelectStatus()
     }
 
     private fun showGalleryUi() {
@@ -269,6 +304,7 @@ class CreateEntryDialog(
         wordLayout.hide()
         galleryLayout.show()
         videoLayout.hide()
+        changeFunctionSelectStatus()
     }
 
     private fun showVideoUi() {
@@ -277,6 +313,7 @@ class CreateEntryDialog(
         imageLayout.hide()
         wordLayout.hide()
         galleryLayout.hide()
+        changeFunctionSelectStatus()
     }
 
     // 保存链接

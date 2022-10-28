@@ -304,13 +304,13 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         } else {
             hideCategoryTag()
         }
-        val iconLink = bean.link.try2IconLink()
-        Ln.i("icon_link", iconLink)
-        val controller: DraweeController = Fresco.newDraweeControllerBuilder()
-            .setControllerListener(ControllerListener(iconLink))
-            .setUri(iconLink) // other setters
-            .build()
-        icon.controller = controller
+//        val iconLink = bean.link.try2IconLink()
+//        Ln.i("icon_link", iconLink)
+//        val controller: DraweeController = Fresco.newDraweeControllerBuilder()
+//            .setControllerListener(ControllerListener(iconLink))
+//            .setUri(iconLink) // other setters
+//            .build()
+//        icon.controller = controller
         tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
         bean.schemeJump?.let { scheme ->
             tvSchemeJump.show()
@@ -322,6 +322,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
             }
         } ?: tvSchemeJump.hide()
         updateStarIcon()
+        icon.setActualImageResource(R.drawable.app_icon_entry_view_tag_link)
     }
 
     private fun updateStarIcon() {
@@ -352,7 +353,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         this.bean = bean
         // 加载缩略图
         Ln.i("ImagePath", bean.path)
-        icon.setImageByPath(bean.path, 12, 12)
+//        icon.setImageByPath(bean.path, 12, 12)
         // 显示/隐藏背景图
         tvHideBgText.text = if (bean.hideBg) "显示背景" else "隐藏背景"
         if (bean.hideBg) {
@@ -372,6 +373,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
         tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
         updateStarIcon()
+        icon.setActualImageResource(R.drawable.app_icon_entry_view_tag_image)
     }
 
     private fun setCategoryTag(belongTo: Long) {
@@ -418,7 +420,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
         tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
         updateStarIcon()
-        icon.setActualImageResource(R.drawable.app_icon_word_entry_view_tag)
+        icon.setActualImageResource(R.drawable.app_icon_entry_view_tag_word)
     }
 
     private fun initWordUi() {
@@ -447,7 +449,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
         tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
         updateStarIcon()
-        icon.setActualImageResource(R.drawable.app_icon_word_entry_view_tag) // TODO VIDEO 更换图标
+        icon.setActualImageResource(R.drawable.app_icon_entry_view_tag_video) // TODO VIDEO 更换图标
     }
 
     private fun initVideoUi() {
@@ -462,7 +464,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         entryBgMask.hide()
         categoryTag.hide()
         tvMap.hide()
-        vEntryTag.setBackgroundColor(resources.getColor(R.color.md_blue_grey_400))
+        vEntryTag.setBackgroundColor(resources.getColor(R.color.md_purple_400))
     }
 
     fun setGalleryEntry(bean: GalleryEntryBean, categoryTagShow: Boolean = true) {
@@ -476,7 +478,7 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
         tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
         updateStarIcon()
-        icon.setActualImageResource(R.drawable.app_icon_gallery_entry_view_tag)
+        icon.setActualImageResource(R.drawable.app_icon_entry_view_tag_gallery)
     }
 
     private fun initGalleryUi() {

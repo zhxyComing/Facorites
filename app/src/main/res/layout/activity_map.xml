@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/app_background_color"
+    android:background="@color/black"
     tools:context=".page.map.MapActivity">
 
     <treeview.GysoTreeView
         android:id="@+id/treeView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/app_background_color" />
+        android:background="@color/md_grey_300" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/editMode"
