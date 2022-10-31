@@ -60,7 +60,7 @@ class HomeActivity : BaseActivity() {
         if (SharedUtil.getBoolean(AGREEMENT_CONFIRM, false) &&
             SharedUtil.getInt(VERSION_UPDATE_TIP, 0) < versionCode
         ) {
-            TipDialog(this, resources.getString(R.string.app_version_update_tip_1_1_2), "版本更新提醒（$versionName）").show()
+            TipDialog(this, resources.getString(R.string.app_version_update_tip_1_1_3), "版本更新提醒（$versionName）").show()
             SharedUtil.putInt(VERSION_UPDATE_TIP, versionCode)
         }
     }
