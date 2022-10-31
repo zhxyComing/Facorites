@@ -59,7 +59,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
     // 所有元素 用于搜索用
     private val allEntries = mutableListOf<Openable<BaseEntryBean>>()
     private var searchEntryAdapter: EntryAdapter? = null
-    private lateinit var searchExpandList: PopupWindow
+    private var searchExpandList: PopupWindow? = null
     private var searchExpandShow = false
 
     override fun onCreateView(
@@ -102,6 +102,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
         var initStartTime = System.currentTimeMillis()
         initBanner()
         Ln.i("HomeFragmentInit", "initBanner ${System.currentTimeMillis() - initStartTime}")
+        Ln.i("InitMonitor", "init add listener")
         DataService.addInitCompleteListener {
             // 避开Banner加载动画
             HandlerUtil.postIdle {
@@ -111,6 +112,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
                 asyncStartTime = System.currentTimeMillis()
                 initEntryView()
                 Ln.i("HomeFragmentInit", "initEntryView ${System.currentTimeMillis() - asyncStartTime}")
+                Ln.i("InitMonitor", "init show home")
                 showCardLayoutInAnim()
                 asyncStartTime = System.currentTimeMillis()
                 initSearchView()
@@ -143,20 +145,20 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
                 { charSequence, _, _, _ ->
                     val searchString = charSequence.toString()
                     if (searchString.isEmpty()) {
-                        if (searchExpandList.isShowing) {
-                            searchExpandList.dismiss()
+                        if (searchExpandList?.isShowing == true) {
+                            searchExpandList?.dismiss()
                         }
                     } else {
                         Ln.i("Filter", "过滤 $searchString")
                         searchEntryAdapter?.filter?.filter(charSequence.toString())
                         etSearch.post {
                             Ln.i("Filter", "过滤结果 ${searchEntryAdapter?.filterData?.size}")
-                            if (!searchExpandShow) {
+                            if (!searchExpandShow && searchExpandList != null) {
 //                            if (!searchExpandShow && searchEntryAdapter?.filterData?.size != 0) {
                                 searchExpandShow = !searchExpandShow
-                                val offsetX = abs(searchExpandList.contentView.measuredWidth - etSearch.width) / 2
+                                val offsetX = abs(searchExpandList!!.contentView.measuredWidth - etSearch.width) / 2
                                 val offsetY = 0
-                                PopupWindowCompat.showAsDropDown(searchExpandList, etSearch, offsetX, offsetY, Gravity.START)
+                                PopupWindowCompat.showAsDropDown(searchExpandList!!, etSearch, offsetX, offsetY, Gravity.START)
                             }
                         }
                     }
@@ -167,20 +169,20 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     val searchString = etSearch.text.toString()
                     if (searchString.isEmpty()) {
-                        if (searchExpandList.isShowing) {
-                            searchExpandList.dismiss()
+                        if (searchExpandList?.isShowing == true) {
+                            searchExpandList?.dismiss()
                         }
                     } else {
                         Ln.i("Filter", "过滤 $searchString")
                         searchEntryAdapter?.filter?.filter(etSearch.text.toString())
                         etSearch.post {
                             Ln.i("Filter", "过滤结果 ${searchEntryAdapter?.filterData?.size}")
-                            if (!searchExpandShow) {
+                            if (!searchExpandShow && searchExpandList != null) {
 //                            if (!searchExpandShow && searchEntryAdapter?.filterData?.size != 0) {
                                 searchExpandShow = !searchExpandShow
-                                val offsetX = abs(searchExpandList.contentView.measuredWidth - etSearch.width) / 2
+                                val offsetX = abs(searchExpandList!!.contentView.measuredWidth - etSearch.width) / 2
                                 val offsetY = 0
-                                PopupWindowCompat.showAsDropDown(searchExpandList, etSearch, offsetX, offsetY, Gravity.START)
+                                PopupWindowCompat.showAsDropDown(searchExpandList!!, etSearch, offsetX, offsetY, Gravity.START)
                             }
                         }
                     }
@@ -205,7 +207,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
 
     override fun onPause() {
         super.onPause()
-        searchExpandList.dismiss()
+        searchExpandList?.dismiss()
     }
 
     override fun onStop() {
@@ -223,7 +225,7 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
             toNetSearch()
         }
         contentView.windowClose.setOnClickListener {
-            searchExpandList.dismiss()
+            searchExpandList?.dismiss()
         }
         with(contentView.rvExpand) {
             this.layoutManager = LinearLayoutManager(context)
@@ -231,26 +233,28 @@ class HomeFragment : VisibleExtensionFragment(), DataService.IGlobalEntryChanged
             adapter = searchEntryAdapter
         }
         searchExpandList = PopupWindow(context)
-        searchExpandList.contentView = contentView
-        searchExpandList.width = ViewGroup.LayoutParams.WRAP_CONTENT
-        searchExpandList.height = ViewGroup.LayoutParams.WRAP_CONTENT
+        searchExpandList?.contentView = contentView
+        searchExpandList?.width = ViewGroup.LayoutParams.WRAP_CONTENT
+        searchExpandList?.height = ViewGroup.LayoutParams.WRAP_CONTENT
 
         // popWindow 显示时，点击外部优先关闭 window
-        searchExpandList.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        searchExpandList?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 //        searchExpandList.isOutsideTouchable = true
 //        searchExpandList.isTouchable = true
         val initStartTime = System.currentTimeMillis()
         // 警告：耗时方法，列表越长越耗时
         // 在展示之前先执行一次测量 避免后续获取宽高为0
         ThreadExecutor.execute {
-            searchExpandList.contentView.measure(
-                makeDropDownMeasureSpec(searchExpandList.width),
-                makeDropDownMeasureSpec(searchExpandList.height)
-            )
+            searchExpandList?.let {
+                it.contentView.measure(
+                    makeDropDownMeasureSpec(it.width),
+                    makeDropDownMeasureSpec(it.height)
+                )
+            }
         }
         Ln.i("HomeFragmentInit", "${System.currentTimeMillis() - initStartTime}")
 
-        searchExpandList.setOnDismissListener {
+        searchExpandList?.setOnDismissListener {
             searchExpandShow = false
         }
     }

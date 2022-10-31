@@ -62,6 +62,7 @@ object DataService : IService {
     override fun runService() {
         ioService.runService()
         ioService.postEvent {
+            Ln.i("InitMonitor", "111")
             val initStartTime = System.currentTimeMillis()
             // 0.检测是不是首次启动 首次启动初始化
             if (!FileUtils.exists("$ROOT_PATH/$CATEGORY_INFO_PATH")) {
@@ -70,6 +71,15 @@ object DataService : IService {
                 }
                 // 初次初始化，创建默认收藏夹
                 doCreateCategory("默认收藏夹")
+                backUi {
+                    initCallback?.let {
+                        it.forEach { action ->
+                            action.invoke()
+                        }
+                        it.clear()
+                        initCallback = null
+                    }
+                }
                 return@postEvent
             }
             // 1.获取所有分类 并添加到内存
@@ -101,6 +111,7 @@ object DataService : IService {
             }
             Ln.i("DataService", "init cost time ${System.currentTimeMillis() - initStartTime}")
             // 初始化完成，清除回调，用不着了
+            Ln.i("InitMonitor", "init over start callback")
             backUi {
                 initCallback?.let {
                     it.forEach { action ->
@@ -109,6 +120,7 @@ object DataService : IService {
                     it.clear()
                     initCallback = null
                 }
+                Ln.i("InitMonitor", "init callback over")
             }
         }
     }

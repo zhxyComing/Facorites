@@ -131,7 +131,7 @@ object DocumentFileUtils {
             return file
         }
         // 文件不可读
-        FileUtils.deleteFile(absDestPath)
+        FileUtils.deleteFileAbs(absDestPath)
         return null
     }
 }

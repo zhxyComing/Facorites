@@ -318,8 +318,8 @@ object FileUtils {
     /**
      * 删除图片
      */
-    fun deleteFile(absolutePath: String): Boolean {
-        val file = File(absolutePath)
+    fun deleteFile(path: String): Boolean {
+        val file = File(ROOT_CATEGORY, path)
         if (!file.exists()) {
             return false
         }
