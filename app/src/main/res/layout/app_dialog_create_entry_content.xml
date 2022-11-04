@@ -427,6 +427,125 @@
 
     </LinearLayout>
 
+    <!-- 导入文件 -->
+    <LinearLayout
+        android:id="@+id/fileLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvFileLayoutTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:text="收藏其它"
+                android:textColor="@color/app_theme_red"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/tvFileLayoutTip"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/app_icon_edit_info" />
+
+            <EditText
+                android:id="@+id/etFileTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/app_shape_create_entry_input"
+                android:hint="在此修改标题"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:singleLine="true"
+                android:textColor="#404040"
+                android:textColorHint="#909090"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/tvFileSubLayout"
+            android:layout_width="match_parent"
+            android:layout_height="148.5dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/app_shape_round_rect_grey_dark"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvFileImportTip"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/app_shape_round_rect_grey_dark"
+                android:gravity="center"
+                android:text="点击导入文件"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:id="@+id/flFileShowView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvFileTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginEnd="20dp"
+                    android:textColor="@color/app_theme_grey_v40"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvFileSize"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="20dp"
+                    android:textColor="@color/app_theme_grey_v90"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/tvFileType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="20dp"
+                    android:textColor="@color/app_theme_grey_v90"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivFileRemove"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="end"
+                android:src="@drawable/app_icon_gallery_remove"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
     <com.app.dixon.facorites.core.view.CustomSpinner
         android:id="@+id/categoryChoose"
         android:layout_width="match_parent"
@@ -454,7 +573,6 @@
                 android:id="@+id/ivGoLinkLayout"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginEnd="10dp"
                 android:padding="8dp"
                 android:src="@drawable/app_icon_entry_view_tag_link" />
 
@@ -462,7 +580,6 @@
                 android:id="@+id/ivGoWordLayout"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginEnd="10dp"
                 android:padding="8dp"
                 android:src="@drawable/app_icon_entry_view_tag_word" />
 
@@ -470,7 +587,6 @@
                 android:id="@+id/ivGoImageLayout"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginEnd="10dp"
                 android:padding="8dp"
                 android:src="@drawable/app_icon_entry_view_tag_image" />
 
@@ -478,7 +594,6 @@
                 android:id="@+id/ivGoGalleryLayout"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginEnd="10dp"
                 android:padding="8dp"
                 android:src="@drawable/app_icon_entry_view_tag_gallery" />
 
@@ -486,9 +601,16 @@
                 android:id="@+id/ivGoVideoLayout"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginEnd="10dp"
                 android:padding="8dp"
                 android:src="@drawable/app_icon_entry_view_tag_video" />
+
+            <ImageView
+                android:id="@+id/ivGoFileLayout"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:padding="8dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/app_icon_entry_view_tag_file" />
         </LinearLayout>
 
         <View

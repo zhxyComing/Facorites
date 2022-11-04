@@ -12,5 +12,6 @@
     <string name="app_version_update_tip_1.1.1">1.支持语录收藏；\n\n2.支持图片集收藏。</string>
     <string name="app_version_update_tip_1.1.2">1.支持视频收藏；\n\n2.完善、优化图片收藏；\n\n3.修复了若干 Bug。</string>
     <string name="app_version_update_tip_1.1.3">修复了若干 Bug。</string>
+    <string name="app_version_update_tip_1.1.4">支持文件导入。</string>
     <string name="app_image_share_tip">图片分享需要存储权限，点击前往授权。</string>
 </resources>

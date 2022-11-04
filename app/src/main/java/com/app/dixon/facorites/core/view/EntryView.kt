@@ -119,6 +119,8 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                 // 图片集不能复制
             }, {
                 // 视频不能复制
+            }, {
+                // 文件不能复制
             })
             ToastUtil.toast("已复制到剪贴板")
         }
@@ -141,6 +143,8 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                 PageJumper.openGalleryPage(context, galleryEntry.path, galleryEntry.title)
             }, { videoEntry ->
                 PageJumper.openVideoPlayerPage(context, videoEntry.path)
+            }, { fileEntry ->
+                OpenFileUtil.openFile(fileEntry.path)
             })
         }
 
@@ -214,6 +218,17 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                             star = star
                         )
                     )
+                }, { fileEntry ->
+                    DataService.updateEntry(
+                        it,
+                        FileEntryBean(
+                            path = fileEntry.path,
+                            title = fileEntry.title,
+                            date = fileEntry.date,
+                            belongTo = fileEntry.belongTo,
+                            star = star
+                        )
+                    )
                 })
             }
         }
@@ -243,6 +258,8 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
                     // 相册集没有背景
                 }, {
                     // 视频没有背景
+                }, {
+                    // 文件没有背景
                 })
             }
         }
@@ -449,7 +466,36 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
         tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
         updateStarIcon()
-        icon.setActualImageResource(R.drawable.app_icon_entry_view_tag_video) // TODO VIDEO 更换图标
+        icon.setActualImageResource(R.drawable.app_icon_entry_view_tag_video)
+    }
+
+    fun setFileEntry(bean: FileEntryBean, categoryTagShow: Boolean = true) {
+        initFileUi()
+        this.bean = bean
+        title.text = bean.title
+        if (categoryTagShow) {
+            setCategoryTag(bean.belongTo)
+        } else {
+            hideCategoryTag()
+        }
+        tvCreateTime.text = TimeUtils.friendlyTime(bean.date)
+        updateStarIcon()
+        icon.setActualImageResource(R.drawable.app_icon_entry_view_tag_file)
+    }
+
+    private fun initFileUi() {
+        tvSchemeJump.hide()
+        tvJump.hide()
+        tvHideBg.hide()
+        tvUpdate.show()
+        tvCopy.hide()
+        ivBrowse.show()
+        tvDelete.show()
+        entryBg.hide()
+        entryBgMask.hide()
+        categoryTag.hide()
+        tvMap.hide()
+        vEntryTag.setBackgroundColor(resources.getColor(R.color.md_brown_400))
     }
 
     private fun initVideoUi() {

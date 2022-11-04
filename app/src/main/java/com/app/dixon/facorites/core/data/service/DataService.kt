@@ -14,6 +14,7 @@ import com.app.dixon.facorites.core.ex.removeByCondition
 import com.app.dixon.facorites.core.util.Ln
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.io.File
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -723,6 +724,9 @@ object DataService : IService {
                     FileIOService.deleteFile(path)
                 }
                 (bean as? VideoEntryBean)?.let {
+                    FileIOService.deleteFile((it.path))
+                }
+                (bean as? FileEntryBean)?.let {
                     FileIOService.deleteFile((it.path))
                 }
             } else {

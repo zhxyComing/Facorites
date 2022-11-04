@@ -154,7 +154,8 @@ fun BaseEntryBean.process(
     categoryAction: (categoryEntry: CategoryEntryBean) -> Unit,
     wordAction: (wordEntry: WordEntryBean) -> Unit,
     galleryAction: (GalleryEntryBean) -> Unit,
-    videoAction: (VideoEntryBean) -> Unit
+    videoAction: (VideoEntryBean) -> Unit,
+    fileAction: (FileEntryBean) -> Unit
 ) {
     (this as? LinkEntryBean)?.let(linkAction)
     (this as? ImageEntryBean)?.let(imageAction)
@@ -162,6 +163,7 @@ fun BaseEntryBean.process(
     (this as? WordEntryBean)?.let(wordAction)
     (this as? GalleryEntryBean)?.let(galleryAction)
     (this as? VideoEntryBean)?.let(videoAction)
+    (this as? FileEntryBean)?.let(fileAction)
 }
 
 /**

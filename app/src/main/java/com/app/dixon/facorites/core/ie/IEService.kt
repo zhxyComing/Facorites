@@ -121,6 +121,8 @@ object IEService : IService {
                 // 相册集不参与书签导出
             }, {
                 // 视频不参与书签导出
+            }, {
+                // 文件不参与书签导出
             })
         }
         FileUtils.appendStringAbs(filePath, "$fatherRetract</DL><p>\n")

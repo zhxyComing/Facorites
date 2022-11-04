@@ -1,11 +1,15 @@
 package com.app.dixon.facorites.core.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.net.Uri
 import android.view.View
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.dixon.facorites.R
+import com.app.dixon.facorites.base.ContextAssistant
+import com.app.dixon.facorites.core.bean.FileBox
 import com.app.dixon.facorites.core.common.Callback
 import com.app.dixon.facorites.core.common.CommonCallback
 import com.app.dixon.facorites.core.common.ProgressCallback
@@ -27,11 +31,15 @@ import com.dixon.dlibrary.util.Ln
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
 import com.google.android.exoplayer2.Player.REPEAT_MODE_ALL
+import com.hjq.permissions.OnPermissionCallback
+import com.hjq.permissions.Permission
+import com.hjq.permissions.XXPermissions
 import com.jarvanmo.exoplayerview.media.SimpleMediaSource
 import kotlinx.android.synthetic.main.app_dialog_create_entry_content.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import java.io.File
 import java.util.*
 
 
@@ -83,6 +91,9 @@ class CreateEntryDialog(
     // 视频
     private var tempVideoPath: String? = null // 新导入的临时视频 如果后续选择取消 则要删除掉这些新导入的视频
 
+    // 文件
+    private var tempFilePath: String? = null // 新导入的临时文件 如果后续选择取消 则要删除掉这些新导入的文件
+
     // 更新用构造函数
     constructor(
         context: Context, entry: BaseEntryBean,
@@ -111,6 +122,7 @@ class CreateEntryDialog(
         initImageLayout()
         initGalleryLayout()
         initVideoLayout()
+        initFileLayout()
     }
 
     // 通用逻辑的初始化
@@ -127,6 +139,7 @@ class CreateEntryDialog(
                 EntryType.WORD -> saveOrUpdateWord()
                 EntryType.GALLERY -> saveOrUpdateGallery()
                 EntryType.VIDEO -> saveOrUpdateVideo()
+                EntryType.FILE -> saveOrUpdateFile()
             }
         }
         // 分类的下拉列表
@@ -165,6 +178,10 @@ class CreateEntryDialog(
             dataType = EntryType.VIDEO
             showVideoUi()
         }
+        ivGoFileLayout.setOnClickListener {
+            dataType = EntryType.FILE
+            showFileUi()
+        }
 
         // 更新 其它类型不显示 并往UI填充已有数据
         tapeEntry?.process({ linkEntry ->
@@ -200,6 +217,13 @@ class CreateEntryDialog(
             // 不允许修改视频：视频都改了，为什么不去创建新的？
             ivVideoRemove.hide()
             playVideo(videoEntryBean.path)
+        }, { fileEntryBean ->
+            dataType = EntryType.FILE
+            tempFilePath = fileEntryBean.path
+            showFileUi()
+            showFile(File(fileEntryBean.path), fileEntryBean.title)
+            // 不允许修改文件
+            ivFileRemove.hide()
         })
         tapeEntry?.let { layoutChange.hide() }
 
@@ -210,6 +234,8 @@ class CreateEntryDialog(
         tvWordLayoutTitle.mediumFont()
         tvGalleryLayoutTitle.mediumFont()
         tvVideoLayoutTitle.mediumFont()
+        tvFileLayoutTitle.mediumFont()
+        tvFileTitle.mediumFont()
 
         changeFunctionSelectStatus()
     }
@@ -242,12 +268,12 @@ class CreateEntryDialog(
         }
     }
 
-    private fun changeFunctionSelectStatus(){
-        val items = listOf(ivGoLinkLayout, ivGoWordLayout, ivGoImageLayout, ivGoGalleryLayout, ivGoVideoLayout)
-        fun resetSelectStatus(){
+    private fun changeFunctionSelectStatus() {
+        val items = listOf(ivGoLinkLayout, ivGoWordLayout, ivGoImageLayout, ivGoGalleryLayout, ivGoVideoLayout, ivGoFileLayout)
+        fun resetSelectStatus() {
             items.forEach { it.setBackgroundColor(Color.TRANSPARENT) }
         }
-        when(dataType){
+        when (dataType) {
             EntryType.LINK -> {
                 resetSelectStatus()
                 ivGoLinkLayout.setBackgroundResource(R.drawable.app_shape_create_entry_function_item_bg)
@@ -268,6 +294,10 @@ class CreateEntryDialog(
                 resetSelectStatus()
                 ivGoVideoLayout.setBackgroundResource(R.drawable.app_shape_create_entry_function_item_bg)
             }
+            EntryType.FILE -> {
+                resetSelectStatus()
+                ivGoFileLayout.setBackgroundResource(R.drawable.app_shape_create_entry_function_item_bg)
+            }
         }
     }
 
@@ -277,6 +307,7 @@ class CreateEntryDialog(
         wordLayout.hide()
         galleryLayout.hide()
         videoLayout.hide()
+        fileLayout.hide()
         changeFunctionSelectStatus()
     }
 
@@ -286,6 +317,7 @@ class CreateEntryDialog(
         wordLayout.hide()
         galleryLayout.hide()
         videoLayout.hide()
+        fileLayout.hide()
         changeFunctionSelectStatus()
     }
 
@@ -295,6 +327,7 @@ class CreateEntryDialog(
         wordLayout.show()
         galleryLayout.hide()
         videoLayout.hide()
+        fileLayout.hide()
         changeFunctionSelectStatus()
     }
 
@@ -304,6 +337,7 @@ class CreateEntryDialog(
         wordLayout.hide()
         galleryLayout.show()
         videoLayout.hide()
+        fileLayout.hide()
         changeFunctionSelectStatus()
     }
 
@@ -313,6 +347,17 @@ class CreateEntryDialog(
         imageLayout.hide()
         wordLayout.hide()
         galleryLayout.hide()
+        fileLayout.hide()
+        changeFunctionSelectStatus()
+    }
+
+    private fun showFileUi() {
+        videoLayout.hide()
+        linkLayout.hide()
+        imageLayout.hide()
+        wordLayout.hide()
+        galleryLayout.hide()
+        fileLayout.show()
         changeFunctionSelectStatus()
     }
 
@@ -522,6 +567,48 @@ class CreateEntryDialog(
         }
     }
 
+    // 保存文件
+    private fun saveOrUpdateFile() {
+        val title = etFileTitle.text.toString()
+        val categoryId = categoryChoose.getSelectionData<CategoryInfoBean>()?.id
+        if (title.isNotEmpty() && categoryId != null && !tempFilePath.isNullOrEmpty()) {
+            if (editType == EDIT_TYPE_CREATE) {
+                DataService.createEntry(
+                    FileEntryBean(
+                        path = tempFilePath!!,
+                        title = title,
+                        date = Date().time,
+                        belongTo = categoryId,
+                    ),
+                    callback
+                )
+            } else if (editType == EDIT_TYPE_UPDATE) {
+                (tapeEntry as? FileEntryBean)?.let {
+                    DataService.updateEntry(
+                        it,
+                        FileEntryBean(
+                            path = tempFilePath!!,
+                            title = title,
+                            date = it.date,
+                            belongTo = categoryId,
+                            star = it.star
+                        ),
+                        callback
+                    )
+                }
+            }
+            hasSave = true
+            dismiss()
+        } else {
+            // 未填数据提示
+            etFileTitle.shakeTipIfEmpty()
+            // 没选图或者导入过程中均不允许创建或更新
+            if (tempFilePath.isNullOrEmpty()) {
+                tvFileSubLayout.shakeTip()
+            }
+        }
+    }
+
     // 图片类型
     private fun initImageLayout() {
         selectImage.setOnClickListener {
@@ -590,6 +677,137 @@ class CreateEntryDialog(
         }
     }
 
+    // 文件类型
+    private fun initFileLayout() {
+        tvFileSubLayout.setOnClickListener {
+            importFile()
+        }
+        ivFileRemove.setOnClickListener {
+            tvFileImportTip.show()
+            ivFileRemove.hide()
+            flFileShowView.hide()
+            deleteExpiredFile()
+        }
+        tvFileLayoutTip.setOnClickListener {
+            TipDialog(
+                context,
+                content = "导入收藏夹子的文件有以下特性：\n\n1.应用外不可见；\n" +
+                        "\n2.删除手机的原文件不会影响到收藏文件。",
+                title = "文件收藏提示"
+            ).show()
+        }
+        flFileShowView.setOnClickListener { }
+    }
+
+    // 导入文件
+    private fun importFile() {
+        // 申请权限
+        // TODO 暂时关闭apk的导入，有俩种可能的原因导致导入的应用无法安装：1.没有执行权限，对比正常apk -rw-rw，它是 -rw 2.应用 md5 校验通不过. 后续修吧，这个影响不大.
+        requestStoragePermission {
+            FileExploreDialog(context) { file, documentFile ->
+                FileBox(file, documentFile).process({
+                    if (it.path.endsWith(".apk")) {
+                        ToastUtil.toast("导入应用程序功能将在后续版本支持，敬请谅解..")
+                        return@process
+                    }
+                    val dialog = ProgressDialog(context, "文件导入中..").apply { show() }
+                    Ln.i("ImportFile", "file: ${it.name}")
+                    FileIOService.saveFile(FileIOService.FileType.FILE, it.toUri(), object : ProgressCallback<String> {
+                        override fun onSuccess(data: String) {
+                            dialog.dismiss()
+                            ToastUtil.toast("文件导入完成")
+                            tempFilePath = data
+                            showFile(File(data), it.name)
+                        }
+
+                        override fun onFail(msg: String) {
+                            dialog.dismiss()
+                            ToastUtil.toast("文件导入失败")
+                        }
+
+                        override fun onProgress(progress: Int) {
+                            dialog.setProgress(progress)
+                        }
+                    })
+                }, {
+                    if (it.name?.endsWith(".apk") == true) {
+                        ToastUtil.toast("导入apk功能将在后续版本支持，敬请谅解.")
+                        return@process
+                    }
+                    val dialog = ProgressDialog(context, "文件导入中..").apply { show() }
+                    Ln.i("ImportFile", "file: ${it.name}")
+                    FileIOService.saveFile(FileIOService.FileType.FILE, it.uri, object : ProgressCallback<String> {
+                        override fun onSuccess(data: String) {
+                            dialog.dismiss()
+                            ToastUtil.toast("文件导入完成")
+                            tempFilePath = data
+                            showFile(File(data), it.name ?: data)
+                        }
+
+                        override fun onFail(msg: String) {
+                            dialog.dismiss()
+                            ToastUtil.toast("文件导入失败")
+                        }
+
+                        override fun onProgress(progress: Int) {
+                            dialog.setProgress(progress)
+                        }
+                    })
+                })
+            }.show()
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showFile(file: File, appointName: String) {
+        ivFileRemove.show()
+        flFileShowView.show()
+        tvFileImportTip.hide()
+        val simpleName = if (appointName.lastIndexOf(".") != -1) {
+            appointName.substring(0, appointName.lastIndexOf("."))
+        } else {
+            appointName
+        }
+        tvFileTitle.text = simpleName
+        etFileTitle.setText(simpleName)
+        tvFileSize.text = "文件大小：${byteToString(file.length())}"
+        tvFileType.text = "文件类型：${
+            if (file.path.lastIndexOf(".") != -1) {
+                file.path.substring(file.path.lastIndexOf(".") + 1)
+            } else {
+                "未知"
+            }
+        }"
+        tvFileType.setOnLongClickListener {
+            ToastUtil.toast(file.name)
+            true
+        }
+    }
+
+    // 请求SD卡读写权限
+    private fun requestStoragePermission(block: () -> Unit) {
+        XXPermissions.with(ContextAssistant.activity())
+            .permission(Permission.MANAGE_EXTERNAL_STORAGE)
+            .request(object : OnPermissionCallback {
+                // 获得权限
+                override fun onGranted(permissions: List<String>, all: Boolean) {
+                    if (all) {
+                        block.invoke()
+                    }
+                }
+
+                override fun onDenied(permissions: List<String>, never: Boolean) {
+                    if (never) {
+                        ToastUtil.toast("收藏夹子被拒绝授权，请手动授予读写权限")
+                        // 如果是被永久拒绝就跳转到应用权限系统设置页面
+                        XXPermissions.startPermissionActivity(ContextAssistant.activity(), permissions)
+                    } else {
+                        ToastUtil.toast("获取读写权限失败，无法浏览文件")
+                    }
+                }
+            })
+    }
+
     private fun changeType() {
         dataType = when (dataType) {
             EntryType.LINK -> EntryType.IMAGE
@@ -639,6 +857,7 @@ class CreateEntryDialog(
             deleteExpiredImportImage()
             deleteExpiredGalleryImage()
             deleteExpiredVideo()
+            deleteExpiredFile()
         } else {
             // 保存了，但是保存的不是对应类型
             if (dataType != EntryType.IMAGE) {
@@ -649,6 +868,9 @@ class CreateEntryDialog(
             }
             if (dataType != EntryType.VIDEO) {
                 deleteExpiredVideo()
+            }
+            if (dataType != EntryType.FILE) {
+                deleteExpiredFile()
             }
         }
         super.onDetachedFromWindow()
@@ -695,6 +917,23 @@ class CreateEntryDialog(
         }
     }
 
+    // 删除过期的导入文件
+    private fun deleteExpiredFile() {
+        tempFilePath?.let {
+            var deleteExpiredFile = true
+            (tapeEntry as? FileEntryBean)?.let { tapeFileBean ->
+                // 带入更新的文件在确认修改之前不删除
+                if (tapeFileBean.path == it) {
+                    deleteExpiredFile = false
+                }
+            }
+            if (deleteExpiredFile) {
+                FileIOService.deleteFile(it)
+                tempFilePath = null
+            }
+        }
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onImageSelectComplete(event: CategoryImageCompleteEvent) {
         // 转存之前先把之前导入的图片删掉
@@ -723,49 +962,6 @@ class CreateEntryDialog(
 
             }
         })
-//        // 图片信息
-//        var rotate = false
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//            context.contentResolver.openInputStream(event.uri)?.let {
-//                val imageRotation = ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
-//                if (imageRotation == ExifInterface.ORIENTATION_ROTATE_90 || imageRotation == ExifInterface.ORIENTATION_ROTATE_270) {
-//                    rotate = true
-//                }
-//            }
-//        }
-//        // 转存图片到本地
-//        var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(event.uri))
-//        // iOS 拍出的图片带旋转角，要在导入时转为旋转后的图片
-//        if (rotate) {
-//            val m = Matrix()
-//            m.setRotate(90f, bitmap.width.toFloat() / 2, bitmap.height.toFloat() / 2)
-//            try {
-//                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
-//            } catch (ex: OutOfMemoryError) {
-//                Ln.e("OutOfMemoryError", "转存图片OOM")
-//            }
-//        }
-//        val absolutePath = BitmapIOService.createBitmapSavePath()
-//        tvTip.text = "转存图片中，请耐心等待"
-//        imageImporting = true
-//        selectImage.isEnabled = false
-//        BitmapIOService.saveBitmap(absolutePath, bitmap, object : Callback<String> {
-//            override fun onSuccess(data: String) {
-//                ToastUtil.toast("图片转存成功")
-//                imageImporting = false
-//                imagePath = data
-//                bgView.setImageByUri(event.uri)
-//                tvTip.text = "从相册选取图片"
-//                selectImage.isEnabled = true
-//            }
-//
-//            override fun onFail(msg: String) {
-//                ToastUtil.toast("图片转存失败，请更换图片后重新尝试")
-//                imageImporting = false
-//                tvTip.text = "从相册选取图片"
-//                selectImage.isEnabled = true
-//            }
-//        })
     }
 
     // 导入多张图片
@@ -775,54 +971,6 @@ class CreateEntryDialog(
         val max = event.list.size
         var progress = 0f
         event.list.forEach { uri ->
-            // 图片信息
-//            var rotate = false
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                context.contentResolver.openInputStream(uri)?.let {
-//                    val imageRotation = ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
-//                    if (imageRotation == ExifInterface.ORIENTATION_ROTATE_90 || imageRotation == ExifInterface.ORIENTATION_ROTATE_270) {
-//                        rotate = true
-//                    }
-//                }
-//            }
-//            // 转存图片到本地
-//            var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
-//            // iOS 拍出的图片带旋转角，要在导入时转为旋转后的图片
-//            if (rotate) {
-//                val m = Matrix()
-//                m.setRotate(90f, bitmap.width.toFloat() / 2, bitmap.height.toFloat() / 2)
-//                try {
-//                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
-//                } catch (ex: OutOfMemoryError) {
-//                    Ln.e("OutOfMemoryError", "转存图片OOM")
-//                }
-//            }
-//            val absolutePath = BitmapIOService.createBitmapSavePath()
-//            BitmapIOService.saveBitmap(absolutePath, bitmap, object : Callback<String> {
-//                override fun onSuccess(data: String) {
-//                    galleryPath.add(data)
-//                    tempGalleryPath.add(data)
-//                    progress++
-//                    dialog.setProgress((progress / max * 100).toInt())
-//                    if (progress.toInt() == max) {
-//                        dialog.dismiss()
-//                        ToastUtil.toast("图片导入完成")
-//                        rvGalleryList.adapter?.notifyDataSetChanged()
-//                    }
-//                }
-//
-//                override fun onFail(msg: String) {
-//                    // 导入失败，删除存图的文件
-//                    FileIOService.deleteFile(absolutePath)
-//                    progress++
-//                    dialog.setProgress((progress / max * 100).toInt())
-//                    if (progress.toInt() == max) {
-//                        dialog.dismiss()
-//                        ToastUtil.toast("图片导入完成")
-//                        rvGalleryList.adapter?.notifyDataSetChanged()
-//                    }
-//                }
-//            })
             FileIOService.saveFile(FileIOService.FileType.IMAGE, uri, object : ProgressCallback<String> {
                 override fun onSuccess(data: String) {
                     galleryPath.add(data)

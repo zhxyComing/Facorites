@@ -13,6 +13,7 @@ import com.app.dixon.facorites.core.ex.isValidUrl
 import com.app.dixon.facorites.core.ex.process
 import com.app.dixon.facorites.core.util.ClipUtil
 import com.app.dixon.facorites.core.util.Ln
+import com.app.dixon.facorites.core.util.OpenFileUtil
 import com.app.dixon.facorites.core.util.mediumFont
 import com.dixon.dlibrary.util.HandlerUtil
 import com.dixon.dlibrary.util.ToastUtil
@@ -65,6 +66,8 @@ class MapActivity : BaseActivity() {
                     PageJumper.openGalleryPage(this, it.path, it.title)
                 }, {
                     PageJumper.openVideoPlayerPage(this, it.path)
+                }, {
+                    OpenFileUtil.openFile(it.path)
                 })
             }
         }
@@ -132,6 +135,8 @@ class MapActivity : BaseActivity() {
                                 newEntry = GalleryEntryBean(it.path, it.title, it.date, newBelongTo, it.star)
                             }, {
                                 newEntry = VideoEntryBean(it.path, it.title, it.date, newBelongTo, it.star)
+                            }, {
+                                newEntry = FileEntryBean(it.path, it.title, it.date, newBelongTo, it.star)
                             })
                             newEntry?.let {
                                 DataService.updateEntry(updater, it)
@@ -189,6 +194,8 @@ class MapActivity : BaseActivity() {
                     name = gallery.title
                 }, { video ->
                     name = video.title
+                }, { file ->
+                    name = file.title
                 })
                 val nodeTemp: NodeModel<BaseNodeData> = NodeModel<BaseNodeData>(EntryNodeData(it, name))
                 treeModel.addNode(rootNode, nodeTemp)

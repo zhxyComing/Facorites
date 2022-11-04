@@ -60,6 +60,8 @@ class NoteAdapter(val context: Context, val data: List<NoteBean>) : RecyclerView
                     PageJumper.openGalleryPage(context, galleryEntry.path, galleryEntry.title)
                 }, {
                     // 视频不会有笔记
+                }, {
+                    // 文件不会有笔记
                 })
             } ?: let {
                 // 未找到 说明条目已删除

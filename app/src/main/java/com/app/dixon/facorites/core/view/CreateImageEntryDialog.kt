@@ -12,10 +12,7 @@ import com.app.dixon.facorites.core.data.bean.CategoryInfoBean
 import com.app.dixon.facorites.core.data.bean.ImageEntryBean
 import com.app.dixon.facorites.core.data.service.DataService
 import com.app.dixon.facorites.core.data.service.FileIOService
-import com.app.dixon.facorites.core.ex.findIndexByCondition
-import com.app.dixon.facorites.core.ex.setImageByPath
-import com.app.dixon.facorites.core.ex.shakeTip
-import com.app.dixon.facorites.core.ex.shakeTipIfEmpty
+import com.app.dixon.facorites.core.ex.*
 import com.app.dixon.facorites.core.util.normalFont
 import com.dixon.dlibrary.util.ScreenUtil
 import com.dixon.dlibrary.util.ToastUtil
@@ -56,7 +53,9 @@ class CreateImageEntryDialog<T>(
     private fun initCommonLogic() {
         llContainer.normalFont()
 
-        saveBitmapToLocal()
+        backUi {
+            saveBitmapToLocal()
+        }
 
         tvCreate.setOnClickListener {
             saveImage()

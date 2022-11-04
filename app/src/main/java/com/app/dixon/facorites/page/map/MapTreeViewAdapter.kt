@@ -50,6 +50,8 @@ class MapTreeViewAdapter(val itemClick: ((BaseNodeData) -> Unit)? = null) : Tree
                     itemView.ivImage.setImageResource(R.drawable.app_icon_entry_view_tag_gallery)
                 }, {
                     itemView.ivImage.setImageResource(R.drawable.app_icon_entry_view_tag_video)
+                }, {
+                    itemView.ivImage.setImageResource(R.drawable.app_icon_entry_view_tag_file)
                 })
             } else {
                 itemView.ivImage.setImageResource(R.drawable.app_icon_entry_view_tag_link)

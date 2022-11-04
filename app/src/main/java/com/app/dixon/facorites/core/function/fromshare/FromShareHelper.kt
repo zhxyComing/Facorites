@@ -9,10 +9,7 @@ import com.app.dixon.facorites.base.ContextAssistant
 import com.app.dixon.facorites.core.ex.backUi
 import com.app.dixon.facorites.core.ex.tryExtractHttp
 import com.app.dixon.facorites.core.util.Ln
-import com.app.dixon.facorites.core.view.CreateEntryDialog
-import com.app.dixon.facorites.core.view.CreateGalleryEntryDialog
-import com.app.dixon.facorites.core.view.CreateImageEntryDialog
-import com.app.dixon.facorites.core.view.CreateVideoEntryDialog
+import com.app.dixon.facorites.core.view.*
 import com.dixon.dlibrary.util.ToastUtil
 
 /**
@@ -32,6 +29,8 @@ class FromShareHelper {
                     handleSendImage(intent) // Handle single image being sent
                 } else if (intent.type?.startsWith("video/") == true) {
                     handleSendVideo(intent)
+                } else {
+                    handleSendFile(intent)
                 }
             }
             intent.action == Intent.ACTION_SEND_MULTIPLE
@@ -57,7 +56,7 @@ class FromShareHelper {
             }
             // 记得清数据 以防跳转到其它页面退回后再次触发
             intent.removeExtra(Intent.EXTRA_TEXT)
-        }
+        } ?: handleSendFile(intent) // 说明分享的是 txt 文件，而不是一段字符串
     }
 
     private fun handleSendImage(intent: Intent) {
@@ -96,6 +95,20 @@ class FromShareHelper {
                 Ln.i("FromShare", uri.toString())
                 ContextAssistant.asContext {
                     CreateVideoEntryDialog(it, uri).show()
+                }
+            }
+            intent.removeExtra(Intent.EXTRA_STREAM)
+        }
+    }
+
+    private fun handleSendFile(intent: Intent) {
+        (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
+            // 获取到链接 走创建流程
+            // 延迟0.5s，防止在部分手机上因Activity在没有Running的情况下弹出Dialog而崩溃
+            backUi(500) {
+                Ln.i("FromShare", uri.toString())
+                ContextAssistant.asContext {
+                    CreateFileEntryDialog(it, uri).show()
                 }
             }
             intent.removeExtra(Intent.EXTRA_STREAM)

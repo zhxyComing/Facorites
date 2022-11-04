@@ -73,8 +73,14 @@ object FileIOService : IService {
     fun saveFile(fileType: FileType, uri: Uri, callback: ProgressCallback<String>) {
         ioService.postEvent {
             val mime = ContextAssistant.application().contentResolver.getType(uri)
-            val suffix = MimeTypeMap.getSingleton().getExtensionFromMimeType(mime)
-            Ln.i("saveFile", "mime:$mime type:$suffix")
+            var suffix = MimeTypeMap.getSingleton().getExtensionFromMimeType(mime)
+            Ln.i("saveFile", "mime:$mime type:$suffix uri:${uri.path}")
+            suffix ?: let {
+                uri.path?.let { path ->
+                    suffix = path.substring(path.lastIndexOf(".") + 1)
+                }
+            }
+            Ln.i("saveFile", "suffix $suffix")
             val savePath = createFileSavePath(fileType, suffix)
             FileUtils.saveFile(uri, savePath, object : ProgressCallback<String> {
                 override fun onProgress(progress: Int) {
