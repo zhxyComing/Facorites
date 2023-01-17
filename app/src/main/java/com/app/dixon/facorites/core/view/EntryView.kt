@@ -6,6 +6,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -20,9 +23,7 @@ import com.app.dixon.facorites.core.util.*
 import com.app.dixon.facorites.page.browse.SchemeJumper
 import com.dixon.dlibrary.util.AnimationUtil
 import com.dixon.dlibrary.util.ToastUtil
-import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
-import com.facebook.drawee.interfaces.DraweeController
 import com.facebook.imagepipeline.image.ImageInfo
 import kotlinx.android.synthetic.main.app_view_link_card.view.*
 
@@ -469,10 +470,23 @@ class EntryView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         icon.setActualImageResource(R.drawable.app_icon_entry_view_tag_video)
     }
 
+    @SuppressLint("SetTextI18n")
     fun setFileEntry(bean: FileEntryBean, categoryTagShow: Boolean = true) {
         initFileUi()
         this.bean = bean
-        title.text = bean.title
+        title.text = if (bean.path.lastIndexOf(".") != -1) {
+            val fileType = bean.path.substring(bean.path.lastIndexOf(".") + 1).lowercase()
+            val text = "${bean.title} $fileType"
+            val textSpanned = SpannableString(text)
+            textSpanned.setSpan(
+                ForegroundColorSpan(resources.getColor(R.color.md_grey_400)),
+                bean.title.length, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            textSpanned
+        } else {
+            bean.title
+        }
+        title.normalFont()
         if (categoryTagShow) {
             setCategoryTag(bean.belongTo)
         } else {

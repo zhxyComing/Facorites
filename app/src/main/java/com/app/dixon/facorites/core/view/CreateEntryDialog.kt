@@ -833,10 +833,7 @@ class CreateEntryDialog(
 
     // 下拉选择框
     private fun initSpinner() {
-        val expendInfoList = mutableListOf<CustomSpinner.ExpandInfo<CategoryInfoBean>>()
-        DataService.getCategoryList().forEach {
-            expendInfoList.add(CustomSpinner.ExpandInfo(it.name, it.bgPath, it))
-        }
+        val expendInfoList = obtainExpendInfoListByCategoryData()
         categoryChoose.setData(expendInfoList)
         categoryChoose.setShowPos(CustomSpinner.ShowPos.TOP)
         defaultCategory?.let { id ->
@@ -846,6 +843,28 @@ class CreateEntryDialog(
                 categoryChoose.setSelection(index)
             }
         }
+    }
+
+    private fun obtainExpendInfoListByCategoryData(): List<CustomSpinner.ExpandInfo<CategoryInfoBean>> {
+        val unorderedCategoryList = DataService.getCategoryList().toMutableList()
+        val resList = mutableListOf<CustomSpinner.ExpandInfo<CategoryInfoBean>>()
+
+        fun appendChild(target: CategoryInfoBean, pool: MutableList<CategoryInfoBean>, resList: MutableList<CustomSpinner.ExpandInfo<CategoryInfoBean>>, level: Int) {
+            pool.forEach {
+                if (it.belongTo == target.id) {
+                    resList.add(CustomSpinner.ExpandInfo("◇ ".repeat(level) + it.name, it.bgPath, it))
+                    appendChild(it, pool, resList, level + 1)
+                }
+            }
+        }
+
+        val rootCategoryList = unorderedCategoryList.filter { it.belongTo == null }
+        val pool = unorderedCategoryList.filter { it.belongTo != null }.toMutableList()
+        rootCategoryList.forEach {
+            resList.add(CustomSpinner.ExpandInfo(it.name, it.bgPath, it))
+            appendChild(it, pool, resList, 1)
+        }
+        return resList
     }
 
     override fun onDetachedFromWindow() {

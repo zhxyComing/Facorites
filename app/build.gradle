@@ -67,4 +67,5 @@ dependencies {
     // 图片双指缩放放大
 //    implementation 'io.github.imablanco:zoomy:1.0.0'
     implementation 'com.github.JarvanMo:ExoVideoView:2.1.6'
+
 }

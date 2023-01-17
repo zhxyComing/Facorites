@@ -9,8 +9,14 @@ import android.util.Log
 import android.view.MotionEvent
 import android.webkit.*
 import com.app.dixon.facorites.core.common.PageJumper
+import com.app.dixon.facorites.core.data.service.base.FileUtils
 import com.dixon.dlibrary.util.Ln
 import com.dixon.dlibrary.util.ToastUtil
+import com.tonyodev.fetch2.Fetch.Impl.getInstance
+import com.tonyodev.fetch2.FetchConfiguration
+import com.tonyodev.fetch2.NetworkType
+import com.tonyodev.fetch2.Priority
+import com.tonyodev.fetch2.Request
 
 
 /**
@@ -63,7 +69,7 @@ class BrowseWebView @JvmOverloads constructor(context: Context, attrs: Attribute
         // 下载监听
         setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
             // TODO 下载器
-            ToastUtil.toast("暂不支持下载哦～")
+
         }
         addJavascriptInterface(JavascriptInterface(context), "imagelistener")
         setOnLongClickListener {

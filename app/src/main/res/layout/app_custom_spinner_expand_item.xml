@@ -33,11 +33,13 @@
             android:layout_height="wrap_content"
             android:gravity="start"
             android:padding="14dp"
+            android:singleLine="true"
             android:textColor="#404040" />
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="1px"
+            android:layout_marginStart="10dp"
             android:background="@color/app_split" />
 
     </LinearLayout>
